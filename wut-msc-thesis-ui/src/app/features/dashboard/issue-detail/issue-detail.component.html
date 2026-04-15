@@ -1,0 +1,46 @@
+<div class="issue-detail-container">
+  <div class="detail-header d-flex align-items-center gap-3">
+    <button class="btn btn-secondary" (click)="goBack()">← Back to Issues</button>
+    <h1 class="mb-0 flex-grow-1">Issue Details - {{ issueKey }}</h1>
+    <a
+      class="btn btn-primary"
+      [routerLink]="['/issue-details', issueKey, 'ai-analysis']"
+      [queryParams]="{ siteId: siteId, source: source, projectKey: projectKey }"
+      *ngIf="issue"
+    >
+      🧠 Get AI Analysis
+    </a>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-3">Loading issue details...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>Error:</strong> {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+  </div>
+
+  <!-- Bug Details Component - Show for Bug type issues -->
+  <app-bug-details *ngIf="!isLoading && issue && !errorMessage && (issue.fields.issuetype?.name === 'Bug' || issue.fields.issuetype?.name === 'bug')" [bug]="issue"></app-bug-details>
+
+  <!-- Fallback to Issue Response Component for non-bug issues -->
+  <app-issue-response *ngIf="!isLoading && issue && !errorMessage && issue.fields.issuetype?.name !== 'Bug' && issue.fields.issuetype?.name !== 'bug'" [issue]="issue"></app-issue-response>
+
+  <!-- Debug info if nothing shows -->
+  <div *ngIf="!isLoading && issue && !errorMessage" class="alert alert-info">
+    <strong>Debug Info:</strong><br>
+    Issue Type: {{ issue.fields.issuetype?.name }}<br>
+    Has Bug Component: {{ issue.fields.issuetype?.name === 'Bug' || issue.fields.issuetype?.name === 'bug' }}
+  </div>
+
+  <!-- Back Button -->
+  <div class="action-footer" *ngIf="!isLoading">
+    <button class="btn btn-secondary" (click)="goBack()">← Back to Issues</button>
+  </div>
+</div>

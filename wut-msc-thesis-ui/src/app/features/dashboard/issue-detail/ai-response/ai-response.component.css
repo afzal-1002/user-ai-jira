@@ -1,0 +1,69 @@
+.ai-response-container {
+  margin-top: 1.5rem;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  background-color: #f8f9fa;
+  border: 1px solid #e2e6ea;
+}
+
+.ai-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.ai-badge {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background-color: #e0f2ff;
+  color: #0366d6;
+}
+
+.ai-title {
+  margin-bottom: 0.25rem;
+}
+
+.ai-description {
+  margin-bottom: 1rem;
+  color: #555;
+}
+
+.section-title {
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.ai-generation-content {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background-color: #ffffff;
+  border: 1px dashed #ced4da;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 0.9rem;
+}
+
+.ai-generation-content br {
+  line-height: 1.5;
+}
+
+.ai-comments {
+  margin-top: 1rem;
+}
+
+.ai-comment-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.attachment-pill {
+  font-size: 0.75rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background-color: #fff3cd;
+  color: #856404;
+}

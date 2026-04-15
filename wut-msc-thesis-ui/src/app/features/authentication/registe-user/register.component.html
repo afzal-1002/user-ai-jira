@@ -1,0 +1,212 @@
+<!-- SIGN-UP FORM VIEW -->
+<div *ngIf="!newUser" class="container d-flex justify-content-center align-items-center default-bg">
+  <div class="card p-4 shadow formDiv">
+
+    <button type="button" routerLink="/home" class="btn-close position-absolute top-0 end-0 m-3"
+      aria-label="Close"></button>
+
+    <h4 class="text-center mb-4">Register User</h4>
+
+    <!-- Error Message -->
+    <div class="alert alert-danger" role="alert" *ngIf="registrationError">
+      {{ registrationError }}
+    </div>
+
+    <form [formGroup]="signUpForm" (ngSubmit)="registerUser()" novalidate>
+
+      <!-- Username (Email) -->
+      <div class="mb-3">
+        <label for="username" class="form-label">Username (Email)</label>
+        <input type="email" class="form-control" id="username" formControlName="username" 
+          [ngClass]="getValidationClass('username')" placeholder="user@example.com" />
+        <div class="invalid-feedback" *ngIf="username?.hasError('required')">
+          Username is required.
+        </div>
+        <div class="invalid-feedback" *ngIf="username?.hasError('pattern')">
+          Please enter a valid email address.
+        </div>
+      </div>
+
+      <!-- Base URL -->
+      <div class="mb-3">
+        <label for="baseUrl" class="form-label">Base URL <small class="text-muted">(e.g., https://bugresolution.atlassian.net)</small></label>
+        <input type="text" class="form-control" id="baseUrl" formControlName="baseUrl" 
+          [ngClass]="getValidationClass('baseUrl')" placeholder="https://your-domain.atlassian.net" />
+        <div class="invalid-feedback" *ngIf="baseUrl?.hasError('required')">
+          Base URL is required.
+        </div>
+      </div>
+
+      <!-- Jira Token -->
+      <div class="mb-3">
+        <label for="jiraToken" class="form-label">Jira Token</label>
+        <input type="password" class="form-control" id="jiraToken" formControlName="jiraToken" 
+          [ngClass]="getValidationClass('jiraToken')" placeholder="Enter your Jira API token" />
+        <div class="invalid-feedback" *ngIf="jiraToken?.hasError('required')">
+          Jira Token is required.
+        </div>
+        <small class="form-text text-muted">Get your token from Jira account settings</small>
+      </div>
+
+      <!-- First Name -->
+      <div class="mb-3">
+        <label for="firstName" class="form-label">First Name</label>
+        <input type="text" class="form-control" id="firstName" formControlName="firstName" 
+          [ngClass]="getValidationClass('firstName')" placeholder="First Name" />
+        <div class="invalid-feedback" *ngIf="firstName?.hasError('required')">
+          First name is required.
+        </div>
+      </div>
+
+      <!-- Last Name -->
+      <div class="mb-3">
+        <label for="lastName" class="form-label">Last Name</label>
+        <input type="text" class="form-control" id="lastName" formControlName="lastName" 
+          [ngClass]="getValidationClass('lastName')" placeholder="Last Name" />
+        <div class="invalid-feedback" *ngIf="lastName?.hasError('required')">
+          Last name is required.
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="mb-3">
+        <label for="emailAddress" class="form-label">Email Address <small class="text-muted">(Optional)</small></label>
+        <input type="email" class="form-control" id="emailAddress" formControlName="emailAddress" 
+          [ngClass]="getValidationClass('emailAddress')" placeholder="Email" />
+        <div class="invalid-feedback" *ngIf="emailAddress?.hasError('pattern')">
+          Please enter a valid email address.
+        </div>
+      </div>
+
+      <!-- Phone -->
+      <div class="mb-3">
+        <label for="phoneNumber" class="form-label">Phone Number <small class="text-muted">(Optional)</small></label>
+        <input type="tel" class="form-control" id="phoneNumber" formControlName="phoneNumber" 
+          [ngClass]="getValidationClass('phoneNumber')" placeholder="Phone Number" />
+        <div class="invalid-feedback" *ngIf="phoneNumber?.hasError('pattern')">
+          Please enter a valid phone number (10–15 digits).
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="mb-3">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" class="form-control" id="password" formControlName="password"
+          [ngClass]="getValidationClass('password')" placeholder="Password" />
+        <div class="invalid-feedback" *ngIf="password?.hasError('required')">
+          Password is required.
+        </div>
+        <div class="invalid-feedback" *ngIf="password?.hasError('minlength')">
+          Minimum 8 characters required.
+        </div>
+        <div class="invalid-feedback" *ngIf="password?.hasError('maxlength')">
+          Maximum 25 characters allowed.
+        </div>
+      </div>
+
+      <!-- Roles (Multiple Select) -->
+      <div class="mb-3">
+        <label class="form-label">Roles <small class="text-muted">(Select one or more)</small></label>
+        <div class="border rounded p-3" [ngClass]="roles?.invalid && (roles?.touched || roles?.dirty) ? 'border-danger' : ''">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="roleUser" value="USER" 
+              (change)="onRoleChange('USER', $event)" />
+            <label class="form-check-label" for="roleUser">
+              User
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="roleAdmin" value="ADMIN" 
+              (change)="onRoleChange('ADMIN', $event)" />
+            <label class="form-check-label" for="roleAdmin">
+              Admin
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="roleTester" value="TESTER" 
+              (change)="onRoleChange('TESTER', $event)" />
+            <label class="form-check-label" for="roleTester">
+              Tester
+            </label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="roleManager" value="MANAGER" 
+              (change)="onRoleChange('MANAGER', $event)" />
+            <label class="form-check-label" for="roleManager">
+              Manager
+            </label>
+          </div>
+        </div>
+        <div class="invalid-feedback d-block" *ngIf="roles?.hasError('required') && (roles?.touched || roles?.dirty)">
+          Please select at least one role.
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="d-grid mb-3">
+        <button type="submit" class="btn btn-primary signUpBtn" [disabled]="signUpForm.invalid || isLoading">
+          <span *ngIf="!isLoading">Register</span>
+          <span *ngIf="isLoading">
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Registering...
+          </span>
+        </button>
+      </div>
+
+      <p class="text-center mb-0" style="font-size: 14px;">
+        Already have an account?
+        <a routerLink="/login" class="fw-bold text-primary loginButton">Log In</a>
+      </p>
+
+    </form>
+  </div>
+</div>
+
+
+
+<!-- PROFILE VIEW AFTER SIGN-UP -->
+<div *ngIf="newUser" class="container rounded bg-white mt-5 mb-5 shadow p-4"
+  style="max-width: 800px; margin-top: 200px;">
+  <div class="row d-flex align-items-center">
+
+    <!-- Left: Profile Picture -->
+    <div class="col-md-4 text-center">
+      <img class="rounded-circle" width="120px" src="https://cdn-icons-png.flaticon.com/512/921/921347.png"
+        alt="Profile" />
+      <h5 class="mt-3">{{ newUser.userName }}</h5>
+    </div>
+
+    <!-- Right: Profile Details -->
+    <div class="col-md-8">
+      <h4 class="mb-4 text-center">
+        <i class="bi bi-person-fill text-primary" style="margin-left: -180px;"></i> 👤 User Profile
+      </h4>
+      <hr />
+
+      <div class="row mb-3">
+        <div class="col-5 fw-semibold">First Name:</div>
+        <div class="col-7">{{ newUser.firstName }}</div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-5 fw-semibold">Last Name:</div>
+        <div class="col-7">{{ newUser.lastName }}</div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-5 fw-semibold">Phone Number:</div>
+        <div class="col-7">{{ newUser.phoneNumber }}</div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-5 fw-semibold">Email:</div>
+        <div class="col-7">{{ newUser.userEmail }}</div>
+      </div>
+
+      <div class="text-center mt-4">
+        <button class="btn btn-outline-secondary" style="margin-left: -120px; max-width: 100px; min-width: 100px;"
+          routerLink="/login">Login</button>
+      </div>
+    </div>
+  </div>
+</div>

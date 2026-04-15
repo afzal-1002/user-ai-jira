@@ -1,0 +1,24 @@
+<div class="content-wrapper">
+  <figure class="chart-card">
+    <h5 class="chart-title">Content Quality & Explainability</h5>
+    <p class="chart-subtitle small text-muted mb-2">
+      Engineering relevance score (0 = low, 3 = high).
+    </p>
+
+    <div *ngIf="isLoading" class="small text-muted">Loading content-quality comparison...</div>
+    <div *ngIf="error" class="alert alert-danger py-1 small">{{ error }}</div>
+
+    <div *ngIf="chartData">
+      <canvas
+        baseChart
+        [data]="chartData"
+        [options]="chartOptions"
+        [type]="'bar'"
+        style="min-height: 260px;">
+      </canvas>
+      <figcaption class="chart-caption small text-muted mt-2">
+        Figure: Gemini favors longer, more detailed engineering responses; DeepSeek stays concise.
+      </figcaption>
+    </div>
+  </figure>
+</div>

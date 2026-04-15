@@ -1,0 +1,9 @@
+{
+  "/api": {
+    "target": "http://localhost:9001",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  },
+  "comment": "Backend URL - see src/config/ngrok.config.ts for centralized configuration. Update localBackend there if needed."
+}

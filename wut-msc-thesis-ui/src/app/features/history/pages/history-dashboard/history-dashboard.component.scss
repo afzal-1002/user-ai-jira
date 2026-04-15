@@ -1,0 +1,44 @@
+.history-landing {
+  max-width: 1200px;
+}
+
+.history-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.history-tab-btn {
+  background-color: #f3f4f6;
+  border: 1px solid #d1d5db;
+  color: #374151;
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: #e5e7eb;
+    border-color: #9ca3af;
+  }
+
+  &.active {
+    background-color: #2563eb;
+    color: #ffffff;
+    border-color: #2563eb;
+  }
+}
+
+.history-back-btn {
+  border-radius: 999px;
+  padding-inline: 1.5rem;
+  font-size: 0.9rem;
+}
+
+.history-card-separator {
+  margin: 0.4rem 0 0.5rem;
+  border: 0;
+  border-top: 1px solid #e5e7eb;
+}

@@ -1,0 +1,251 @@
+<div class="container mt-4 ai-estimations-page">
+  <div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+      <h2 class="mb-1">AI Metrics Analysis</h2>
+      <p class="text-muted mb-0">Detailed metrics: raw AI outputs and filters (hours, days, markdown/explanation flags).</p>
+    </div>
+    <div>
+      <button class="btn btn-outline-secondary btn-sm metrics-back-btn" (click)="goBack()">
+        &larr; Back to AI Metrics
+      </button>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <!-- Top controls: centered inner card with Run Metrics button + dynamic input -->
+      <div class="metrics-top-card">
+        <div class="d-flex flex-wrap align-items-end metrics-top-row">
+          <div class="mb-2 me-3">
+            <button class="btn btn-primary btn-sm metrics-run-btn" (click)="runMetricsQuery()" [disabled]="isLoadingMetrics">
+              <span *ngIf="!isLoadingMetrics">Run Metrics Query</span>
+              <span *ngIf="isLoadingMetrics">Running...</span>
+            </button>
+          </div>
+          <div class="flex-grow-1 mb-2 metrics-input-wrapper">
+            <ng-container [ngSwitch]="activeMetricsTab">
+            <div *ngSwitchCase="'metrics-issue'" class="position-relative">
+              <label class="form-label mb-1 visually-hidden">Issue Key</label>
+              <input
+                class="form-control form-control-sm"
+                [(ngModel)]="metricsIssueKey"
+                (input)="onBugInputChange($event)"
+                (focus)="onBugInputChange($event)"
+                placeholder="Issue Key (e.g. BUG-5) - Type to search or select"
+                autocomplete="off"
+              />
+              <!-- Bug dropdown filter -->
+              <div *ngIf="showBugDropdown && filteredBugs.length > 0" class="bug-dropdown">
+                <div class="bug-dropdown-list">
+                  <div
+                    *ngFor="let bug of filteredBugs.slice(0, 10)"
+                    class="bug-dropdown-item"
+                    (click)="selectBug(bug)"
+                  >
+                    <strong>{{ bug.key || bug.id }}</strong>
+                    <span *ngIf="bug.summary" class="bug-summary">{{ bug.summary }}</span>
+                  </div>
+                  <div *ngIf="filteredBugs.length > 10" class="bug-dropdown-more">
+                    ... and {{ filteredBugs.length - 10 }} more
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="isLoadingBugs" class="small text-muted mt-1">Loading bugs...</div>
+            </div>
+            <div *ngSwitchCase="'metrics-model'">
+              <label class="form-label mb-1 visually-hidden">AI Provider</label>
+              <select class="form-select form-select-sm" [(ngModel)]="metricsProvider">
+                <option [ngValue]="null" disabled selected>AI Provider</option>
+                <option value="GEMINI">Gemini</option>
+                <option value="DEEPSEEK">DeepSeek</option>
+              </select>
+            </div>
+            <div *ngSwitchCase="'hours-le'">
+              <label class="form-label mb-1 visually-hidden">Hours threshold (≤)</label>
+              <input
+                type="number"
+                class="form-control form-control-sm"
+                [(ngModel)]="hoursThreshold"
+                placeholder="Hours threshold (≤)"
+              />
+            </div>
+            <div *ngSwitchCase="'hours-gt'">
+              <label class="form-label mb-1 visually-hidden">Hours threshold (&gt;)</label>
+              <input
+                type="number"
+                class="form-control form-control-sm"
+                [(ngModel)]="hoursThreshold"
+                placeholder="Hours threshold (&gt;)"
+              />
+            </div>
+            <div *ngSwitchCase="'days-le'">
+              <label class="form-label mb-1 visually-hidden">Days threshold (≤)</label>
+              <input
+                type="number"
+                class="form-control form-control-sm"
+                [(ngModel)]="daysThreshold"
+                placeholder="Days threshold (≤)"
+              />
+            </div>
+            <div *ngSwitchCase="'days-gt'">
+              <label class="form-label mb-1 visually-hidden">Days threshold (&gt;)</label>
+              <input
+                type="number"
+                class="form-control form-control-sm"
+                [(ngModel)]="daysThreshold"
+                placeholder="Days threshold (&gt;)"
+              />
+            </div>
+            <div *ngSwitchDefault></div>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mode groups: arranged in two columns for clarity -->
+      <div class="metrics-modes mt-2">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <div class="metrics-group-card">
+              <div class="metrics-group-title">Basic Views</div>
+              <ul class="nav nav-pills small mb-1 metrics-tabs">
+                <li class="nav-item"><button class="nav-link" [class.active]="activeMetricsTab === 'metrics-issue'" (click)="activeMetricsTab = 'metrics-issue'">By Issue</button></li>
+                <li class="nav-item"><button class="nav-link" [class.active]="activeMetricsTab === 'metrics-model'" (click)="activeMetricsTab = 'metrics-model'">By AI Model</button></li>
+              </ul>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="metrics-group-card">
+              <div class="metrics-group-title">Estimation Filters</div>
+              <ul class="nav nav-pills small mb-1 metrics-tabs">
+                <li class="nav-item"><button class="nav-link" [class.active]="activeMetricsTab === 'hours-le'" (click)="activeMetricsTab = 'hours-le'">≤ X hours</button></li>
+                <li class="nav-item"><button class="nav-link" [class.active]="activeMetricsTab === 'hours-gt'" (click)="activeMetricsTab = 'hours-gt'">&gt; X hours</button></li>
+                <li class="nav-item"><button class="nav-link" [class.active]="activeMetricsTab === 'days-le'" (click)="activeMetricsTab = 'days-le'">≤ X days</button></li>
+                <li class="nav-item"><button class="nav-link" [class.active]="activeMetricsTab === 'days-gt'" (click)="activeMetricsTab = 'days-gt'">&gt; X days</button></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <div class="metrics-group-card">
+            <div class="metrics-group-title">Output Configuration</div>
+            <ul class="nav nav-pills small mb-0 metrics-tabs">
+              <li class="nav-item"><button class="nav-link" [class.active]="activeMetricsTab === 'markdown-on'" (click)="activeMetricsTab = 'markdown-on'">Markdown Enabled</button></li>
+              <li class="nav-item"><button class="nav-link" [class.active]="activeMetricsTab === 'markdown-off'" (click)="activeMetricsTab = 'markdown-off'">Markdown Disabled</button></li>
+              <li class="nav-item"><button class="nav-link" [class.active]="activeMetricsTab === 'explanation-on'" (click)="activeMetricsTab = 'explanation-on'">Explanation Enabled</button></li>
+              <li class="nav-item"><button class="nav-link" [class.active]="activeMetricsTab === 'explanation-off'" (click)="activeMetricsTab = 'explanation-off'">Explanation Disabled</button></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="metrics-content">
+
+        <div *ngIf="metricsError" class="text-danger small mt-2">{{ metricsError }}</div>
+
+        <div class="mt-3 small text-muted">
+          Outputs: raw AI estimation records that are now visualized as model comparison and feature-impact charts.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="metricsResult">
+    <div class="metrics-chart-stack">
+      <app-ai-metrics-chart-card
+        *ngIf="providerComparison.length"
+        title="Provider Comparison"
+        caption="Figure: Average estimated resolution time (hours) per AI model computed from the selected metrics."
+        [chartType]="providerBarType"
+        [chartData]="providerBarData"
+        [chartOptions]="providerBarOptions">
+      </app-ai-metrics-chart-card>
+
+      <figure class="chart-card" *ngIf="markdownDistribution.length">
+        <h5 class="chart-card__title">Markdown Output Distribution</h5>
+        <p class="chart-card__subtitle">Share of runs executed with Markdown or without it.</p>
+
+        <canvas
+          baseChart
+          [data]="markdownPieData"
+          [options]="markdownPieOptions"
+          [type]="markdownPieType"
+          style="max-height: 280px;">
+        </canvas>
+
+        <div class="metrics-pie-legend small mt-2 text-center">
+          <div *ngFor="let m of markdownDistribution" class="d-inline-block me-3 mb-1">
+            <span class="legend-color-box" [ngClass]="{'markdown-on': m.label === 'Markdown ON', 'markdown-off': m.label === 'Markdown OFF'}"></span>
+            {{ m.label }}: {{ m.value }} runs
+          </div>
+        </div>
+
+        <figcaption class="chart-card__caption">
+          Figure: Proportion of runs with Markdown enabled vs disabled in the AI configuration (shown as a pie chart).
+        </figcaption>
+      </figure>
+
+      <app-ai-metrics-chart-card
+        *ngIf="responseTimeBarData"
+        title="Performance Analysis"
+        subtitle="Average response time (seconds) per AI model."
+        caption="Figure: Average response time in seconds per AI model for the current metrics selection."
+        [chartType]="responseTimeBarType"
+        [chartData]="responseTimeBarData"
+        [chartOptions]="responseTimeBarOptions">
+      </app-ai-metrics-chart-card>
+
+      <app-ai-metrics-chart-card
+        *ngIf="estimationRangeBarData"
+        title="Distribution Breakdown"
+        subtitle="Minimum, average, and maximum estimated resolution hours per AI model."
+        caption="Figure: Minimum, average, and maximum estimated resolution time (hours) per AI model."
+        [chartType]="estimationRangeBarType"
+        [chartData]="estimationRangeBarData"
+        [chartOptions]="estimationRangeBarOptions">
+      </app-ai-metrics-chart-card>
+
+      <app-ai-metrics-chart-card
+        *ngIf="estimationTrendLineData"
+        title="Estimation Trend"
+        subtitle="Evolution of estimated resolution hours over time per provider."
+        caption="Figure: Evolution of estimated resolution hours over time for each AI model (ordered by run timestamp)."
+        [chartType]="estimationTrendLineType"
+        [chartData]="estimationTrendLineData"
+        [chartOptions]="estimationTrendLineOptions">
+      </app-ai-metrics-chart-card>
+
+      <app-ai-metrics-chart-card
+        *ngIf="comparisonRadarData"
+        title="Multi-Criteria Radar"
+        subtitle="Average response time, hours, range, and explanation share per provider."
+        caption="Figure: Multi-criteria comparison per AI model  average response time (sec), average estimated hours, estimation range, and percentage of runs with explanations enabled."
+        [dense]="true"
+        [canvasMaxWidth]="720"
+        [canvasMinHeight]="100"
+        
+        [chartType]="comparisonRadarType"
+        [chartData]="comparisonRadarData"
+        [chartOptions]="comparisonRadarOptions">
+      </app-ai-metrics-chart-card>
+
+      <app-ai-metrics-chart-card
+        *ngIf="stabilityBoxBarData"
+        title="Stability Spread"
+        subtitle="Min, quartiles, and max estimated hours per model."
+        caption="Figure: Box-plot style stability view per AI model  showing minimum, 25th percentile (Q1), median, 75th percentile (Q3) and maximum estimated resolution hours."
+        [chartType]="stabilityBoxBarType"
+        [chartData]="stabilityBoxBarData"
+        [chartOptions]="stabilityBoxBarOptions">
+      </app-ai-metrics-chart-card>
+    </div>
+
+    <div class="card shadow-sm mt-3">
+      <div class="card-body">
+        <h6>Raw Metrics Result</h6>
+        <pre class="small bg-light p-2 border rounded">{{ metricsResult | json }}</pre>
+      </div>
+    </div>
+  </div>
+</div>

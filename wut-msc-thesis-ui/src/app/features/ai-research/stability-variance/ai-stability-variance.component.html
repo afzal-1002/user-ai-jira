@@ -1,0 +1,49 @@
+<div class="container mt-4 ai-research-page">
+  <div class="research-header">
+    <div>
+      <h2 class="research-header__title">Stability &amp; Variance</h2>
+      <p class="research-header__subtitle">
+        Matches the evaluation dashboards by charting provider-level variance next to an aggregate dispersion radar.
+      </p>
+    </div>
+    <button type="button" class="btn btn-outline-secondary research-back-btn" (click)="goBack()">
+      &larr; Back
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="research-status research-status--loading">Loading stability analysis&#8230;</div>
+  <div *ngIf="!isLoading && error" class="research-status research-status--error">{{ error }}</div>
+
+  <div class="chart-stack" *ngIf="!isLoading && !error">
+    <app-ai-metrics-chart-card
+      title="Variance by Provider"
+      subtitle="Estimation vs response time variance"
+      caption="Figure: Grouped-bar presentation reused from the evaluation tabs to highlight jitter in estimation or latency per model."
+      [chartType]="'bar'"
+      [chartData]="varianceComparisonChartData"
+      [chartOptions]="varianceComparisonChartOptions">
+      <div class="metric-band" *ngIf="varianceSummaryChips.length">
+        <div class="metric-chip" *ngFor="let chip of varianceSummaryChips">
+          <span class="metric-chip__label">{{ chip.label }}</span>
+          <span class="metric-chip__value">{{ chip.value }}</span>
+        </div>
+      </div>
+    </app-ai-metrics-chart-card>
+
+    <app-ai-metrics-chart-card
+      title="Average Variance Footprint"
+      subtitle="Radar of aggregate dispersion"
+      caption="Figure: Condenses estimation and latency spread into the same polar visualization used elsewhere in the thesis appendices."
+      [chartType]="'radar'"
+      [chartData]="varianceSummaryChartData"
+      [chartOptions]="varianceSummaryChartOptions"
+      [dense]="true"
+      [canvasMinHeight]="260">
+    </app-ai-metrics-chart-card>
+  </div>
+
+  <section class="raw-result-card" *ngIf="result">
+    <h5 class="mb-2">Raw Stability Metrics</h5>
+    <pre class="small mb-0">{{ result | json }}</pre>
+  </section>
+</div>

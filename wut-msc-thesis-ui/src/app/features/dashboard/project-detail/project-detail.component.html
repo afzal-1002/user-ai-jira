@@ -1,0 +1,115 @@
+<div class="project-detail-container" *ngIf="!isLoading && !errorMessage && project; else loadingOrError">
+  <div class="header">
+    <button class="btn btn-link" (click)="goBackToProjects()">
+       Back to Projects
+    </button>
+    <div class="title-block">
+      <h2 class="project-name">{{ project.name }}</h2>
+      <span class="project-key">{{ project.key }}</span>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <div class="left-column">
+      <div class="card">
+        <h4>Overview</h4>
+        <p *ngIf="project.description; else noDescription">{{ project.description }}</p>
+        <ng-template #noDescription>
+          <p class="text-muted">No description provided for this project.</p>
+        </ng-template>
+      </div>
+
+      <div class="card" *ngIf="project.lead">
+        <h4>Project Lead</h4>
+        <div class="lead-info">
+          <img *ngIf="project.lead.avatarUrls?.['32x32']"
+               [src]="project.lead.avatarUrls['32x32']"
+               [alt]="project.lead.displayName"
+               class="lead-avatar" />
+          <div class="lead-text">
+            <div class="lead-name">{{ project.lead.displayName }}</div>
+            <div class="lead-id" [title]="project.lead.accountId">{{ project.lead.accountId }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h4>Details</h4>
+        <div class="details-grid">
+          <div class="detail-item">
+            <span class="label">Project ID</span>
+            <span class="value">{{ project.id }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Type</span>
+            <span class="value">{{ project.projectTypeKey }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Assignee Type</span>
+            <span class="value">{{ project.assigneeType }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Style</span>
+            <span class="value">{{ project.style }}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Visibility</span>
+            <span class="value" [ngClass]="project.private ? 'text-danger' : 'text-success'">
+              {{ project.private ? 'Private' : 'Public' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="right-column">
+      <div class="card">
+        <h4>Issue Types</h4>
+        <div *ngIf="project.issueTypes?.length; else noIssueTypes">
+          <ul class="issue-types-list">
+            <li *ngFor="let issueType of project.issueTypes">
+              <img *ngIf="issueType.iconUrl"
+                   [src]="issueType.iconUrl"
+                   [alt]="issueType.name"
+                   class="issue-type-icon" />
+              <span class="issue-type-name">{{ issueType.name }}</span>
+              <small class="issue-type-desc" *ngIf="issueType.description">{{ issueType.description }}</small>
+            </li>
+          </ul>
+        </div>
+        <ng-template #noIssueTypes>
+          <p class="text-muted mb-0">No issue types information available.</p>
+        </ng-template>
+      </div>
+
+      <div class="card actions-card">
+        <h4>Actions</h4>
+        <div class="actions">
+          <button class="btn btn-primary" (click)="viewBugs()">
+            🐛 View Bugs for this Project
+          </button>
+          <button class="btn btn-outline-secondary" (click)="goBackToProjects()">
+            Back to Projects
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template #loadingOrError>
+  <div class="loading-error-container" *ngIf="isLoading">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-3">Loading project details...</p>
+  </div>
+  <div class="loading-error-container" *ngIf="!isLoading && errorMessage">
+    <div class="alert alert-danger" role="alert">
+      {{ errorMessage }}
+    </div>
+    <button class="btn btn-secondary" (click)="goBackToProjects()">
+      Back to Projects
+    </button>
+  </div>
+</ng-template>

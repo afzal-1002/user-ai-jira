@@ -1,0 +1,113 @@
+<div class="container py-4 admin-user-wrap">
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <div class="card shadow-sm p-4 h-100">
+        <h4>{{ editingUserId ? 'Update User' : 'Create User' }}</h4>
+        <p class="text-muted small">Only admins can create, update, delete users and assign roles.</p>
+
+        <div *ngIf="saveMessage" class="alert alert-success py-2">{{ saveMessage }}</div>
+        <div *ngIf="saveError" class="alert alert-danger py-2">{{ saveError }}</div>
+
+        <form [formGroup]="userForm" (ngSubmit)="saveUser()">
+          <div class="mb-2">
+            <label class="form-label">Username (Email)</label>
+            <input class="form-control" formControlName="username" type="email" placeholder="user@company.com" />
+          </div>
+
+          <div class="row g-2 mb-2">
+            <div class="col">
+              <label class="form-label">First Name</label>
+              <input class="form-control" formControlName="firstName" type="text" />
+            </div>
+            <div class="col">
+              <label class="form-label">Last Name</label>
+              <input class="form-control" formControlName="lastName" type="text" />
+            </div>
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Email Address</label>
+            <input class="form-control" formControlName="emailAddress" type="email" />
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Phone Number</label>
+            <input class="form-control" formControlName="phoneNumber" type="text" />
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Password {{ editingUserId ? '(optional for update)' : '' }}</label>
+            <input class="form-control" formControlName="password" type="password" />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label d-block">Roles</label>
+            <div class="role-grid">
+              <div class="form-check" *ngFor="let role of roleOptions">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  [id]="'role-' + role"
+                  [checked]="hasRole(role)"
+                  (change)="onRoleChange(role, $any($event.target).checked)"
+                />
+                <label class="form-check-label" [for]="'role-' + role">{{ role }}</label>
+              </div>
+            </div>
+          </div>
+
+          <div class="d-flex gap-2">
+            <button class="btn btn-primary" type="submit" [disabled]="isSaving">
+              {{ editingUserId ? 'Update User' : 'Create User' }}
+            </button>
+            <button class="btn btn-outline-secondary" type="button" (click)="cancelEdit()">Clear</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      <div class="card shadow-sm p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h4 class="mb-0">Registered Users</h4>
+          <button class="btn btn-sm btn-outline-primary" type="button" (click)="refreshUsers()">Refresh</button>
+        </div>
+
+        <div *ngIf="isLoading" class="text-muted">Loading users...</div>
+
+        <div class="table-responsive" *ngIf="!isLoading">
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Roles</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let user of users">
+                <td>{{ user.userName }}</td>
+                <td>{{ user.firstName }} {{ user.lastName }}</td>
+                <td>{{ toRoles(user.userRole) }}</td>
+                <td>
+                  <span class="badge" [class.bg-success]="user.active" [class.bg-secondary]="!user.active">
+                    {{ user.active ? 'Active' : 'Inactive' }}
+                  </span>
+                </td>
+                <td class="text-end">
+                  <button class="btn btn-sm btn-outline-primary me-2" (click)="editUser(user)">Edit</button>
+                  <button class="btn btn-sm btn-outline-danger" (click)="deleteUser(user)">Delete</button>
+                </td>
+              </tr>
+              <tr *ngIf="users.length === 0">
+                <td colspan="5" class="text-center text-muted">No users found.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

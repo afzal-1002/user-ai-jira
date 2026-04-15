@@ -1,0 +1,317 @@
+.ai-estimations-page {
+  font-size: 0.95rem;
+}
+
+.ai-estimations-page .nav-pills .nav-link {
+  border-radius: 999px;
+  text-align: center;
+  padding: 0.3rem 0.9rem;
+  font-weight: 500;
+  color: #1d4ed8;
+  background-color: #e0ecff; /* light blue pill so it looks like a button */
+  border: 1px solid #c4d0ff;
+}
+
+.ai-estimations-page .nav-pills .nav-link.active {
+  background: linear-gradient(90deg, #0d6efd, #2563eb);
+  color: #fff;
+  box-shadow: 0 0.25rem 0.5rem rgba(37, 99, 235, 0.35);
+}
+
+.metrics-top-row {
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.metrics-top-card {
+  max-width: 640px;
+  margin: 0 auto 0.9rem;
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+.metrics-input-wrapper {
+  max-width: 480px;
+}
+
+.metrics-tabs {
+  padding-top: 0.2rem;
+  padding-bottom: 0.3rem;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.metrics-tabs .nav-link {
+  margin-bottom: 0;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.metrics-tabs .nav-link:hover:not(.active) {
+  background-color: #d1ddff;
+  transform: translateY(-1px);
+}
+
+.metrics-tabs .nav-item + .nav-item {
+  margin-left: 0.6rem;
+}
+
+.metrics-run-btn {
+  border-radius: 999px;
+  padding: 0.35rem 1.1rem;
+  font-weight: 600;
+  background: linear-gradient(90deg, #16a34a, #22c55e);
+  border: none;
+  color: #ffffff;
+  box-shadow: 0 0.25rem 0.55rem rgba(34, 197, 94, 0.45);
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.metrics-run-btn:hover:not(:disabled) {
+  background: linear-gradient(90deg, #15803d, #22c55e);
+  box-shadow: 0 0.35rem 0.85rem rgba(21, 128, 61, 0.55);
+  transform: translateY(-1px);
+}
+
+.metrics-back-btn {
+  border-radius: 999px;
+  padding-inline: 0.9rem;
+  font-size: 0.78rem;
+}
+
+/* Bug dropdown filter styles */
+.bug-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 0.25rem;
+  background: white;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.bug-dropdown-list {
+  padding: 0.5rem 0;
+}
+
+.bug-dropdown-item {
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  border-bottom: 1px solid #f3f4f6;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.bug-dropdown-item:hover {
+  background-color: #f0f9ff;
+}
+
+.bug-dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.bug-dropdown-item strong {
+  color: #1f2937;
+  font-size: 0.95rem;
+}
+
+.bug-summary {
+  color: #6b7280;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bug-dropdown-more {
+  padding: 0.5rem 1rem;
+  color: #6b7280;
+  font-size: 0.85rem;
+  text-align: center;
+  background-color: #f9fafb;
+}
+
+/* Increase metrics-top-card height and make full width */
+.metrics-top-card {
+  width: 100%;
+  margin: 0 0 0.9rem 0;
+  padding: 1.2rem 0.8rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+  min-height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.metrics-top-row {
+  width: 100%;
+  justify-content: flex-start;
+}
+
+.metrics-input-wrapper {
+  flex-grow: 1;
+  max-width: none !important;
+}
+
+.metrics-group-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.metrics-group-card {
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  padding: 0.8rem 1rem;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.metrics-modes {
+  background-color: #f9fafb;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.chart-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem;
+  background-color: #ffffff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+}
+
+.chart-card__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #0f172a;
+  text-align: left;
+}
+
+.chart-card__subtitle {
+  margin: 0.2rem 0 0.6rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+.chart-card__caption {
+  margin-top: 0.6rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.metrics-chart-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 0.75rem;
+}
+
+.metrics-bar-chart {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 1.2rem;
+  height: 220px; /* taller bars for better readability */
+  padding: 0.75rem 0;
+}
+
+.metrics-bar {
+  flex: 0 0 50px; /* narrower bars */
+  max-width: 50px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+}
+
+.metrics-bar-track {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: flex-end; /* bars rest on the bottom baseline and grow upward */
+}
+
+.metrics-bar-fill {
+  width: 70%; /* slimmer bar inside its slot */
+  margin: 0 auto;
+  background: linear-gradient(to top, #14532d, #22c55e); /* default green if no specific class */
+  border-radius: 4px 4px 0 0;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  transition: height 0.3s ease;
+}
+
+/* Per-bar gradient colors for multiple providers */
+.metrics-bar-fill.bar-green {
+  background: linear-gradient(to top, #14532d, #22c55e);
+}
+
+.metrics-bar-fill.bar-blue {
+  background: linear-gradient(to top, #1d4ed8, #60a5fa);
+}
+
+.metrics-bar-fill.bar-purple {
+  background: linear-gradient(to top, #6d28d9, #a855f7);
+}
+
+.metrics-bar-fill.bar-orange {
+  background: linear-gradient(to top, #c2410c, #fdba74);
+}
+
+.metrics-bar-label {
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.metrics-bar-value {
+  font-size: 0.75rem;
+  color: #6c757d;
+}
+
+/* Solid 2D pie chart for Markdown ON/OFF */
+.metrics-pie-real {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  /* Default: green and blue slices, each with dark→light conic gradient */
+  background: conic-gradient(
+    #14532d 0,
+    #22c55e 60%,
+    #1d4ed8 60%,
+    #60a5fa 100%
+  );
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.metrics-pie-legend .legend-color-box {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  margin-right: 4px;
+  border-radius: 2px;
+}
+
+.metrics-pie-legend .legend-color-box.markdown-on {
+  background: linear-gradient(to right, #14532d, #22c55e);
+}
+
+.metrics-pie-legend .legend-color-box.markdown-off {
+  background: linear-gradient(to right, #1d4ed8, #60a5fa); /* blue slice to match blue bar */
+}

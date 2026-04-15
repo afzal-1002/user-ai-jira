@@ -1,0 +1,62 @@
+<div class="container mt-4 ai-comparison-page ai-estimations-page">
+  <div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+      <h2 class="mb-1">AI Model Comparison - Gemini vs DeepSeek</h2>
+      <p class="text-muted mb-0 small">Thesis-ready visual comparison of performance, estimation, stability, and content quality.</p>
+    </div>
+    <div>
+      <button class="btn btn-outline-secondary btn-sm comparison-back-btn"  (click)="goBackToDashboard()">
+       Back to Home
+      </button>
+    </div>
+  </div>
+
+  <section class="issue-analysis-shell">
+    <app-ai-eval-bug-model-comparison></app-ai-eval-bug-model-comparison>
+  </section>
+
+  <!-- Tabs / menu for individual comparison views inside a centered card -->
+  <div class="ai-comparison-tabs-card">
+    <ul class="nav nav-pills small ai-comparison-tabs mb-0 justify-content-center">
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab === 'overall'" (click)="selectTab('overall')">Overall</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab === 'performance'" (click)="selectTab('performance')">Performance</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab === 'estimation'" (click)="selectTab('estimation')">Estimation</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab === 'stability'" (click)="selectTab('stability')">Stability</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab === 'content'" (click)="selectTab('content')">Content Quality</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab === 'summary'" (click)="selectTab('summary')">Summary</button>
+      </li>
+    </ul>
+  </div>
+
+  <div class="mt-3" [ngSwitch]="activeTab">
+    <ng-container *ngSwitchCase="'overall'">
+      <app-ai-overall-comparison></app-ai-overall-comparison>
+    </ng-container>
+    <ng-container *ngSwitchCase="'performance'">
+      <app-ai-performance-comparison></app-ai-performance-comparison>
+    </ng-container>
+    <ng-container *ngSwitchCase="'estimation'">
+      <app-ai-estimation-comparison></app-ai-estimation-comparison>
+    </ng-container>
+    <ng-container *ngSwitchCase="'stability'">
+      <app-ai-stability-comparison></app-ai-stability-comparison>
+    </ng-container>
+    <ng-container *ngSwitchCase="'content'">
+      <app-ai-content-comparison></app-ai-content-comparison>
+    </ng-container>
+    <ng-container *ngSwitchCase="'summary'">
+      <app-ai-summary-comparison></app-ai-summary-comparison>
+    </ng-container>
+  </div>
+</div>

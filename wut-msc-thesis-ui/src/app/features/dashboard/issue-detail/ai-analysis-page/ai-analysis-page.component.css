@@ -1,0 +1,73 @@
+.ai-analysis-page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 2rem;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.ai-model-toggle .btn {
+  padding: 0.3rem 0.75rem;
+  font-size: 0.82rem;
+}
+
+.ai-model-btn {
+  min-width: 150px;
+  width: 150px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ai-model-btn.btn-outline-primary {
+  background-color: #fff7e6; /* light cream */
+  border-color: #0d6efd;
+  color: #0d6efd;
+}
+
+.ai-model-btn.btn-outline-primary:hover {
+  background-color: #e7f1ff; /* light blue on hover */
+  color: #0d6efd;
+}
+
+.config-section-sub {
+  font-weight: 400;
+  font-size: 0.9em;
+  color: #6c757d;
+}
+
+.config-section-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  color: #343a40;
+}
+
+.config-section {
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  background-color: #fdfdff;
+}
+
+.ai-model-option {
+  cursor: pointer;
+}
+
+.section-pick-list {
+  border-top: 1px dashed #dee2e6;
+  padding-top: 0.5rem;
+}

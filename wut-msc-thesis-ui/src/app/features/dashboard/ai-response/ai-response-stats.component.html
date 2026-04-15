@@ -1,0 +1,58 @@
+<div class="response-stats-panel">
+  <div *ngIf="isLoading" class="response-stats-note text-muted">Calling response-time API...</div>
+  <div *ngIf="error" class="alert alert-danger py-2 small response-stats-alert">{{ error }}</div>
+  <div *ngIf="!isLoading && !error && !hasStats" class="response-stats-note text-muted">
+    Activate "Stats" to fetch response-time metrics.
+  </div>
+
+  <div *ngIf="hasStats" class="response-stats-stack">
+    <app-ai-metrics-chart-card
+      title="Multi-Metric Radar"
+      subtitle="Avg / Min / Max / Std Dev per model."
+      caption="Figure: Radar overlay contrasting four core response-time statistics for every AI provider."
+      [chartType]="radarChartType"
+      [chartData]="radarChartData"
+      [chartOptions]="radarChartOptions"
+      [dense]="true"
+      [canvasMaxWidth]="720"
+      [canvasMinHeight]="320">
+    </app-ai-metrics-chart-card>
+
+    <app-ai-metrics-chart-card
+      title="Min, Max, Std Dev"
+      subtitle="Grouped bars approximating a box plot."
+      caption="Figure: Highlights volatility by stacking minimum, maximum, and standard deviation values per model."
+      [chartType]="boxChartType"
+      [chartData]="boxChartData"
+      [chartOptions]="boxChartOptions"
+      [dense]="true"
+      [canvasMaxWidth]="720"
+      [canvasMinHeight]="320">
+    </app-ai-metrics-chart-card>
+
+    <app-ai-metrics-chart-card
+      title="Average Response Time"
+      subtitle="Mean response seconds for each provider."
+      caption="Figure: Thesis-ready bar chart contrasting typical latency across providers."
+      [chartType]="barChartType"
+      [chartData]="barChartData"
+      [chartOptions]="barChartOptions"
+      [dense]="true"
+      [canvasMaxWidth]="720"
+      [canvasMinHeight]="320">
+    </app-ai-metrics-chart-card>
+
+    <app-ai-metrics-chart-card
+      title="Response Time Over Time"
+      subtitle="Time-series placeholder for future API support."
+      caption="Figure: Reserved slot for chronological trend data once the API exposes timestamped measurements."
+      [chartType]="lineChartType"
+      [chartData]="lineChartData"
+      [chartOptions]="lineChartOptions"
+      emptyMessage="Time series data is not yet available in the comparison API."
+      [dense]="true"
+      [canvasMaxWidth]="720"
+      [canvasMinHeight]="220">
+    </app-ai-metrics-chart-card>
+  </div>
+</div>

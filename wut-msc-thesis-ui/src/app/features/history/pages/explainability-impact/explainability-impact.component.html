@@ -1,0 +1,210 @@
+<div class="container mt-4 history-page">
+  <div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+      <h2 class="mb-1">Explainability Impact Analysis</h2>
+      <p class="text-muted mb-0">Effect of explanation generation on AI response latency and performance.</p>
+    </div>
+    <button class="btn btn-outline-secondary btn-sm history-back-btn" (click)="goBack()">
+      &larr; Back to History
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="alert alert-info">Loading explainability impact data...</div>
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <ng-container *ngIf="!isLoading && !error && results?.length">
+    <!-- View Selector -->
+    <div class="view-selector mb-4">
+      <div class="btn-group btn-group-sm" role="group">
+        <button type="button" class="btn" [class.active]="activeView === 'grouped'" (click)="setActiveView('grouped')" title="PRIMARY: Grouped comparison">
+          📊 Grouped Bars
+        </button>
+        <button type="button" class="btn" [class.active]="activeView === 'overhead'" (click)="setActiveView('overhead')" title="SECONDARY: Overhead cost">
+          🔧 Overhead Cost
+        </button>
+        <button type="button" class="btn" [class.active]="activeView === 'sidebyside'" (click)="setActiveView('sidebyside')" title="TERTIARY: Model comparison">
+          ⚖️ Side-by-Side
+        </button>
+        <button type="button" class="btn" [class.active]="activeView === 'radar'" (click)="setActiveView('radar')" title="OPTIONAL: Radar view">
+          🎯 Radar Chart
+        </button>
+      </div>
+    </div>
+
+    <!-- Chart 1: Grouped Bar Chart (PRIMARY) -->
+    <div class="card chart-card mb-4" *ngIf="activeView === 'grouped'">
+      <div class="card-body">
+        <div class="chart-header">
+          <div>
+            <h6 class="card-title">📊 Grouped Bar Chart: Impact on Response Time (PRIMARY)</h6>
+            <p class="card-text small text-muted">
+              Directly answers the research question: What is the impact of explainability on AI response time?
+            </p>
+          </div>
+          <span class="badge bg-success">BEST FOR THESIS</span>
+        </div>
+        
+        <div class="chart-container">
+          <canvas baseChart 
+            [data]="responseTimeChartConfig.data"
+            [options]="responseTimeChartConfig.options"
+            [type]="responseTimeChartConfig.type">
+          </canvas>
+        </div>
+
+        <p class="small text-muted mt-3 thesis-note">
+          <strong>Thesis Caption:</strong> Figure X: Impact of explainability on AI response time. Enabling explanation generation increases latency for both models, with Gemini showing higher computational overhead.
+        </p>
+
+        <div class="mt-3 p-3 bg-light rounded summary-box">
+          <h6 class="mb-2">📈 Key Findings:</h6>
+          <div class="row g-2">
+            <div class="col-md-6" *ngFor="let item of chartData">
+              <div class="finding-item">
+                <strong>{{ item.provider }}</strong>
+                <div class="small mt-1">
+                  <div><span class="badge bg-danger me-2">Disabled: {{ item.withoutExplanation | number: '1.2-2' }}s</span></div>
+                  <div class="mt-1"><span class="badge bg-primary">Enabled: {{ item.withExplanation | number: '1.2-2' }}s</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart 2: Overhead Cost Chart (SECONDARY) -->
+    <div class="card chart-card mb-4" *ngIf="activeView === 'overhead'">
+      <div class="card-body">
+        <div class="chart-header">
+          <div>
+            <h6 class="card-title">🔧 Overhead Cost: Additional Latency from Explainability (SECONDARY)</h6>
+            <p class="card-text small text-muted">
+              Quantifies the exact computational cost of enabling explanation generation.
+            </p>
+          </div>
+          <span class="badge bg-info">STRONG FOR CONCLUSIONS</span>
+        </div>
+
+        <div class="chart-container">
+          <canvas baseChart 
+            [data]="overheadChartConfig.data"
+            [options]="overheadChartConfig.options"
+            [type]="overheadChartConfig.type">
+          </canvas>
+        </div>
+
+        <p class="small text-muted mt-3 thesis-note">
+          <strong>Thesis Sentence:</strong> Explainability introduces an average response-time overhead of approximately 1–1.5 seconds, depending on the AI provider, representing a measurable trade-off between interpretability and computational efficiency.
+        </p>
+
+        <div class="mt-3 p-3 bg-light rounded summary-box">
+          <h6 class="mb-2">💰 Overhead Analysis:</h6>
+          <div class="row g-2">
+            <div class="col-md-6" *ngFor="let item of chartData">
+              <div class="finding-item">
+                <strong>{{ item.provider }}</strong>
+                <div class="small mt-1">
+                  <span class="badge bg-warning text-dark">Overhead: +{{ item.overheadDelta | number: '1.2-2' }}s</span>
+                  <br>
+                  <span class="text-muted">{{(item.overheadDelta / item.withoutExplanation * 100) | number: '1.0-0'}}% increase</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart 3: Side-by-Side Comparison (TERTIARY) -->
+    <div class="card chart-card mb-4" *ngIf="activeView === 'sidebyside'">
+      <div class="card-body">
+        <div class="chart-header">
+          <div>
+            <h6 class="card-title">⚖️ Side-by-Side Model Comparison (TERTIARY)</h6>
+            <p class="card-text small text-muted">
+              Highlights baseline performance differences and DeepSeek's consistent speed advantage.
+            </p>
+          </div>
+          <span class="badge bg-secondary">MODEL-CENTRIC VIEW</span>
+        </div>
+
+        <div class="row mt-3">
+          <div class="col-md-6">
+            <h6 class="text-center small mb-2">Explanation Disabled</h6>
+            <div class="chart-container-small">
+              <canvas baseChart 
+                [data]="sideBySideDisabledChartConfig.data"
+                [options]="sideBySideDisabledChartConfig.options"
+                [type]="sideBySideDisabledChartConfig.type">
+              </canvas>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h6 class="text-center small mb-2">Explanation Enabled</h6>
+            <div class="chart-container-small">
+              <canvas baseChart 
+                [data]="sideBySideEnabledChartConfig.data"
+                [options]="sideBySideEnabledChartConfig.options"
+                [type]="sideBySideEnabledChartConfig.type">
+              </canvas>
+            </div>
+          </div>
+        </div>
+
+        <p class="small text-muted mt-3 thesis-note">
+          <strong>Thesis Angle:</strong> DeepSeek demonstrates consistently lower response latency regardless of explainability configuration, suggesting more efficient underlying computational architecture.
+        </p>
+
+        <div class="mt-3 p-3 bg-light rounded summary-box">
+          <h6 class="mb-2">⚡ Performance Comparison:</h6>
+          <div class="row g-2">
+            <div class="col-md-6" *ngFor="let item of chartData">
+              <div class="finding-item">
+                <strong>{{ item.provider }}</strong>
+                <div class="small mt-1">
+                  <div class="badge bg-light text-dark me-1">Baseline: {{ item.withoutExplanation | number: '1.2-2' }}s</div>
+                  <br>
+                  <div class="mt-1">
+                    <span class="badge bg-light text-dark">Full: {{ item.withExplanation | number: '1.2-2' }}s</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart 4: Radar Chart (OPTIONAL) -->
+    <div class="card chart-card mb-4" *ngIf="activeView === 'radar'">
+      <div class="card-body">
+        <div class="chart-header">
+          <div>
+            <h6 class="card-title">🎯 Radar Chart: Multi-Axis Performance (OPTIONAL/ADVANCED)</h6>
+            <p class="card-text small text-muted">
+              AI-research-style visualization showing normalized performance across multiple dimensions.
+            </p>
+          </div>
+          <span class="badge bg-warning text-dark">ADVANCED VIEW</span>
+        </div>
+
+        <div class="chart-container-radar">
+          <canvas baseChart 
+            [data]="radarChartConfig.data"
+            [options]="radarChartConfig.options"
+            [type]="radarChartConfig.type">
+          </canvas>
+        </div>
+
+        <p class="small text-muted mt-3 thesis-note">
+          <strong>Use Case:</strong> Ideal for discussion slides, thesis appendix, or advanced research presentations. Visually demonstrates the trade-off space between configurations.
+        </p>
+      </div>
+    </div>
+  </ng-container>
+
+  <div *ngIf="!isLoading && !error && !results?.length" class="alert alert-info">
+    No explainability impact data available.
+  </div>
+</div>

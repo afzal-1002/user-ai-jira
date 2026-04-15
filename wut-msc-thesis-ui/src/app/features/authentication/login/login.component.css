@@ -1,0 +1,379 @@
+
+
+/* Simple login Page */
+/* Background with image */
+.login-bg {
+  min-height: 100vh;
+  background-image: url('../../../assets/image/main-image/KeryBrd01.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Input field */
+.card .form-control {
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+/* Focus style */
+.card .form-control:focus {
+  box-shadow: none;
+  outline: none;
+}
+
+/* Link style */
+.customLink {
+  color: #0d6efd;
+}
+
+/* Error message style */
+.erroText {
+  color: red;
+  font-size: 14px;
+}
+
+.glass-card .form-control:focus {
+  border-bottom: 2px solid #70eb0c;
+  box-shadow: none;
+  outline: none;
+  font-size: 20px;
+    
+}
+
+.loginbtn:hover {
+  background: linear-gradient(to right, #817219, #2563eb);
+}
+
+.customLink:hover {
+  color: rgb(201, 130, 8);
+}
+
+.checkbox-label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  
+  
+}
+
+
+
+
+
+
+
+/* 1. Background with subtle bottom light */
+/* .login-bg {
+  min-height: 100vh;
+  background: radial-gradient(ellipse at bottom, rgba(143, 130, 255, 0.2), #0f0f2e 80%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Open Sans', sans-serif;
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 25px;
+  padding: 40px 30px;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  color: #fff;
+  width: 340px;
+  text-align: center;
+}
+
+
+.glass-card img {
+  width: 80px;
+  margin-bottom: 20px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 5px;
+}
+
+
+.glass-card .form-control {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 0;
+  color: white;
+  font-size: 14px;
+  margin-bottom: 15px;
+}
+
+.glass-card .form-control:focus {
+  border-bottom: 2px solid #70eb0c;
+  box-shadow: none;
+  outline: none;
+  font-size: 20px;
+    
+}
+
+.glass-card .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+  
+
+}
+
+
+.loginbtn {
+  background: linear-gradient(to right, #6f00ff, #3b82f6);
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  width: 100%;
+  font-weight: 600;
+  color: white;
+  transition: background 0.3s ease;
+}
+
+.loginbtn:hover {
+  background: linear-gradient(to right, #817219, #2563eb);
+}
+
+
+.cutomLink {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.cutomLink:hover {
+  color: orange;
+}
+
+.checkbox-label {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.8);
+  
+  
+}
+
+.erroText {
+  color:rgb(238, 255, 0);
+  margin-inline-start: auto;
+  margin-top: -25px;       
+  margin-bottom: 2px;      
+  font-size: 15px;
+  text-align: left;
+}
+ */
+
+
+
+
+/* 
+
+.login-bg {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f52ba, #00c6ff);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Open Sans', sans-serif;
+}
+
+
+.glass-card {
+  background-color: rgba(0, 0, 0, 0.1); 
+  width: 350px;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: white;
+  position: relative;
+}
+
+.glass-card h3 {
+  text-align: center;
+  margin-bottom: 20px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.glass-card input {
+  background-color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 12px;
+  margin-bottom: 15px;
+  width: 100%;
+  font-size: 14px;
+  color: #333;
+}
+
+.glass-card input::placeholder {
+  color: #999;
+}
+
+
+.loginbtn {
+  width: 100%;
+  background-color: #00bfff;
+  border: none;
+  padding: 10px;
+  color: white;
+  font-weight: 600;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.loginbtn:hover {
+  background-color: #009acd;
+}
+
+
+.cutomLink {
+  display: block;
+  text-align: center;
+  margin-top: 10px;
+  color: #eeeeee;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.cutomLink:hover {
+  text-decoration: underline;
+} */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* 
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  margin: 0;
+  padding: 0;
+  background: radial-gradient(circle at center, #0f1b2a 0%, #050c17 100%);
+  color: white;
+}
+
+.login-bg {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at center, #0f1b2a 0%, #050c17 100%);
+}
+
+
+.glass-card {
+  background: rgba(12, 24, 39, 0.6);
+  border: 2px solid #00bfff;
+  box-shadow: 0 0 12px #00bfff;
+  padding: 30px;
+  border-radius: 10px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  position: relative;
+}
+
+
+.glass-card input[type="text"],
+.glass-card input[type="password"] {
+  background: transparent;
+  border: 1px solid #00bfff;
+  color: #fff;
+  padding: 10px;
+  margin-top: 15px;
+  width: 100%;
+  border-radius: 5px;
+}
+
+.glass-card input::placeholder {
+  color: #00bfff;
+  opacity: 0.6;
+}
+
+
+.loginbtn {
+  background-color: #00bfff;
+  color: #fff;
+  border: none;
+  width: 100%;
+  padding: 10px;
+  margin-top: 20px;
+  border-radius: 5px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.loginbtn:hover {
+  background-color: #0099cc;
+  color: #fff;
+}
+
+
+.cutomLink {
+  color: #00bfff;
+  text-decoration: none;
+}
+
+.cutomLink:hover {
+  color: #ffffff;
+  text-decoration: underline;
+} */

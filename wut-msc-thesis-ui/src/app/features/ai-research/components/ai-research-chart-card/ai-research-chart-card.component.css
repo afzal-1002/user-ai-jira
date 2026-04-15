@@ -1,0 +1,43 @@
+.research-chart-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 1rem 1.15rem;
+  background-color: #ffffff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  width: 100%;
+}
+
+.research-chart-card + .research-chart-card {
+  margin-top: 1rem;
+}
+
+.research-chart-card__header {
+  text-align: left;
+  margin-bottom: 0.5rem;
+}
+
+.research-chart-card__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.research-chart-card__subtitle {
+  margin: 0.2rem 0 0;
+  font-size: 0.9rem;
+  color: #6b7280;
+}
+
+.research-chart-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.research-chart-card__caption {
+  margin-top: 0.6rem;
+  text-align: center;
+  font-size: 0.82rem;
+  color: #6b7280;
+}

@@ -1,0 +1,9 @@
+.admin-jira-wrap {
+  max-width: 920px;
+}
+
+.invalid-hint {
+  color: #b42318;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}

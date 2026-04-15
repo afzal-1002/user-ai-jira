@@ -1,0 +1,106 @@
+<div class="evaluation-wrapper">
+  <div *ngIf="isLoading" class="small text-muted text-center">
+    Building provider snapshot...
+  </div>
+
+  <div *ngIf="!isLoading && error" class="alert alert-danger py-1 small">
+    {{ error }}
+  </div>
+
+  <ng-container *ngIf="!isLoading && !error">
+    <div class="metric-band" *ngIf="summaryMetrics.length">
+      <div class="metric-chip" *ngFor="let metric of summaryMetrics">
+        <span class="metric-chip__label">{{ metric.label }}</span>
+        <span class="metric-chip__value">{{ metric.value }}</span>
+      </div>
+    </div>
+
+    <div class="evaluation-grid">
+      <figure class="chart-card chart-card--pie">
+        <h5 class="chart-title">Model Overview</h5>
+        <p class="chart-subtitle">Share of runs, analysis time, and hours.</p>
+
+        <canvas
+          *ngIf="modelByModelPieData?.datasets?.length"
+          baseChart
+          [data]="modelByModelPieData"
+          [options]="modelByModelPieOptions"
+          [type]="modelByModelPieType">
+        </canvas>
+
+        <p *ngIf="!modelByModelPieData?.datasets?.length" class="text-muted small text-center mt-3">
+          No model overview data available.
+        </p>
+
+        <figcaption class="chart-caption">
+          Figure: Relative share of total runs, avg analysis time, and estimated effort for the provider.
+        </figcaption>
+      </figure>
+
+      <figure class="chart-card">
+        <h5 class="chart-title">Key Statistics</h5>
+        <p class="chart-subtitle">Runs, coverage, and averages.</p>
+
+        <canvas
+          *ngIf="modelByModelBarData?.datasets?.length"
+          baseChart
+          [data]="modelByModelBarData"
+          [options]="modelByModelBarOptions"
+          [type]="modelByModelBarType"
+          style="max-height: 280px;">
+        </canvas>
+
+        <p *ngIf="!modelByModelBarData?.datasets?.length" class="text-muted small text-center mt-3">
+          No summary metrics available yet.
+        </p>
+
+        <figcaption class="chart-caption">
+          Figure: Total runs, unique issues, average analysis time, and estimated hours for the model.
+        </figcaption>
+      </figure>
+
+      <figure class="chart-card">
+        <h5 class="chart-title">Distribution Breakdown</h5>
+        <p class="chart-subtitle">Min | Avg | Max | Std Dev per model.</p>
+
+        <canvas
+          *ngIf="distributionBreakdownBarData?.datasets?.length"
+          baseChart
+          [data]="distributionBreakdownBarData"
+          [options]="distributionBreakdownBarOptions"
+          [type]="distributionBreakdownBarType"
+          style="max-height: 320px;">
+        </canvas>
+
+        <p *ngIf="!distributionBreakdownBarData?.datasets?.length" class="text-muted small text-center mt-3">
+          Distribution data is not available for this provider.
+        </p>
+
+        <figcaption class="chart-caption">
+          Figure: Spread of response times highlighting speed and variability per model.
+        </figcaption>
+      </figure>
+
+      <figure class="chart-card chart-card--line">
+        <h5 class="chart-title">Efficiency Trend</h5>
+        <p class="chart-subtitle">How analysis time compares to estimated effort.</p>
+
+        <canvas
+          *ngIf="efficiencyLineData?.datasets?.length"
+          baseChart
+          [data]="efficiencyLineData"
+          [options]="efficiencyLineOptions"
+          [type]="efficiencyLineType">
+        </canvas>
+
+        <p *ngIf="!efficiencyLineData?.datasets?.length" class="text-muted small text-center mt-3">
+          Not enough data to chart efficiency yet.
+        </p>
+
+        <figcaption class="chart-caption">
+          Figure: Comparison between analysis runtime (converted to hours) and estimated effort.
+        </figcaption>
+      </figure>
+    </div>
+  </ng-container>
+</div>

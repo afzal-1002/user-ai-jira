@@ -1,0 +1,30 @@
+
+<hr>
+<div class="customDiv">
+
+    <div style="width: 400px; background-color: bisque; color: blueviolet; text-align: center;">
+      <h1> Dynamic Styling </h1>
+    </div>
+    <h1 [style.backgroundColor]="bgColor"
+        [style.fontSize]="fontSizeSmall"
+        [style.fontSize.px]="fontSizeWithoutpx">This is Dynamic color</h1>
+
+        <br>
+
+       <h1 [style.backgroundColor]="bgColor"
+        [style.fontSize]="zoomSize ? fontSizeLarge :fontSizeSmall"
+        >This is Dynamic color</h1>
+</div>
+
+<hr>
+<div class="customDiv">
+
+    <div style="width: 400px; background-color: bisque; color: blueviolet; text-align: center;">
+      <h1> Signal Count {{ count() }}</h1>
+    </div>
+
+     <button class="btn btn-test" (click)=" updateValue('inc')">Increase Signal</button>
+     <button class="btn btn-test" (click)=" updateValue('dec')">Decrment Signal</button>
+     <button class="btn btn-test" (click)="count.set(20)">Increase Property</button>
+
+</div>

@@ -1,0 +1,58 @@
+<div class="logs-list-container">
+  <div *ngIf="logs.length === 0" class="empty-state">
+    <div class="empty-icon">📭</div>
+    <h4>No Logs Found</h4>
+    <p>No API logs available at this time.</p>
+  </div>
+
+  <div *ngIf="logs.length > 0" class="logs-table-wrapper">
+    <table class="logs-table">
+      <thead>
+        <tr>
+          <th>Timestamp</th>
+          <th>Method</th>
+          <th>Endpoint</th>
+          <th>Status</th>
+          <th>Success</th>
+          <th>Response Time</th>
+          <th>Frontend</th>
+          <th>Component</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let log of logs" class="log-row">
+          <td class="timestamp">{{ log.timestamp | slice:0:19 }}</td>
+          <td>
+            <span class="badge method" [ngClass]="getMethodClass(log.method)">
+              {{ log.method }}
+            </span>
+          </td>
+          <td class="endpoint" [title]="log.endpoint">{{ log.endpoint }}</td>
+          <td>
+            <span class="badge status" [ngClass]="getStatusClass(log.statusCode)">
+              {{ log.statusCode || 'N/A' }}
+            </span>
+          </td>
+          <td>
+            <span class="badge" [ngClass]="getSuccessClass(log.success)">
+              {{ log.success ? '✓ Yes' : '✗ No' }}
+            </span>
+          </td>
+          <td class="response-time">{{ log.responseTime || '-' }}ms</td>
+          <td class="frontend">{{ log.frontend || 'N/A' }}</td>
+          <td class="component">{{ log.component || 'N/A' }}</td>
+          <td class="action">
+            <button class="btn-details" (click)="viewDetails(log)" title="View Details">
+              🔍
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="logs-footer">
+    <p class="result-count">Showing {{ logs.length }} log entries</p>
+  </div>
+</div>

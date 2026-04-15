@@ -1,0 +1,16 @@
+.analysis-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+}
+
+.placeholder-area {
+  border: 1px dashed #c7d2fe;
+  border-radius: 0.9rem;
+  padding: 1.5rem;
+  text-align: center;
+  color: #475569;
+  font-size: 0.95rem;
+}

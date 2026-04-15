@@ -1,0 +1,156 @@
+<!-- USER PROFILE VIEW -->
+<div class="profile-container">
+  <!-- Header Section -->
+  <div class="profile-header">
+    <button type="button" class="btn btn-secondary" (click)="goBack()">
+      ← Back
+    </button>
+    <h2 class="page-title">My Profile</h2>
+    <button type="button" class="btn btn-primary" (click)="editProfile()" *ngIf="appUser">
+      ✏ Edit Profile
+    </button>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-3">Loading your profile...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="!isLoading && errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>Error:</strong> {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+  </div>
+
+  <!-- Warning: Jira profile not available -->
+  <div *ngIf="!isLoading && !jiraUser && appUser" class="alert alert-warning alert-dismissible fade show" role="alert">
+    <strong>Note:</strong> Could not load Jira profile details. Application profile is displayed below.
+    <button type="button" class="btn-close" (click)="jiraUser = null"></button>
+  </div>
+
+  <!-- Profile Content -->
+  <div *ngIf="!isLoading && !errorMessage" class="profile-content">
+    
+    <!-- Avatar and Name Section (Jira info if available, otherwise app user) -->
+    <div class="profile-card profile-header-card" *ngIf="jiraUser">
+      <div class="profile-avatar">
+        <div class="avatar-placeholder">
+          {{ jiraUser.displayName?.charAt(0)?.toUpperCase() || 'U' }}
+        </div>
+      </div>
+      <div class="profile-name-section">
+        <h3 class="profile-display-name">{{ jiraUser.displayName }}</h3>
+        <p class="profile-account-id">{{ jiraUser.accountId }}</p>
+        <span class="badge" [ngClass]="jiraUser.active ? 'bg-success' : 'bg-danger'">
+          {{ jiraUser.active ? '● Active' : '● Inactive' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Avatar and Name Section (Fallback to app user if Jira not available) -->
+    <div class="profile-card profile-header-card" *ngIf="!jiraUser && appUser">
+      <div class="profile-avatar">
+        <div class="avatar-placeholder">
+          {{ appUser.firstName?.charAt(0)?.toUpperCase() || appUser.userName?.charAt(0)?.toUpperCase() || 'U' }}
+        </div>
+      </div>
+      <div class="profile-name-section">
+        <h3 class="profile-display-name">{{ appUser.firstName }} {{ appUser.lastName }}</h3>
+        <p class="profile-account-id">{{ appUser.userName }}</p>
+      </div>
+    </div>
+
+    <!-- Jira Details Card -->
+    <div *ngIf="jiraUser" class="profile-card details-card">
+      <h4 class="card-title">Jira Account Information</h4>
+      
+      <div class="details-grid">
+        
+        <!-- Email Address -->
+        <div class="detail-section">
+          <label class="detail-label">Email Address</label>
+          <p class="detail-value">{{ jiraUser.emailAddress }}</p>
+        </div>
+
+        <!-- Account Type -->
+        <div class="detail-section">
+          <label class="detail-label">Account Type</label>
+          <p class="detail-value">
+            <span class="badge bg-info">{{ jiraUser.accountType }}</span>
+          </p>
+        </div>
+
+        <!-- Time Zone -->
+        <div class="detail-section">
+          <label class="detail-label">Time Zone</label>
+          <p class="detail-value">{{ jiraUser.timeZone }}</p>
+        </div>
+
+        <!-- Locale -->
+        <div class="detail-section">
+          <label class="detail-label">Locale</label>
+          <p class="detail-value">{{ jiraUser.locale }}</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Application User Info (from local auth) -->
+    <div *ngIf="appUser" class="profile-card app-user-card">
+      <h4 class="card-title">Application Information</h4>
+      
+      <div class="details-grid">
+        
+        <!-- Username -->
+        <div class="detail-section">
+          <label class="detail-label">Username</label>
+          <p class="detail-value">{{ appUser.userName }}</p>
+        </div>
+
+        <!-- First Name -->
+        <div class="detail-section">
+          <label class="detail-label">First Name</label>
+          <p class="detail-value">{{ appUser.firstName }}</p>
+        </div>
+
+        <!-- Last Name -->
+        <div class="detail-section">
+          <label class="detail-label">Last Name</label>
+          <p class="detail-value">{{ appUser.lastName }}</p>
+        </div>
+
+        <!-- Roles -->
+        <div class="detail-section">
+          <label class="detail-label">Roles</label>
+          <p class="detail-value">
+            <span class="badge bg-primary" *ngFor="let role of appUser.userRole">
+              {{ role }}
+            </span>
+          </p>
+        </div>
+
+        <!-- Base URL -->
+        <div class="detail-section">
+          <label class="detail-label">Jira Base URL</label>
+          <p class="detail-value text-break">{{ appUser.baseUrl }}</p>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="profile-actions">
+      <button type="button" class="btn btn-primary btn-lg" (click)="editProfile()">
+        Edit Profile
+      </button>
+      <button type="button" class="btn btn-secondary btn-lg" (click)="goBack()">
+        Back to Home
+      </button>
+    </div>
+
+  </div>
+
+</div>

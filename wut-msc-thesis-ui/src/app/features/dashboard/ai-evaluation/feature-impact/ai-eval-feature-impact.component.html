@@ -1,0 +1,34 @@
+<div class="content-wrapper">
+  <figure class="chart-card chart-card--pie" *ngIf="markdownEnabledPieData || markdownDisabledPieData">
+    <h5 class="chart-title">Markdown Feature Impact</h5>
+    <p class="chart-subtitle">Enabled vs disabled distributions.</p>
+    <div class="d-flex flex-wrap justify-content-center gap-4">
+      <canvas *ngIf="markdownEnabledPieData"
+              baseChart
+              [data]="markdownEnabledPieData"
+              [options]="markdownPieOptions"
+              [type]="markdownPieType"></canvas>
+
+      <canvas *ngIf="markdownDisabledPieData"
+              baseChart
+              [data]="markdownDisabledPieData"
+              [options]="markdownPieOptions"
+              [type]="markdownPieType"></canvas>
+    </div>
+    <figcaption class="chart-caption">
+      Figure: Total runs and average analysis time when Markdown is toggled.
+    </figcaption>
+  </figure>
+
+  <figure class="chart-card" *ngIf="markdownBarData?.datasets?.length">
+    <h5 class="chart-title">Markdown Comparison</h5>
+    <p class="chart-subtitle">Bar comparison of runs &amp; time.</p>
+    <canvas baseChart
+            [data]="markdownBarData"
+            [options]="markdownBarOptions"
+            [type]="markdownBarType"></canvas>
+    <figcaption class="chart-caption">
+      Figure: Relative performance difference between Markdown enabled and disabled modes.
+    </figcaption>
+  </figure>
+</div>

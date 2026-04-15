@@ -1,0 +1,54 @@
+<div class="container py-4 admin-jira-wrap">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h3 class="mb-0">Jira Platform Registration</h3>
+    <a routerLink="/home" class="btn btn-outline-secondary">Back</a>
+  </div>
+
+  <div class="card shadow-sm p-4">
+    <p class="text-muted mb-4">
+      Configure Jira access once for your platform. The Jira token is stored encrypted in the backend.
+    </p>
+
+    <div *ngIf="saveMessage" class="alert alert-success" role="alert">{{ saveMessage }}</div>
+    <div *ngIf="errorMessage" class="alert alert-danger" role="alert">{{ errorMessage }}</div>
+
+    <form [formGroup]="configForm" (ngSubmit)="saveConfig()" novalidate>
+      <div class="mb-3">
+        <label class="form-label" for="siteName">Site Name</label>
+        <input id="siteName" class="form-control" type="text" formControlName="siteName" placeholder="My Jira" />
+        <div class="invalid-hint" *ngIf="configForm.controls.siteName.invalid && configForm.controls.siteName.touched">
+          Site name is required.
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="hostPart">Host Part</label>
+        <input id="hostPart" class="form-control" type="text" formControlName="hostPart" placeholder="your-domain" />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="baseUrl">Base URL</label>
+        <input id="baseUrl" class="form-control" type="text" formControlName="baseUrl" placeholder="https://your-domain.atlassian.net" />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="username">Jira Username</label>
+        <input id="username" class="form-control" type="text" formControlName="username" placeholder="jira-admin@company.com" />
+        <div class="invalid-hint" *ngIf="configForm.controls.username.invalid && configForm.controls.username.touched">
+          Jira username is required.
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="jiraToken">Jira Token</label>
+        <input id="jiraToken" class="form-control" type="password" formControlName="jiraToken" placeholder="Enter token to create/update" />
+        <small class="text-muted">Leave empty to keep the existing encrypted token.</small>
+      </div>
+
+      <button class="btn btn-primary" type="submit" [disabled]="isSaving || isLoading">
+        <span *ngIf="!isSaving">Save Jira Configuration</span>
+        <span *ngIf="isSaving">Saving...</span>
+      </button>
+    </form>
+  </div>
+</div>

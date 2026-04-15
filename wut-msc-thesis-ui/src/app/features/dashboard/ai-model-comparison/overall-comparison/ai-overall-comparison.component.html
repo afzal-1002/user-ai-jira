@@ -1,0 +1,138 @@
+<div class="overall-wrapper">
+
+  <!-- Loading & Error -->
+  <div *ngIf="isLoading" class="small text-muted">
+    Loading overall comparison...
+  </div>
+
+  <div *ngIf="error" class="alert alert-danger py-1 small">
+    {{ error }}
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <ng-container *ngIf="!isLoading && !error">
+
+    <div class="overall-grid">
+
+      <!-- Performance -->
+      <figure class="chart-card">
+        <h5 class="chart-title mb-1">Performance Analysis</h5>
+        <p class="chart-subtitle small text-muted mb-2">
+          Average latency comparison.
+        </p>
+        <canvas
+          baseChart
+          [data]="performanceErrorBarData"
+          [options]="performanceErrorBarOptions"
+          [type]="'bar'"
+          style="min-height: 260px;">
+        </canvas>
+        <figcaption class="chart-caption small text-muted mt-2">
+          Figure: DeepSeek sustains lower response latency compared to Gemini.
+        </figcaption>
+      </figure>
+
+      <!-- Estimation Behaviour -->
+      <figure class="chart-card">
+        <h5 class="chart-title mb-1">Estimation Behaviour</h5>
+        <p class="chart-subtitle small text-muted mb-2">
+          Min / Avg / Max estimated resolution time.
+        </p>
+        <canvas
+          baseChart
+          [data]="estimationGroupedData"
+          [options]="estimationGroupedOptions"
+          [type]="'bar'"
+          style="min-height: 260px;">
+        </canvas>
+        <figcaption class="chart-caption small text-muted mt-2">
+          Figure: Gemini provides wider, conservative estimates; DeepSeek remains compact.
+        </figcaption>
+      </figure>
+
+      <!-- Stability -->
+      <figure class="chart-card">
+        <h5 class="chart-title mb-1">Stability & Consistency</h5>
+        <p class="chart-subtitle small text-muted mb-2">
+          Relative stability score distribution.
+        </p>
+        <canvas
+          baseChart
+          [data]="stabilityPieData"
+          [options]="stabilityPieOptions"
+          [type]="'pie'"
+          style="max-width: 320px; min-height: 220px; margin: 0 auto;">
+        </canvas>
+        <figcaption class="chart-caption small text-muted mt-2">
+          Figure: Higher stability share indicates more consistent responses.
+        </figcaption>
+      </figure>
+
+      <!-- Content Quality -->
+      <figure class="chart-card">
+        <h5 class="chart-title mb-1">Content Quality & Explainability</h5>
+        <p class="chart-subtitle small text-muted mb-2">
+          Engineering relevance vs. verbosity.
+        </p>
+        <canvas
+          baseChart
+          [data]="contentBarData"
+          [options]="contentBarOptions"
+          [type]="'bar'"
+          style="min-height: 260px;">
+        </canvas>
+        <figcaption class="chart-caption small text-muted mt-2">
+          Figure: Gemini generates longer explanations; DeepSeek remains concise.
+        </figcaption>
+      </figure>
+
+      <!-- Radar (WIDE) -->
+      <figure class="chart-card chart-card--wide">
+        <h5 class="chart-title mb-1">Multi-Criteria Radar</h5>
+        <p class="chart-subtitle small text-muted mb-2">
+          Normalized comparison across five evaluation dimensions.
+        </p>
+        <canvas
+          baseChart
+          [data]="overallRadarData"
+          [options]="overallRadarOptions"
+          [type]="'radar'"
+          style="min-height: 320px;">
+        </canvas>
+        <figcaption class="chart-caption small text-muted mt-2">
+          Figure: Hybrid recommendation—DeepSeek for speed and stability, Gemini for depth and explanation.
+        </figcaption>
+      </figure>
+
+    </div>
+
+    <!-- Decision Summary Table -->
+    <div class="scorecard-card mt-4">
+      <h5 class="chart-title mb-2">Decision Summary</h5>
+      <table class="scorecard-table">
+        <thead>
+          <tr>
+            <th>Criterion</th>
+            <th>Gemini</th>
+            <th>DeepSeek</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let row of scorecardRows">
+            <td>{{ row.criterion }}</td>
+            <td>{{ row.gemini }}</td>
+            <td>{{ row.deepseek }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Insights -->
+    <ul class="insight-list mt-3" *ngIf="insights.length">
+      <li *ngFor="let insight of insights">
+        {{ insight }}
+      </li>
+    </ul>
+
+  </ng-container>
+</div>

@@ -1,0 +1,122 @@
+<div class="modal-overlay" *ngIf="isOpen" (click)="closeModal()" (keydown)="onKeyDown($event)">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3 class="modal-title">Create New Issue</h3>
+      <button type="button" class="btn-close" aria-label="Close" (click)="closeModal()"></button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Success Message -->
+      <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong>Success!</strong> {{ successMessage }}
+      </div>
+
+      <!-- Error Message -->
+      <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <strong>Error:</strong> {{ errorMessage }}
+        <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+      </div>
+
+      <!-- Form -->
+      <form (ngSubmit)="createIssue()" [hidden]="successMessage">
+        <!-- Summary -->
+        <div class="form-group mb-3">
+          <label for="summary" class="form-label">Summary <span class="text-danger">*</span></label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="summary" 
+            [(ngModel)]="summary" 
+            name="summary"
+            placeholder="Enter issue summary"
+            required
+          />
+        </div>
+
+        <!-- Issue Type -->
+        <div class="form-group mb-3">
+          <label for="issuetype" class="form-label">Issue Type</label>
+          <select 
+            class="form-select" 
+            id="issuetype" 
+            [(ngModel)]="issuetype" 
+            name="issuetype"
+          >
+            <option *ngFor="let type of issueTypes" [value]="type.name">{{ type.name }}</option>
+          </select>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group mb-3">
+          <label for="description" class="form-label">Description</label>
+          <textarea 
+            class="form-control" 
+            id="description" 
+            [(ngModel)]="description" 
+            name="description"
+            placeholder="Enter issue description"
+            rows="4"
+          ></textarea>
+        </div>
+
+        <!-- Due Date -->
+        <div class="form-group mb-3">
+          <label for="duedate" class="form-label">Due Date</label>
+          <input 
+            type="date" 
+            class="form-control" 
+            id="duedate" 
+            [(ngModel)]="duedate" 
+            name="duedate"
+          />
+        </div>
+
+        <!-- Assignee Username -->
+        <div class="form-group mb-3">
+          <label for="assigneeUsername" class="form-label">Assignee Username</label>
+          <input 
+            type="email" 
+            class="form-control" 
+            id="assigneeUsername" 
+            [(ngModel)]="assigneeUsername" 
+            name="assigneeUsername"
+            placeholder="e.g., user@example.com"
+          />
+        </div>
+
+        <!-- Labels -->
+        <div class="form-group mb-3">
+          <label for="labels" class="form-label">Labels</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="labels" 
+            [(ngModel)]="labels" 
+            name="labels"
+            placeholder="Comma-separated labels (e.g., bug,urgent,auto-created)"
+          />
+        </div>
+      </form>
+    </div>
+
+    <div class="modal-footer">
+      <button 
+        type="button" 
+        class="btn btn-secondary" 
+        (click)="closeModal()"
+        [disabled]="isLoading"
+      >
+        Cancel
+      </button>
+      <button 
+        type="button" 
+        class="btn btn-primary" 
+        (click)="createIssue()"
+        [disabled]="isLoading || !summary.trim()"
+      >
+        <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+        {{ isLoading ? 'Creating...' : 'Create Issue' }}
+      </button>
+    </div>
+  </div>
+</div>

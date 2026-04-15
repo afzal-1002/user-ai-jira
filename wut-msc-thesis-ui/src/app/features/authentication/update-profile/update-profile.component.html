@@ -1,0 +1,135 @@
+<!-- UPDATE PROFILE FORM -->
+<div class="update-profile-container">
+  <!-- Header Section -->
+  <div class="profile-header">
+    <button type="button" class="btn btn-secondary" (click)="goBack()">
+      ← Back
+    </button>
+    <h2 class="page-title">✏️ Update Profile</h2>
+    <div style="width: 120px;"></div>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success alert-dismissible fade show" role="alert">
+    {{ successMessage }}
+    <button type="button" class="btn-close" (click)="successMessage = ''"></button>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+    {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+  </div>
+
+  <!-- Update Profile Form -->
+  <div class="profile-form-container">
+    <div class="form-icon">✏️</div>
+
+    <form [formGroup]="updateForm" (ngSubmit)="onSubmit()" novalidate *ngIf="userData">
+
+      <!-- Row 1: Login Name and First Name -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="userName" class="form-label">Login Name (Email)</label>
+          <input type="email" class="form-control" id="userName" formControlName="userName" 
+            placeholder="username@example.com" />
+          <div class="invalid-feedback" *ngIf="updateForm.get('userName')?.hasError('required')">
+            Login name is required.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="firstName" class="form-label">First Name</label>
+          <input type="text" class="form-control" id="firstName" formControlName="firstName" 
+            placeholder="First Name" />
+          <div class="invalid-feedback" *ngIf="updateForm.get('firstName')?.hasError('required')">
+            First name is required.
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 2: Last Name and Display Name -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="lastName" class="form-label">Last Name</label>
+          <input type="text" class="form-control" id="lastName" formControlName="lastName" 
+            placeholder="Last Name" />
+          <div class="invalid-feedback" *ngIf="updateForm.get('lastName')?.hasError('required')">
+            Last name is required.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="displayName" class="form-label">Display Name</label>
+          <input type="text" class="form-control" id="displayName" formControlName="displayName" 
+            placeholder="Display Name (e.g., Muhammad Afzal)" />
+          <div class="invalid-feedback" *ngIf="updateForm.get('displayName')?.hasError('required')">
+            Display name is required.
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 3: Email and Phone -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="emailAddress" class="form-label">Email Address</label>
+          <input type="email" class="form-control" id="emailAddress" formControlName="emailAddress" 
+            placeholder="email@example.com" />
+          <div class="invalid-feedback" *ngIf="updateForm.get('emailAddress')?.hasError('pattern')">
+            Please enter a valid email address.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="phoneNumber" class="form-label">Phone Number <small class="text-muted">(Optional)</small></label>
+          <input type="tel" class="form-control" id="phoneNumber" formControlName="phoneNumber" 
+            placeholder="+48872929451" />
+          <div class="invalid-feedback" *ngIf="updateForm.get('phoneNumber')?.hasError('pattern')">
+            Please enter a valid phone number (10-15 digits).
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 4: Password -->
+      <div class="form-row full-width">
+        <div class="form-group">
+          <label for="password" class="form-label">Password <small class="text-muted">(Leave empty to keep current password)</small></label>
+          <input type="password" class="form-control" id="password" formControlName="password" 
+            placeholder="Enter new password (min. 6 characters)" />
+          <div class="invalid-feedback" *ngIf="updateForm.get('password')?.hasError('minlength')">
+            Password must be at least 6 characters long.
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 5: Status -->
+      <div class="form-row full-width">
+        <div class="form-group checkbox-group">
+          <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="isActive" formControlName="isActive" />
+            <label class="form-check-label" for="isActive">
+              Active Account
+            </label>
+          </div>
+          <small class="form-text text-muted">Check this box if the account should be active</small>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="button-group">
+        <button type="submit" class="btn btn-primary btn-lg" [disabled]="isSubmitting">
+          <span *ngIf="!isSubmitting">Save Changes</span>
+          <span *ngIf="isSubmitting">
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            Saving...
+          </span>
+        </button>
+        <button type="button" class="btn btn-secondary btn-lg" (click)="goBack()" [disabled]="isSubmitting">
+          Cancel
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+</div>

@@ -1,0 +1,118 @@
+<ng-container *ngFor="let node of content">
+  <!-- Paragraph -->
+  <ng-container *ngIf="isNodeType(node, 'paragraph')">
+    <p *ngIf="node.content && node.content.length > 0">
+      <ng-container *ngFor="let child of node.content">
+        <!-- Text with marks -->
+        <ng-container *ngIf="child.type === 'text'">
+          <strong *ngIf="hasMark(child, 'strong')">{{ child.text }}</strong>
+          <em *ngIf="hasMark(child, 'em') && !hasMark(child, 'strong')">{{ child.text }}</em>
+          <u *ngIf="hasMark(child, 'underline') && !hasMark(child, 'strong') && !hasMark(child, 'em')">{{ child.text }}</u>
+          <span *ngIf="!hasMark(child, 'strong') && !hasMark(child, 'em') && !hasMark(child, 'underline')">{{ child.text }}</span>
+        </ng-container>
+
+        <!-- Mention -->
+        <ng-container *ngIf="child.type === 'mention'">
+          <span class="mention-badge">{{ getMentionText(child.attrs) }}</span>
+        </ng-container>
+
+        <!-- Emoji -->
+        <ng-container *ngIf="child.type === 'emoji'">
+          <span class="emoji" [title]="getEmojiText(child.attrs)">{{ getEmojiText(child.attrs) }}</span>
+        </ng-container>
+
+        <!-- Status -->
+        <ng-container *ngIf="child.type === 'status'">
+          <span class="status-badge" [style.background-color]="getStatusColor(child.attrs)">
+            {{ child.attrs?.text || 'Status' }}
+          </span>
+        </ng-container>
+
+        <!-- Link -->
+        <ng-container *ngIf="child.type === 'link'">
+          <a [href]="child.attrs?.href" target="_blank" rel="noopener">{{ child.text || child.attrs?.href }}</a>
+        </ng-container>
+      </ng-container>
+    </p>
+  </ng-container>
+
+  <!-- Heading -->
+  <ng-container *ngIf="isNodeType(node, 'heading')">
+    <h1 *ngIf="node.attrs?.level === 1" class="adf-heading">
+      <app-comment-renderer [content]="node.content || []"></app-comment-renderer>
+    </h1>
+    <h2 *ngIf="node.attrs?.level === 2" class="adf-heading">
+      <app-comment-renderer [content]="node.content || []"></app-comment-renderer>
+    </h2>
+    <h3 *ngIf="node.attrs?.level === 3" class="adf-heading">
+      <app-comment-renderer [content]="node.content || []"></app-comment-renderer>
+    </h3>
+  </ng-container>
+
+  <!-- List -->
+  <ng-container *ngIf="isNodeType(node, 'bulletList')">
+    <ul class="adf-list">
+      <li *ngFor="let item of node.content">
+        <app-comment-renderer [content]="item.content || []"></app-comment-renderer>
+      </li>
+    </ul>
+  </ng-container>
+
+  <ng-container *ngIf="isNodeType(node, 'orderedList')">
+    <ol class="adf-list">
+      <li *ngFor="let item of node.content">
+        <app-comment-renderer [content]="item.content || []"></app-comment-renderer>
+      </li>
+    </ol>
+  </ng-container>
+
+  <!-- Code Block -->
+  <ng-container *ngIf="isNodeType(node, 'codeBlock')">
+    <pre class="adf-code"><code>{{ renderText(node) }}</code></pre>
+  </ng-container>
+
+  <!-- Block Quote -->
+  <ng-container *ngIf="isNodeType(node, 'blockquote')">
+    <blockquote class="adf-blockquote">
+      <app-comment-renderer [content]="node.content || []"></app-comment-renderer>
+    </blockquote>
+  </ng-container>
+
+  <!-- Horizontal Rule -->
+  <ng-container *ngIf="isNodeType(node, 'rule')">
+    <hr class="adf-hr" />
+  </ng-container>
+
+  <!-- Media (Image) -->
+  <ng-container *ngIf="isNodeType(node, 'mediaSingle')">
+    <div class="adf-media" *ngFor="let media of node.content">
+      <img 
+        *ngIf="media.type === 'image'" 
+        [src]="media.attrs?.src" 
+        [alt]="media.attrs?.alt || 'Image'"
+        class="adf-image"
+      />
+    </div>
+  </ng-container>
+
+  <!-- Table -->
+  <ng-container *ngIf="isNodeType(node, 'table')">
+    <table class="adf-table">
+      <tbody>
+        <tr *ngFor="let row of node.content">
+          <td *ngFor="let cell of row.content" class="adf-table-cell">
+            <app-comment-renderer [content]="cell.content || []"></app-comment-renderer>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </ng-container>
+
+  <!-- Panel (Info, Warning, etc.) -->
+  <ng-container *ngIf="isNodeType(node, 'panel')">
+    <div [class]="'alert ' + getAlertClass(node.attrs?.panelType)" class="adf-panel">
+      <strong>{{ node.attrs?.panelType | titlecase }}:</strong>
+      <app-comment-renderer [content]="node.content || []"></app-comment-renderer>
+    </div>
+  </ng-container>
+</ng-container>

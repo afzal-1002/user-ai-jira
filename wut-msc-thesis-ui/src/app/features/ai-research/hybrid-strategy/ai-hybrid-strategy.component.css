@@ -1,0 +1,13 @@
+.card-title {
+  font-weight: 600;
+}
+
+.hybrid-header-row {
+  gap: 0.75rem;
+}
+
+.hybrid-back-btn {
+  border-radius: 999px;
+  padding: 0.2rem 0.9rem;
+  font-size: 0.8rem;
+}

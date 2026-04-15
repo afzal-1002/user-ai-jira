@@ -1,0 +1,360 @@
+<div class="bug-details-container" *ngIf="bug">
+  <!-- Header Section -->
+  <div class="bug-header">
+    <div class="header-top">
+      <div class="issue-key-badge">{{ bug.key }}</div>
+      <h1 class="bug-summary">{{ bug.fields.summary }}</h1>
+    </div>
+    
+    <div class="status-priority-row">
+      <span class="badge" [ngClass]="'bg-' + getStatusColor(bug.fields.status?.name)">
+        {{ bug.fields.status?.name }}
+      </span>
+      <span class="badge" [ngClass]="'bg-' + getPriorityColor(bug.fields.priority?.name)">
+        {{ bug.fields.priority?.name }} Priority
+      </span>
+    </div>
+  </div>
+
+  <!-- Main Content Grid -->
+  <div class="bug-content">
+    <!-- Left Column: Metadata -->
+    <div class="metadata-column">
+      <div class="metadata-card">
+        <h3 class="metadata-title">Issue Details</h3>
+        
+        <!-- Project -->
+        <div class="metadata-item">
+          <label>Project</label>
+          <div class="metadata-value">
+            <span class="project-badge">{{ bug.fields.project?.name }}</span>
+          </div>
+        </div>
+
+        <!-- Type -->
+        <div class="metadata-item">
+          <label>Type</label>
+          <div class="metadata-value">{{ bug.fields.issuetype?.name }}</div>
+        </div>
+
+        <!-- Assignee -->
+        <div class="metadata-item">
+          <label>Assignee</label>
+          <div class="metadata-value" *ngIf="bug.fields.assignee">
+            <div class="user-info">
+              <img *ngIf="bug.fields.assignee.avatarUrls" [src]="bug.fields.assignee.avatarUrls['32x32']" [alt]="bug.fields.assignee.displayName" class="avatar">
+              <span>{{ bug.fields.assignee.displayName }}</span>
+            </div>
+          </div>
+          <div class="metadata-value" *ngIf="!bug.fields.assignee">Unassigned</div>
+        </div>
+
+        <!-- Reporter -->
+        <div class="metadata-item">
+          <label>Reporter</label>
+          <div class="metadata-value" *ngIf="bug.fields.reporter">
+            <div class="user-info">
+              <img *ngIf="bug.fields.reporter.avatarUrls" [src]="bug.fields.reporter.avatarUrls['32x32']" [alt]="bug.fields.reporter.displayName" class="avatar">
+              <span>{{ bug.fields.reporter.displayName }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Creator -->
+        <div class="metadata-item">
+          <label>Creator</label>
+          <div class="metadata-value" *ngIf="bug.fields.creator">
+            <div class="user-info">
+              <img *ngIf="bug.fields.creator.avatarUrls" [src]="bug.fields.creator.avatarUrls['32x32']" [alt]="bug.fields.creator.displayName" class="avatar">
+              <span>{{ bug.fields.creator.displayName }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dates Card -->
+      <div class="metadata-card">
+        <h3 class="metadata-title">Dates</h3>
+        
+        <div class="metadata-item">
+          <label>Created</label>
+          <div class="metadata-value">{{ formatDate(bug.fields.created) }}</div>
+        </div>
+
+        <div class="metadata-item">
+          <label>Updated</label>
+          <div class="metadata-value">{{ formatDate(bug.fields.updated) }}</div>
+        </div>
+
+        <div class="metadata-item">
+          <label>Due Date</label>
+          <div class="metadata-value" *ngIf="bug.fields.duedate">
+            {{ bug.fields.duedate | date: 'MMM d, y' }}
+          </div>
+          <div class="metadata-value" *ngIf="!bug.fields.duedate">None</div>
+        </div>
+
+        <div class="metadata-item">
+          <label>Last Viewed</label>
+          <div class="metadata-value">{{ formatDate(bug.fields.lastViewed) }}</div>
+        </div>
+      </div>
+
+      <!-- Labels & Components -->
+      <div class="metadata-card" *ngIf="getLabels().length > 0 || getComponentNames().length > 0">
+        <h3 class="metadata-title">Categories</h3>
+        
+        <div class="metadata-item" *ngIf="getLabels().length > 0">
+          <label>Labels</label>
+          <div class="metadata-value">
+            <span class="label-badge" *ngFor="let label of getLabels()">{{ label }}</span>
+          </div>
+        </div>
+
+        <div class="metadata-item" *ngIf="getComponentNames().length > 0">
+          <label>Components</label>
+          <div class="metadata-value">
+            <span class="label-badge" *ngFor="let component of getComponentNames()">{{ component }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Time Tracking Card -->
+      <div class="metadata-card" *ngIf="bug.fields.timetracking">
+        <h3 class="metadata-title">Time Tracking</h3>
+        
+        <div class="metadata-item">
+          <label>Original Estimate</label>
+          <div class="metadata-value">{{ formatTimeEstimate(bug.fields.timetracking?.originalEstimateSeconds) }}</div>
+        </div>
+
+        <div class="metadata-item">
+          <label>Remaining Estimate</label>
+          <div class="metadata-value">{{ formatTimeEstimate(bug.fields.timetracking?.remainingEstimateSeconds) }}</div>
+        </div>
+
+        <div class="metadata-item" *ngIf="bug.fields.timetracking.originalEstimateSeconds !== undefined && bug.fields.timetracking.remainingEstimateSeconds !== undefined">
+          <label>Time Spent</label>
+          <div class="metadata-value">
+            {{ formatTimeEstimate(bug.fields.timetracking.originalEstimateSeconds - bug.fields.timetracking.remainingEstimateSeconds) }}
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-item" *ngIf="bug.fields.timetracking.originalEstimateSeconds">
+          <div class="progress-label">Time Progress</div>
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width]="getTimeSpentPercent() + '%'"></div>
+          </div>
+          <div class="progress-text">{{ getTimeSpentPercent() }}% Complete</div>
+        </div>
+      </div>
+
+      <!-- Watchers & Votes -->
+      <div class="metadata-card">
+        <h3 class="metadata-title">Engagement</h3>
+        
+        <div class="metadata-item">
+          <label>Watchers</label>
+          <div class="metadata-value">{{ getWatchersCount() }} {{ getWatchersCount() === 1 ? 'person' : 'people' }}</div>
+        </div>
+
+        <div class="metadata-item">
+          <label>Votes</label>
+          <div class="metadata-value">{{ getVotesCount() }} {{ getVotesCount() === 1 ? 'vote' : 'votes' }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Details & Comments -->
+    <div class="details-column">
+      <!-- Description -->
+      <div class="details-card">
+        <h3 class="card-title">Description</h3>
+        <div class="description-content">
+          <app-comment-renderer 
+            *ngIf="bug.fields.description?.content"
+            [content]="bug.fields.description?.content || []">
+          </app-comment-renderer>
+          <p *ngIf="!bug.fields.description?.content" class="no-content">No description provided.</p>
+        </div>
+      </div>
+
+      <!-- Attachments -->
+      <div class="details-card" *ngIf="hasAttachments()">
+        <h3 class="card-title">Attachments ({{ bug.fields.attachment?.length || 0 }})</h3>
+        <div class="attachments-list">
+          <div class="attachment-item" *ngFor="let attachment of bug.fields.attachment">
+            <div class="attachment-info">
+              <a [href]="attachment.content" target="_blank" class="attachment-link">
+                {{ attachment.filename }}
+              </a>
+              <div class="attachment-meta">
+                <span class="attachment-size" *ngIf="attachment.size">{{ (attachment.size / 1024).toFixed(1) }} KB</span>
+                <span class="attachment-date">{{ formatDate(attachment.created) }}</span>
+                <span class="attachment-author" *ngIf="attachment.author">by {{ attachment.author.displayName }}</span>
+              </div>
+            </div>
+            <a [href]="attachment.thumbnail" target="_blank" class="attachment-thumbnail" *ngIf="attachment.thumbnail">
+              <img [src]="attachment.thumbnail" [alt]="attachment.filename">
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comments Section -->
+      <div class="details-card">
+        <h3 class="card-title">Comments ({{ totalComments }})</h3>
+        <div *ngIf="deleteErrorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+          {{ deleteErrorMessage }}
+          <button type="button" class="btn-close" (click)="deleteErrorMessage = ''"></button>
+        </div>
+        
+        <div class="comments-list">
+          <div class="comment-item" *ngFor="let comment of displayedComments">
+            <div class="comment-header">
+              <div class="comment-author">
+                <img
+                  *ngIf="comment.author && comment.author.avatarUrls"
+                  [src]="comment.author.avatarUrls['32x32']"
+                  [alt]="comment.author.displayName || 'Avatar'"
+                  class="avatar-small"
+                >
+                <span class="author-name">{{ comment.author?.displayName || 'Unknown' }}</span>
+              </div>
+              <div class="comment-meta">
+                <span class="comment-date">{{ formatDate(comment.created) }}</span>
+                <span class="comment-visibility" *ngIf="comment.visibility">
+                  👁️ {{ comment.visibility.value }}
+                </span>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-secondary ms-2"
+                  *ngIf="editingCommentId !== comment.id"
+                  (click)="startEditComment(comment)"
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-danger ms-2"
+                  (click)="deleteComment(comment)"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+            
+            <div class="comment-content" *ngIf="editingCommentId !== comment.id" (click)="startEditComment(comment)">
+              <app-comment-renderer 
+                *ngIf="comment.body?.content"
+                [content]="comment.body?.content || []">
+              </app-comment-renderer>
+            </div>
+
+            <div class="comment-content" *ngIf="editingCommentId === comment.id">
+              <textarea
+                class="form-control mb-2"
+                rows="3"
+                [(ngModel)]="editedCommentText"
+              ></textarea>
+              <div class="d-flex gap-2">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-primary"
+                  [disabled]="updateInProgress || !editedCommentText.trim()"
+                  (click)="saveEditedComment(comment)"
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-secondary"
+                  [disabled]="updateInProgress"
+                  (click)="cancelEdit()"
+                >
+                  Cancel
+                </button>
+              </div>
+
+              <div *ngIf="updateErrorMessage" class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                {{ updateErrorMessage }}
+                <button type="button" class="btn-close" (click)="updateErrorMessage = ''"></button>
+              </div>
+            </div>
+          </div>
+
+          <div class="no-comments" *ngIf="totalComments === 0">
+            <p>No comments yet.</p>
+          </div>
+        </div>
+
+            <div class="add-comment mt-3">
+              <h4 class="card-subtitle mb-2">Add Comment</h4>
+              <textarea
+                class="form-control mb-2"
+                rows="3"
+                placeholder="Write a new comment..."
+                [(ngModel)]="newCommentText"
+              ></textarea>
+              <div class="d-flex gap-2 align-items-center">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-primary"
+                  [disabled]="addInProgress || !newCommentText.trim()"
+                  (click)="addComment()"
+                >
+                  <span *ngIf="!addInProgress">Add Comment</span>
+                  <span *ngIf="addInProgress">
+                    <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                    <span class="ms-1">Adding…</span>
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-sm btn-outline-secondary"
+                  [disabled]="addInProgress"
+                  (click)="newCommentText = ''"
+                >
+                  Clear
+                </button>
+              </div>
+
+              <div *ngIf="addErrorMessage" class="alert alert-danger alert-dismissible fade show mt-2" role="alert">
+                {{ addErrorMessage }}
+                <button type="button" class="btn-close" (click)="addErrorMessage = ''"></button>
+              </div>
+            </div>
+
+        <!-- Pagination -->
+        <div class="pagination" *ngIf="totalCommentPages > 1">
+          <button class="pagination-btn" (click)="loadCommentPage(1)" [disabled]="commentPage === 1">
+            First
+          </button>
+          <button class="pagination-btn" (click)="loadCommentPage(commentPage - 1)" [disabled]="commentPage === 1">
+            Previous
+          </button>
+
+          <button 
+            class="pagination-btn" 
+            *ngFor="let page of visiblePages"
+            [class.active]="page === commentPage"
+            (click)="loadCommentPage(page)">
+            {{ page }}
+          </button>
+
+          <button class="pagination-btn" (click)="loadCommentPage(commentPage + 1)" [disabled]="commentPage === totalCommentPages">
+            Next
+          </button>
+          <button class="pagination-btn" (click)="loadCommentPage(totalCommentPages)" [disabled]="commentPage === totalCommentPages">
+            Last
+          </button>
+
+          <span class="pagination-info">
+            Page {{ commentPage }} of {{ totalCommentPages }} ({{ totalComments }} total)
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

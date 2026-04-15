@@ -1,0 +1,199 @@
+<div class="container mt-4 history-page">
+  <div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+      <h2 class="mb-1">Stability & Variance Analysis</h2>
+      <p class="text-muted mb-0">Model consistency and output variance analysis across AI providers.</p>
+    </div>
+  </div>
+
+  <!-- Loading & Error States -->
+  <div *ngIf="isLoading" class="alert alert-info">
+    <span class="spinner-border spinner-border-sm me-2"></span> Loading stability metrics...
+  </div>
+  <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
+
+  <!-- Main Content -->
+  <ng-container *ngIf="!isLoading && !error && results?.length">
+    <!-- View Selector -->
+    <div class="view-selector mb-4">
+      <button 
+        (click)="setActiveView('dualbar')"
+        [class.active]="activeView === 'dualbar'"
+        class="btn btn-outline-primary btn-sm">
+        📊 Dual Metric Bars
+      </button>
+      <button 
+        (click)="setActiveView('radar')"
+        [class.active]="activeView === 'radar'"
+        class="btn btn-outline-primary btn-sm">
+        🎯 Stability Radar
+      </button>
+      <button 
+        (click)="setActiveView('index')"
+        [class.active]="activeView === 'index'"
+        class="btn btn-outline-primary btn-sm">
+        📈 Stability Index
+      </button>
+      <button 
+        (click)="setActiveView('scatter')"
+        [class.active]="activeView === 'scatter'"
+        class="btn btn-outline-primary btn-sm">
+        📍 Scatter Plot
+      </button>
+    </div>
+
+    <!-- Dual Bar Chart (PRIMARY VIEW) -->
+    <div *ngIf="activeView === 'dualbar'" class="card shadow-sm chart-card">
+      <div class="card-body">
+        <h5 class="card-title mb-1">📊 Dual Metric Variance Comparison</h5>
+        <p class="text-muted small mb-3">
+          Direct comparison of estimation error variance and response time variance across AI providers.
+          Lower values indicate more consistent and stable model behavior.
+        </p>
+        <div class="chart-container">
+          <canvas baseChart 
+            [type]="'bar'"
+            [data]="dualBarChartData"
+            [options]="dualBarChartOptions">
+          </canvas>
+        </div>
+        
+        <!-- Key Findings -->
+        <div class="mt-4 findings-grid">
+          <div *ngFor="let item of stabilityVarianceData; let idx = index" class="finding-box">
+            <h6 class="mb-2">{{ item.provider }}</h6>
+            <div class="finding-metric">
+              <small class="text-muted">Est. Variance:</small>
+              <strong>{{ item.estimationVariance.toFixed(2) }}h</strong>
+            </div>
+            <div class="finding-metric">
+              <small class="text-muted">Resp. Time Var:</small>
+              <strong>{{ item.responseTimeVariance.toFixed(2) }}s</strong>
+            </div>
+            <div class="finding-metric">
+              <small class="text-muted">Total Variance:</small>
+              <strong>{{ item.totalVariance?.toFixed(2) }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Radar Chart (SECONDARY VIEW) -->
+    <div *ngIf="activeView === 'radar'" class="card shadow-sm chart-card">
+      <div class="card-body">
+        <h5 class="card-title mb-1">🎯 Stability Profile Radar Chart</h5>
+        <p class="text-muted small mb-3">
+          Multi-dimensional stability assessment showing normalized stability scores (0-10 scale).
+          Higher values indicate greater consistency and reduced variance in model predictions.
+        </p>
+        <div class="chart-container-radar">
+          <canvas baseChart 
+            [type]="'radar'"
+            [data]="radarChartData"
+            [options]="radarChartOptions">
+          </canvas>
+        </div>
+        
+        <!-- Key Findings -->
+        <div class="mt-4 findings-grid">
+          <div *ngFor="let item of stabilityRadarData" class="finding-box">
+            <h6 class="mb-2">{{ item.provider }}</h6>
+            <div class="finding-metric">
+              <small class="text-muted">Est. Stability:</small>
+              <strong>{{ item.estimationStability.toFixed(2) }}/10</strong>
+            </div>
+            <div class="finding-metric">
+              <small class="text-muted">Resp. Stability:</small>
+              <strong>{{ item.responseTimeStability.toFixed(2) }}/10</strong>
+            </div>
+            <div class="finding-metric">
+              <small class="text-muted">Avg Stability:</small>
+              <strong>{{ ((item.estimationStability + item.responseTimeStability) / 2).toFixed(2) }}/10</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stability Index Chart (TERTIARY VIEW) -->
+    <div *ngIf="activeView === 'index'" class="card shadow-sm chart-card">
+      <div class="card-body">
+        <h5 class="card-title mb-1">📈 Stability Index Ranking</h5>
+        <p class="text-muted small mb-3">
+          Combined stability metric calculated as inverse of total variance (1/Total Variance).
+          Higher index values represent more stable and consistent model performance.
+        </p>
+        <div class="chart-container">
+          <canvas baseChart 
+            [type]="'bar'"
+            [data]="stabilityIndexChartData"
+            [options]="stabilityIndexChartOptions">
+          </canvas>
+        </div>
+        
+        <!-- Key Findings -->
+        <div class="mt-4 findings-grid">
+          <div *ngFor="let item of stabilityIndexData; let idx = index" class="finding-box">
+            <h6 class="mb-2">{{ item.provider }}</h6>
+            <div class="finding-metric">
+              <small class="text-muted">Stability Index:</small>
+              <strong>{{ item.stabilityIndex.toFixed(4) }}</strong>
+            </div>
+            <div class="finding-metric">
+              <small class="text-muted">Classification:</small>
+              <span [class]="'badge ' + getStabilityBadgeClass(idx)">
+                {{ getStabilityLabel(idx) }}
+              </span>
+            </div>
+            <div class="finding-metric mt-2">
+              <small class="text-muted d-block mb-1">Variance Breakdown:</small>
+              <small class="d-block">Est: {{ item.estimationVariance.toFixed(2) }}h | Resp: {{ item.responseTimeVariance.toFixed(2) }}s</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scatter Plot (OPTIONAL VIEW) -->
+    <div *ngIf="activeView === 'scatter'" class="card shadow-sm chart-card">
+      <div class="card-body">
+        <h5 class="card-title mb-1">📍 Variance Relationship Scatter Plot</h5>
+        <p class="text-muted small mb-3">
+          Two-dimensional visualization showing relationship between estimation variance (X-axis) 
+          and response time variance (Y-axis). Position indicates stability characteristics relative to peer models.
+        </p>
+        <div class="chart-container">
+          <canvas baseChart 
+            [type]="'scatter'"
+            [data]="scatterChartData"
+            [options]="scatterChartOptions">
+          </canvas>
+        </div>
+        
+        <!-- Key Findings -->
+        <div class="mt-4 findings-grid">
+          <div *ngFor="let item of stabilityScatterData" class="finding-box">
+            <h6 class="mb-2">{{ item.provider }}</h6>
+            <div class="finding-metric">
+              <small class="text-muted">X-Axis (Est. Var):</small>
+              <strong>{{ item.estimationVariance.toFixed(2) }}h</strong>
+            </div>
+            <div class="finding-metric">
+              <small class="text-muted">Y-Axis (Resp. Var):</small>
+              <strong>{{ item.responseTimeVariance.toFixed(2) }}s</strong>
+            </div>
+            <div class="finding-metric">
+              <small class="text-muted">Distance from Origin:</small>
+              <strong>{{ Math.hypot(item.estimationVariance, item.responseTimeVariance).toFixed(2) }}</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </ng-container>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && !error && !results?.length" class="alert alert-info">
+    No stability history available.

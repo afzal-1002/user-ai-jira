@@ -1,0 +1,36 @@
+<div class="summary-wrapper">
+  <figure class="chart-card">
+    <h5 class="chart-title mb-1">Overall Comparison Summary</h5>
+    <p class="chart-subtitle small text-muted mb-2">
+      Count of categories (stability, speed, research, industry, depth) won by each model.
+    </p>
+
+    <div *ngIf="isLoading" class="small text-muted">Loading summary...</div>
+    <div *ngIf="error" class="alert alert-danger py-1 small">{{ error }}</div>
+
+    <div *ngIf="chartData">
+      <canvas
+        baseChart
+        [data]="chartData"
+        [options]="chartOptions"
+        [type]="'bar'"
+        style="min-height: 260px;">
+      </canvas>
+      <figcaption class="chart-caption small text-muted mt-2">
+        Figure: Higher bars indicate the model recommended in more decision categories.
+      </figcaption>
+    </div>
+  </figure>
+
+  <div class="summary-table-wrapper" *ngIf="summaryItems.length">
+    <h6 class="text-muted text-center mb-3">Key recommendations</h6>
+    <table class="summary-table">
+      <tbody>
+        <tr *ngFor="let item of summaryItems">
+          <th scope="row">{{ item.label }}</th>
+          <td>{{ item.value }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

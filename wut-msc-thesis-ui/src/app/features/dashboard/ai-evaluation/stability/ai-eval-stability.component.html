@@ -1,0 +1,107 @@
+<div class="evaluation-wrapper">
+  <div *ngIf="isLoading" class="small text-muted text-center">
+    Building stability snapshot...
+  </div>
+
+  <div *ngIf="!isLoading && error" class="alert alert-danger py-1 small">
+    {{ error }}
+  </div>
+
+  <ng-container *ngIf="!isLoading && !error">
+    <div class="metric-band" *ngIf="summaryMetrics.length">
+      <div class="metric-chip" *ngFor="let metric of summaryMetrics">
+        <span class="metric-chip__label">{{ metric.label }}</span>
+        <span class="metric-chip__value">{{ metric.value }}</span>
+      </div>
+    </div>
+
+    <div class="evaluation-grid">
+      <figure class="chart-card">
+        <h5 class="chart-title">Stability Summary</h5>
+        <p class="chart-subtitle">Issue {{ issueLabel || 'N/A' }} — hours distribution.</p>
+
+        <canvas
+          *ngIf="stabilityBarData?.datasets?.length"
+          baseChart
+          [data]="stabilityBarData"
+          [options]="stabilityBarOptions"
+          [type]="stabilityBarType"
+          style="max-height: 300px;">
+        </canvas>
+
+        <p *ngIf="!stabilityBarData?.datasets?.length" class="text-muted small text-center mt-3">
+          No summary stability metrics available.
+        </p>
+
+        <figcaption class="chart-caption">
+          Figure: Min | Avg | Max hours | Standard deviation.
+        </figcaption>
+      </figure>
+
+      <figure class="chart-card">
+        <h5 class="chart-title">Trend Line</h5>
+        <p class="chart-subtitle">Sequential metric view.</p>
+
+        <canvas
+          *ngIf="stabilityLineData?.datasets?.length"
+          baseChart
+          [data]="stabilityLineData"
+          [options]="stabilityLineOptions"
+          [type]="stabilityLineType"
+          style="max-height: 280px;">
+        </canvas>
+
+        <p *ngIf="!stabilityLineData?.datasets?.length" class="text-muted small text-center mt-3">
+          Trend data unavailable for this issue.
+        </p>
+
+        <figcaption class="chart-caption">
+          Figure: Trend of the same stability metrics plotted linearly.
+        </figcaption>
+      </figure>
+
+      <figure class="chart-card chart-card--pie">
+        <h5 class="chart-title">Composition</h5>
+        <p class="chart-subtitle">Share of each metric.</p>
+
+        <canvas
+          *ngIf="stabilityPieData?.datasets?.length"
+          baseChart
+          [data]="stabilityPieData"
+          [options]="stabilityPieOptions"
+          [type]="stabilityPieType">
+        </canvas>
+
+        <p *ngIf="!stabilityPieData?.datasets?.length" class="text-muted small text-center mt-3">
+          Composition data unavailable.
+        </p>
+
+        <figcaption class="chart-caption">
+          Figure: How each metric contributes to the total hours distribution.
+        </figcaption>
+      </figure>
+
+      <figure class="chart-card">
+        <h5 class="chart-title">Radar Profile</h5>
+        <p class="chart-subtitle">Normalized stability view.</p>
+
+        <canvas
+          *ngIf="stabilityRadarData?.datasets?.length"
+          baseChart
+          [data]="stabilityRadarData"
+          [options]="stabilityRadarOptions"
+          [type]="stabilityRadarType"
+          style="max-height: 320px;">
+        </canvas>
+
+        <p *ngIf="!stabilityRadarData?.datasets?.length" class="text-muted small text-center mt-3">
+          Radar visualization unavailable.
+        </p>
+
+        <figcaption class="chart-caption">
+          Figure: Radar visualization of min, avg, max hours and standard deviation.
+        </figcaption>
+      </figure>
+    </div>
+  </ng-container>
+</div>

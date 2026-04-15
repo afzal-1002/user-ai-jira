@@ -1,0 +1,77 @@
+<div class="container py-4 admin-site-wrap">
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <div class="card shadow-sm p-4 h-100">
+        <h4>Create Jira Site Connection</h4>
+        <p class="text-muted small">Admin-only setup. Jira token is encrypted in backend storage.</p>
+
+        <div *ngIf="successMessage" class="alert alert-success py-2">{{ successMessage }}</div>
+        <div *ngIf="errorMessage" class="alert alert-danger py-2">{{ errorMessage }}</div>
+
+        <form [formGroup]="siteForm" (ngSubmit)="saveSite()">
+          <div class="mb-2">
+            <label class="form-label">Site Name</label>
+            <input class="form-control" formControlName="siteName" type="text" placeholder="My Jira" />
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Host Part</label>
+            <input class="form-control" formControlName="hostPart" type="text" placeholder="your-domain" />
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Base URL</label>
+            <input class="form-control" formControlName="baseUrl" type="text" placeholder="https://your-domain.atlassian.net" />
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Jira Username</label>
+            <input class="form-control" formControlName="username" type="text" placeholder="jira-admin@company.com" />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Jira Token</label>
+            <input class="form-control" formControlName="jiraToken" type="password" placeholder="Jira API token" />
+          </div>
+
+          <button class="btn btn-primary" type="submit" [disabled]="isSaving">
+            {{ isSaving ? 'Saving...' : 'Create Site Connection' }}
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      <div class="card shadow-sm p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h4 class="mb-0">Configured Sites</h4>
+          <button class="btn btn-sm btn-outline-primary" type="button" (click)="loadSites()">Refresh</button>
+        </div>
+
+        <div *ngIf="isLoading" class="text-muted">Loading sites...</div>
+
+        <div class="table-responsive" *ngIf="!isLoading">
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr>
+                <th>Site Name</th>
+                <th>Host</th>
+                <th>Base URL</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let site of sites">
+                <td>{{ site.siteName }}</td>
+                <td>{{ site.hostPart || '-' }}</td>
+                <td>{{ site.baseUrl || '-' }}</td>
+              </tr>
+              <tr *ngIf="sites.length === 0">
+                <td colspan="3" class="text-center text-muted">No sites found.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
