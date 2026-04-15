@@ -1,33 +1,32 @@
 <div class="issues-container">
-  <div class="issues-header">
+  <div class="issues-header d-flex align-items-center justify-content-between gap-3 flex-wrap">
     <div class="header-content">
       <h2 class="page-title">Issues - {{ projectKey }}</h2>
-      <p class="page-subtitle">All issues and bugs for this project</p>
     </div>
-    <div class="header-actions">
-      <button class="btn btn-secondary" (click)="goBack()">← Back to Projects</button>
-    </div>
-  </div>
 
-  <div class="filters-section">
-    <div class="search-box">
-      <input type="text" class="search-input" placeholder="Search by issue key or summary..." #searchInput (input)="onSearchChange(searchInput.value)" />
+    <div class="d-flex flex-grow-1 justify-content-center px-3" style="min-width: 320px;">
+      <input
+        type="text"
+        class="form-control"
+        style="max-width: 760px; width: 100%;"
+        placeholder="Search issues by key, summary, description, assignee, reporter, status, priority..."
+        #searchInput
+        (input)="onSearchChange(searchInput.value)"
+      />
     </div>
-    <div class="filter-controls">
-      <select class="filter-select" #statusFilter (change)="onStatusFilterChange(statusFilter.value)">
-        <option value="">All Status</option>
-        <option value="todo">To Do</option>
-        <option value="progress">In Progress</option>
-        <option value="done">Done</option>
-      </select>
-      <select class="filter-select" #priorityFilter (change)="onPriorityFilterChange(priorityFilter.value)">
+
+    <div class="header-actions d-flex align-items-center gap-2 ms-auto flex-wrap">
+      <select class="form-select" style="width: 150px;" #priorityFilter (change)="onPriorityFilterChange(priorityFilter.value)">
         <option value="">All Priorities</option>
         <option value="high">High</option>
         <option value="medium">Medium</option>
         <option value="low">Low</option>
       </select>
+      <button class="btn btn-secondary" (click)="goBack()">← Back to Projects</button>
     </div>
   </div>
+
+  <div class="mt-4"></div>
 
   <div *ngIf="isLoading" class="loading-container">
     <div class="spinner-border text-primary" role="status">

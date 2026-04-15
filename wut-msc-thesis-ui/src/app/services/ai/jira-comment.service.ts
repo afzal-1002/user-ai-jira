@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
+import { Observable, map, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
 export interface JiraCommentVisibility {
@@ -31,39 +31,50 @@ export interface JiraCommentUpdateRequest {
 export class JiraCommentService {
   constructor(private http: HttpClient) {}
 
-  /**
-   * Update or create a Jira comment
-   * POST is used for both create and update operations
-   */
   updateFullComment(issueKey: string, request: JiraCommentUpdateRequest): Observable<any> {
-    return this.http.post<any>(`/api/wut/jira/comment/${issueKey}`, request).pipe(
+    return this.createComment(issueKey, request).pipe(
       catchError((error: HttpErrorResponse) => {
-        console.error('❌ Failed to update/create Jira comment:', error);
+        console.error('Failed to create MCP comment:', error);
         return throwError(() => error);
       })
     );
   }
 
-  /**
-   * Create a new Jira comment
-   */
   createComment(issueKey: string, request: JiraCommentUpdateRequest): Observable<any> {
-    return this.http.post<any>(`/api/wut/jira/comment/${issueKey}`, request);
+    return this.http.post<any>(`/api/wut/mcp/server/issues/${issueKey}/comments`, request);
   }
 
-  /**
-   * Fetch existing AI comments for an issue
-   * This helps check if an AI comment already exists
-   */
-  getAIComments(issueKey: string): Observable<any> {
-    return this.http.get<any>(`/api/wut/jira/comment/${issueKey}/ai-comments`);
+  getAIComments(issueKey: string): Observable<any[]> {
+    return this.http.get<any>(`/api/wut/mcp/server/issues/${issueKey}/comments`).pipe(
+      map((response: any) => {
+        const comments = response?.fields?.comment?.comments || response?.comments || [];
+        return comments.filter((comment: any) => this.isAiComment(comment));
+      })
+    );
   }
 
-  /**
-   * Update an existing comment by ID
-   * NOTE: This requires backend implementation of PUT endpoint
-   */
   updateCommentById(issueKey: string, commentId: string, request: JiraCommentUpdateRequest): Observable<any> {
-    return this.http.put<any>(`/api/wut/jira/comment/${issueKey}/${commentId}`, request);
+    return this.http.put<any>(`/api/wut/mcp/server/issues/${issueKey}/comments/${commentId}`, request);
+  }
+
+  private isAiComment(comment: any): boolean {
+    const text = this.extractText(comment?.body || {});
+    return text.toLowerCase().includes('ai analysis') || text.toLowerCase().includes('root cause');
+  }
+
+  private extractText(node: any): string {
+    if (!node) {
+      return '';
+    }
+
+    if (typeof node.text === 'string') {
+      return node.text;
+    }
+
+    if (Array.isArray(node.content)) {
+      return node.content.map((child: any) => this.extractText(child)).join(' ');
+    }
+
+    return '';
   }
 }

@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { NgIf, NgFor, CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { McpFrontendService, McpProjectSource } from '../../../services/mcp/mcp-frontend.service';
+import { McpFrontendStateService } from '../../../services/mcp/mcp-frontend-state.service';
+import { IssueResponse } from '../../../models/interface/mcp-server.interface';
 
 @Component({
   selector: 'app-issues-home',
@@ -13,57 +15,91 @@ import { McpFrontendService, McpProjectSource } from '../../../services/mcp/mcp-
 export class IssuesHomeComponent implements OnInit {
   projectKey: string = '';
   siteId: number | null = null;
+  hostPart = '';
   source: McpProjectSource = 'jira';
-  issues: any[] = [];
+  issues: IssueResponse[] = [];
   isLoading = true;
   errorMessage = '';
-  filteredIssues: any[] = [];
+  filteredIssues: IssueResponse[] = [];
   searchQuery = '';
-  filterStatus = '';
   filterPriority = '';
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private mcpFrontendService: McpFrontendService
+    private mcpFrontendService: McpFrontendService,
+    private mcpFrontendStateService: McpFrontendStateService
   ) {}
 
   ngOnInit(): void {
     this.route.params.subscribe((params: any) => {
       this.projectKey = params['key'] || '';
+      if (this.projectKey) {
+        this.mcpFrontendStateService.setSelectedProjectKey(this.projectKey);
+      }
       this.route.queryParams.subscribe((queryParams) => {
-        this.siteId = queryParams['siteId'] ? Number(queryParams['siteId']) : null;
+        this.siteId = queryParams['siteId'] ? Number(queryParams['siteId']) : this.mcpFrontendStateService.selectedSiteId;
+        this.hostPart = String(queryParams['hostPart'] || '').trim() || String(this.mcpFrontendStateService.selectedHostPart || '').trim();
         this.source = queryParams['source'] === 'local' ? 'local' : 'jira';
+        const routeProjectKey = String(queryParams['projectKey'] || '').trim();
+        if (routeProjectKey) {
+          this.projectKey = routeProjectKey;
+          this.mcpFrontendStateService.setSelectedProjectKey(routeProjectKey);
+        } else if (!this.projectKey) {
+          this.projectKey = this.mcpFrontendStateService.selectedProjectKey;
+        }
 
-        if (this.projectKey && this.siteId) {
+        if (this.siteId) {
+          this.mcpFrontendStateService.selectSiteById(this.siteId);
+        }
+
+        const canLoadJira = this.source === 'jira' && !!this.hostPart;
+        const canLoadLocal = this.source === 'local' && !!this.siteId;
+
+        if (this.projectKey && (canLoadJira || canLoadLocal)) {
           this.loadIssues();
         } else {
           this.isLoading = false;
-          this.errorMessage = 'Missing site selection. Please select a site and project again.';
+          this.errorMessage = this.source === 'jira'
+            ? 'Missing hostPart selection. Please select a site and project again.'
+            : 'Missing site selection. Please select a site and project again.';
         }
       });
     });
   }
 
   loadIssues(): void {
-    if (!this.siteId) {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    const selectedSite = this.mcpFrontendStateService.selectedSite;
+    const resolvedHostPart = this.hostPart
+      || String(selectedSite?.hostPart || '').trim()
+      || String(this.mcpFrontendStateService.selectedHostPart || '').trim();
+
+    if (this.source === 'jira' && !resolvedHostPart) {
+      this.isLoading = false;
+      this.errorMessage = 'Missing hostPart selection.';
+      return;
+    }
+
+    if (this.source === 'local' && !this.siteId) {
       this.isLoading = false;
       this.errorMessage = 'Missing site selection.';
       return;
     }
 
-    this.isLoading = true;
-    this.errorMessage = '';
+    const issuesCall = this.source === 'jira' && resolvedHostPart
+      ? this.mcpFrontendService.getProjectIssuesByHostPart(this.projectKey, resolvedHostPart, 50)
+      : this.mcpFrontendService.getProjectIssues(this.projectKey, this.siteId as number, this.source, 50);
 
-    this.mcpFrontendService
-      .getProjectIssues(this.siteId, this.projectKey, this.source, 50, 'Bug')
-      .subscribe({
-        next: (response: any) => {
+    issuesCall.subscribe({
+        next: (response: { issues: IssueResponse[]; total?: number; [key: string]: unknown } | IssueResponse[]) => {
           this.isLoading = false;
-          if (response?.issues && Array.isArray(response.issues)) {
-            this.issues = response.issues;
-          } else if (Array.isArray(response)) {
+          if (Array.isArray(response)) {
             this.issues = response;
+          } else if (Array.isArray(response.issues)) {
+            this.issues = response.issues;
           } else {
             this.issues = [];
           }
@@ -77,18 +113,28 @@ export class IssuesHomeComponent implements OnInit {
   }
 
   applyFilters(): void {
-    this.filteredIssues = this.issues.filter((issue) => {
-      const matchesSearch = !this.searchQuery || 
-        issue.key?.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        issue.fields?.summary?.toLowerCase().includes(this.searchQuery.toLowerCase());
-      
-      const matchesStatus = !this.filterStatus || 
-        issue.fields?.status?.name?.toLowerCase() === this.filterStatus.toLowerCase();
+    this.filteredIssues = this.issues.filter((issue: IssueResponse) => {
+      const searchLower = this.searchQuery.toLowerCase();
+      const matchesSearch = !searchLower || [
+        issue.key,
+        issue.fields?.summary,
+        issue.fields?.description ? this.getDescription(issue.fields.description) : '',
+        issue.fields?.statusResponse?.name,
+        issue.fields?.status?.name,
+        issue.fields?.priorityResponse?.name,
+        issue.fields?.priority?.name,
+        issue.fields?.assignee?.displayName,
+        issue.fields?.reporter?.displayName,
+        issue.fields?.issuetype?.name,
+      ]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(searchLower));
       
       const matchesPriority = !this.filterPriority || 
-        issue.fields?.priority?.name?.toLowerCase() === this.filterPriority.toLowerCase();
+        (issue.fields?.priorityResponse?.name?.toLowerCase() === this.filterPriority.toLowerCase() ||
+          issue.fields?.priority?.name?.toLowerCase() === this.filterPriority.toLowerCase());
       
-      return matchesSearch && matchesStatus && matchesPriority;
+      return matchesSearch && matchesPriority;
     }).sort((a, b) => {
       // Extract issue numbers from keys (e.g., "BUG-9" -> 9)
       const numA = parseInt(a.key?.split('-')[1] || '0', 10);
@@ -99,11 +145,6 @@ export class IssuesHomeComponent implements OnInit {
 
   onSearchChange(query: string): void {
     this.searchQuery = query;
-    this.applyFilters();
-  }
-
-  onStatusFilterChange(status: string): void {
-    this.filterStatus = status;
     this.applyFilters();
   }
 
@@ -141,7 +182,7 @@ export class IssuesHomeComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/projects']);
+    this.router.navigate(['/mcp/projects']);
   }
 
   getDescription(description: any): string {
@@ -173,13 +214,19 @@ export class IssuesHomeComponent implements OnInit {
     return 'No description provided';
   }
 
-  viewDetails(issue: any): void {
+  viewDetails(issue: IssueResponse): void {
     const issueKey = issue.key;
-    this.router.navigate(['/issue-details', issueKey], {
+    const selectedSite = this.mcpFrontendStateService.selectedSite;
+    const resolvedHostPart = this.hostPart
+      || String(selectedSite?.hostPart || '').trim()
+      || String(this.mcpFrontendStateService.selectedHostPart || '').trim();
+
+    this.router.navigate(['/mcp/issues', issueKey], {
       queryParams: {
         siteId: this.siteId,
+        hostPart: resolvedHostPart || undefined,
         source: this.source,
-        projectKey: this.projectKey
+        projectKey: this.projectKey || this.mcpFrontendStateService.selectedProjectKey || undefined
       }
     });
   }

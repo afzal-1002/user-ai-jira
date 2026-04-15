@@ -58,14 +58,21 @@ export class AdminUserManagementComponent implements OnInit {
     this.editingUserId = user.id;
     this.saveMessage = '';
     this.saveError = '';
+    
+    // Handle both old (userName, userEmail, userRole) and new (username, emailAddress, roles) field names
+    const apiUser = user as any;
+    const username = apiUser.username || user.userName || '';
+    const email = apiUser.emailAddress || user.userEmail || '';
+    const roles = apiUser.roles || user.userRole || ['USER'];
+    
     this.userForm.patchValue({
-      username: user.userName || '',
+      username: username,
       firstName: user.firstName || '',
       lastName: user.lastName || '',
-      emailAddress: user.userEmail || '',
+      emailAddress: email,
       phoneNumber: user.phoneNumber || '',
       password: '',
-      roles: Array.isArray(user.userRole) ? user.userRole : ['USER']
+      roles: Array.isArray(roles) ? roles : ['USER']
     });
   }
 
@@ -100,7 +107,7 @@ export class AdminUserManagementComponent implements OnInit {
     const payload = this.buildPayload();
 
     const request$ = this.editingUserId
-      ? this.userService.updateAdminUser(this.editingUserId, payload)
+      ? this.userService.updateUser(this.editingUserId, payload as any)
       : this.adminApiService.createUser(payload as AdminCreateUserPayload);
 
     request$.subscribe({
@@ -119,11 +126,6 @@ export class AdminUserManagementComponent implements OnInit {
 
   deleteUser(user: User): void {
     if (!user.id) {
-      return;
-    }
-
-    const confirmed = confirm(`Delete user ${user.userName}?`);
-    if (!confirmed) {
       return;
     }
 
@@ -162,6 +164,21 @@ export class AdminUserManagementComponent implements OnInit {
     if (!roles) return '-';
     if (Array.isArray(roles)) return roles.join(', ');
     return roles;
+  }
+
+  getUsername(user: User): string {
+    const apiUser = user as any;
+    return apiUser.username || user.userName || '-';
+  }
+
+  getRoles(user: User): string[] | string {
+    const apiUser = user as any;
+    return apiUser.roles || user.userRole || ['USER'];
+  }
+
+  isActive(user: User): boolean {
+    const apiUser = user as any;
+    return apiUser.active || user.active || false;
   }
 
   private buildPayload(): any {

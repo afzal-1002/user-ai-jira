@@ -4,7 +4,7 @@
     <h1 class="mb-0 flex-grow-1">Issue Details - {{ issueKey }}</h1>
     <a
       class="btn btn-primary"
-      [routerLink]="['/issue-details', issueKey, 'ai-analysis']"
+      [routerLink]="['/mcp/issues', issueKey, 'analysis']"
       [queryParams]="{ siteId: siteId, source: source, projectKey: projectKey }"
       *ngIf="issue"
     >

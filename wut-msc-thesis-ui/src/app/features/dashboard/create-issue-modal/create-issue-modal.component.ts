@@ -1,7 +1,8 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IssueService } from '../../../services/issue/issue.service';
+import { McpFrontendService } from '../../../services/mcp/mcp-frontend.service';
+import { CreateIssueRequest } from '../../../models/interface/mcp-server.interface';
 
 @Component({
   selector: 'app-create-issue-modal',
@@ -13,9 +14,8 @@ import { IssueService } from '../../../services/issue/issue.service';
 export class CreateIssueModalComponent implements OnInit {
   @Input() isOpen: boolean = false;
   @Input() projectKey: string = '';
-  @Input() baseUrl: string | null = null;
   @Output() close = new EventEmitter<void>();
-  @Output() issueCreated = new EventEmitter<any>();
+  @Output() issueCreated = new EventEmitter<{ id: string; key: string; self: string; [key: string]: unknown }>();
 
   isLoading = false;
   errorMessage = '';
@@ -36,7 +36,7 @@ export class CreateIssueModalComponent implements OnInit {
     { id: '10003', name: 'Sub-task' }
   ];
 
-  constructor(private issueService: IssueService) {}
+  constructor(private mcpFrontendService: McpFrontendService) {}
 
   ngOnInit(): void {}
 
@@ -68,12 +68,12 @@ export class CreateIssueModalComponent implements OnInit {
     this.successMessage = '';
 
     // Build the issue payload
-    const issuePayload = {
+    const issuePayload: CreateIssueRequest = {
       fields: {
         project: { key: this.projectKey },
         issuetype: { name: this.issuetype },
         summary: this.summary.trim()
-      } as any
+      }
     };
 
     // Add optional fields
@@ -105,27 +105,24 @@ export class CreateIssueModalComponent implements OnInit {
       issuePayload.fields.labels = this.labels.split(',').map(l => l.trim()).filter(l => l);
     }
 
-    // Call the service to create the issue
-    if (this.baseUrl) {
-      this.issueService.createIssue(issuePayload, this.baseUrl).subscribe({
-        next: (response: any) => {
-          this.isLoading = false;
-          this.successMessage = `Issue ${response.key} created successfully!`;
-          console.log('✅ Issue created:', response);
-          
-          // Emit the created issue and close after 2 seconds
-          setTimeout(() => {
-            this.issueCreated.emit(response);
-            this.closeModal();
-          }, 1500);
-        },
-        error: (error: any) => {
-          this.isLoading = false;
-          console.error('❌ Failed to create issue:', error);
-          this.errorMessage = error?.error?.message || error?.message || 'Failed to create issue. Please try again.';
-        }
-      });
-    }
+    this.mcpFrontendService.createIssue(issuePayload).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        this.successMessage = `Issue ${response.key} created successfully!`;
+        console.log('✅ Issue created:', response);
+
+        // Emit the created issue and close after 2 seconds
+        setTimeout(() => {
+          this.issueCreated.emit(response);
+          this.closeModal();
+        }, 1500);
+      },
+      error: (error: any) => {
+        this.isLoading = false;
+        console.error('❌ Failed to create issue:', error);
+        this.errorMessage = error?.error?.message || error?.message || 'Failed to create issue. Please try again.';
+      }
+    });
   }
 
   onKeyDown(event: KeyboardEvent): void {

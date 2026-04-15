@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
 
 export interface ProjectCreationPayload {
   key: string;
@@ -18,41 +18,49 @@ export interface ProjectCreationPayload {
 export class ProjectService {
   constructor(private http: HttpClient) {}
 
-  // Create a new project
+  // Project creation is not exposed by MCP server API.
   createProject(projectData: ProjectCreationPayload): Observable<any> {
-    return this.http.post('/api/wut/projects/create', projectData);
+    return throwError(() => new Error('Project creation is not supported by MCP server API.'));
   }
 
-  // Get all projects by baseUrl
-  getProjectsByBaseUrl(baseUrl: string): Observable<any[]> {
-    const params = { baseUrl };
-    return this.http.post<any[]>('/api/wut/projects/list/jira', {}, { params });
+  // Compatibility method kept for older callers; uses hostPart-aware MCP listing.
+  getProjectsByBaseUrl(baseUrlOrSiteId: string | number): Observable<any[]> {
+    const hostPart = String(baseUrlOrSiteId || '').trim();
+    if (!hostPart) {
+      return throwError(() => new Error('A hostPart value is required for MCP project listing.'));
+    }
+
+    const params = new HttpParams().set('hostPart', hostPart);
+    return this.http.get<any[]>('/api/wut/mcp/server/sites/projects/jira/by-host-part', { params });
   }
 
-  // Get local projects by baseUrl
-  getLocalProjectsByBaseUrl(baseUrl: string): Observable<any[]> {
-    const params = { baseUrl };
-    return this.http.post<any[]>('/api/wut/projects/list/local', {}, { params });
+  // Compatibility method kept for older callers; uses site-aware MCP listing.
+  getLocalProjectsByBaseUrl(baseUrlOrSiteId: string | number): Observable<any[]> {
+    const siteId = Number(baseUrlOrSiteId);
+    if (!siteId) {
+      return throwError(() => new Error('A numeric siteId is required for MCP project listing.'));
+    }
+    return this.http.get<any[]>(`/api/wut/mcp/server/sites/${siteId}/projects/local`);
   }
 
-  // Get all projects
+  // Not available without a site context in MCP flow.
   getAllProjects(): Observable<any[]> {
-    return this.http.get<any[]>('/api/wut/projects');
+    return throwError(() => new Error('Use site-based MCP project listing instead.'));
   }
 
-  // Get project by key
+  // Get project by key using source=jira by default.
   getProjectByKey(projectKey: string): Observable<any> {
-    return this.http.get(`/api/wut/projects/${projectKey}`);
+    const params = new HttpParams().set('source', 'jira');
+    return this.http.get(`/api/wut/mcp/server/projects/${projectKey}`, { params });
   }
 
-  // Update an existing Jira project by key
-  updateProject(projectKey: string, projectData: ProjectCreationPayload): Observable<any> {
-    return this.http.put(`/api/wut/projects/jira/${projectKey}`, projectData);
+  // MCP project update uses projectId.
+  updateProject(projectId: string | number, projectData: ProjectCreationPayload): Observable<any> {
+    return this.http.put(`/api/wut/mcp/server/projects/${projectId}`, projectData);
   }
 
-  // Delete project
+  // Project delete should not be exposed in MCP frontend.
   deleteProject(projectKey: string): Observable<void> {
-    // Use Jira-backed delete endpoint: /api/wut/projects/jira/{projectKey}
-    return this.http.delete<void>(`/api/wut/projects/jira/${projectKey}`);
+    return throwError(() => new Error('Project delete is not exposed by MCP server flow.'));
   }
 }

@@ -1,6 +1,10 @@
 import { defineConfig } from 'vite';
 import { ngrokConfig } from './src/config/ngrok.config';
 
+const backendTarget =
+  process.env['VITE_BACKEND_URL'] ||
+  (ngrokConfig.enabled ? ngrokConfig.backend : ngrokConfig.localBackend);
+
 export default defineConfig({
   server: {
     host: true,
@@ -8,7 +12,7 @@ export default defineConfig({
     allowedHosts: ['**'],
     proxy: {
       '/api': {
-        target: ngrokConfig.localBackend,
+        target: backendTarget,
         changeOrigin: true,
         secure: false
       }

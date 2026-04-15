@@ -1,51 +1,24 @@
 <!-- PROJECTS HOME PAGE -->
 <div class="projects-container">
-  <!-- Header Section -->
-  <div class="projects-header">
-    <div class="header-content">
-      <h2 class="page-title">Projects</h2>
-      <p class="page-subtitle">Manage your projects</p>
-    </div>
-    <button class="btn btn-primary btn-lg" routerLink="/create-project">
-      <span class="btn-icon">+</span> Create New Project
-    </button>
-  </div>
-
-  <!-- Project Source Toggle -->
-  <div class="project-source-toggle">
-    <div class="toggle-row mb-3">
-      <div class="w-100" style="max-width: 420px;">
-        <label class="form-label mb-1">Assigned Jira Site</label>
+  <!-- Header + Site Selection Card -->
+  <div class="card shadow-sm p-4 mb-4">
+    <div class="d-flex align-items-center justify-content-between gap-3">
+      <div class="d-flex align-items-center gap-2">
+        <h5 class="mb-0">{{ isBugsFlow ? 'Select Site To View Bugs' : 'Select Site To View Projects' }}</h5>
         <select
           class="form-select"
           [value]="selectedSite?.id || ''"
           (change)="onSiteChange($any($event.target).value)"
+          style="max-width: 250px; min-width: 220px;"
         >
-          <option value="" disabled>Select site</option>
+          <option value="" [selected]="!selectedSite">Select site</option>
           <option *ngFor="let site of assignedSites" [value]="site.id">
-            {{ site.siteName }} ({{ site.baseUrl || site.hostPart }})
+            {{ site.siteName }} ({{ site.baseURL || site.baseUrl || site.hostPart }})
           </option>
         </select>
       </div>
-    </div>
-
-    <div class="toggle-row">
-      <div class="toggle-buttons">
-        <button class="toggle-btn" 
-                [class.active]="projectSource === 'jira'"
-                (click)="toggleProjectSource('jira')">
-          <span class="toggle-icon">☁️</span>
-          Jira Projects
-        </button>
-        <button class="toggle-btn" 
-                [class.active]="projectSource === 'local'"
-                (click)="toggleProjectSource('local')">
-          <span class="toggle-icon">💾</span>
-          Local Projects
-        </button>
-      </div>
       <button
-        class="btn btn-secondary back-to-home-btn"
+        class="btn btn-secondary btn-sm"
         *ngIf="userId"
         [routerLink]="['/user-dashboard', userId]"
       >
@@ -59,7 +32,7 @@
     <div class="spinner-border text-primary" role="status">
       <span class="visually-hidden">Loading...</span>
     </div>
-    <p class="mt-3">Loading projects...</p>
+    <p class="mt-3">{{ isBugsFlow ? 'Loading bugs...' : 'Loading projects...' }}</p>
   </div>
 
   <!-- Error State -->
@@ -69,17 +42,21 @@
   </div>
 
   <!-- Empty State -->
-  <div *ngIf="!isLoading && projects.length === 0 && !errorMessage" class="empty-state">
+  <div *ngIf="!isLoading && !hasSelectedSite && !errorMessage" class="empty-state">
+    <div class="empty-state-icon">🧭</div>
+    <h4>Select a Site</h4>
+    <p>Choose one assigned site from the dropdown to view its {{ isBugsFlow ? 'bugs' : 'projects' }}.</p>
+  </div>
+
+  <!-- Projects Grid (Hidden in Bugs Flow) -->
+  <div *ngIf="!isLoading && !isBugsFlow && hasSelectedSite && projects.length === 0 && !errorMessage" class="empty-state">
     <div class="empty-state-icon">📁</div>
     <h4>No Projects Found</h4>
-    <p>You don't have any projects yet. Create one to get started.</p>
-    <button class="btn btn-primary" routerLink="/create-project">
-      Create Your First Project
-    </button>
+    <p>Select a site to load projects for that site.</p>
   </div>
 
   <!-- Projects Grid -->
-  <div *ngIf="!isLoading && projects.length > 0" class="projects-grid">
+  <div *ngIf="!isLoading && !isBugsFlow && projects.length > 0" class="projects-grid">
     <div *ngFor="let project of projects" class="project-card">
       <!-- Project Card Header -->
       <div class="project-card-header">
@@ -110,7 +87,7 @@
             <small class="detail-label">Project Lead:</small>
             <div class="lead-details">
               <img *ngIf="project.lead.avatarUrls?.['24x24']" 
-                   [src]="project.lead.avatarUrls['24x24']" 
+                    [src]="project.lead.avatarUrls?.['24x24']" 
                    [alt]="project.lead.displayName" 
                    class="lead-avatar" />
               <span class="lead-name">{{ project.lead.displayName }}</span>
@@ -172,33 +149,7 @@
         <button class="btn btn-sm btn-primary" (click)="editProject(project)">
           Edit
         </button>
-        <button class="btn btn-sm btn-primary" (click)="toggleDeleteConfirmation(project.key)">
-          Delete
-        </button>
-      </div>
-
-      <!-- Delete Confirmation Modal -->
-      <div *ngIf="deleteConfirmationProjectId === project.key" class="delete-confirmation">
-        <div class="delete-confirmation-content">
-          <h6>Delete Project?</h6>
-          <p>Are you sure you want to delete <strong>{{ project.key }} - {{ project.name }}</strong>? This action cannot be undone.</p>
-          <div class="confirmation-buttons">
-            <button class="btn btn-sm btn-danger" (click)="deleteProject(project.key)">
-              Yes, Delete
-            </button>
-            <button class="btn btn-sm btn-secondary" (click)="cancelDelete()">
-              Cancel
-            </button>
-          </div>
-        </div>
       </div>
     </div>
-  </div>
-
-  <!-- Back Button -->
-  <div class="back-button-container mt-4">
-    <button class="btn btn-secondary" routerLink="/home">
-      Back to Home
-    </button>
   </div>
 </div>

@@ -15,10 +15,15 @@ import { UserService } from '../../../services/user/user.service';
 export class AdminSiteAssignmentComponent implements OnInit {
   users: User[] = [];
   sites: AdminSite[] = [];
+  assignedSitesByUsername: AdminSite[] = [];
   isLoading = false;
   isAssigning = false;
+  isLoadingAssignedSites = false;
   successMessage = '';
   errorMessage = '';
+  assignedSitesMessage = '';
+
+  usernameLookup = new FormControl<string>('', { nonNullable: true, validators: [Validators.required] });
 
   assignmentForm = new FormGroup({
     userId: new FormControl<number | null>(null, { validators: [Validators.required] }),
@@ -80,10 +85,58 @@ export class AdminSiteAssignmentComponent implements OnInit {
       next: () => {
         this.isAssigning = false;
         this.successMessage = 'Site assigned successfully.';
+        const username = this.usernameLookup.value.trim();
+        if (username) {
+          this.fetchAssignedSitesByUsername();
+        }
       },
       error: (error) => {
         this.isAssigning = false;
         this.errorMessage = error?.error?.message || 'Could not assign site to user.';
+      }
+    });
+  }
+
+  fillUsernameFromSelectedUser(): void {
+    const selectedUserId = this.assignmentForm.controls.userId.value;
+    if (!selectedUserId) {
+      return;
+    }
+
+    const selectedUser = this.users.find((u) => u.id === selectedUserId);
+    const username = (selectedUser as any)?.username || selectedUser?.userName || '';
+    this.usernameLookup.setValue(username);
+  }
+
+  fetchAssignedSitesByUsername(): void {
+    this.assignedSitesMessage = '';
+    this.errorMessage = '';
+
+    if (this.usernameLookup.invalid) {
+      this.usernameLookup.markAsTouched();
+      return;
+    }
+
+    const username = this.usernameLookup.value.trim();
+    if (!username) {
+      this.usernameLookup.markAsTouched();
+      return;
+    }
+
+    this.isLoadingAssignedSites = true;
+    this.adminApiService.getSitesByUsername(username).subscribe({
+      next: (sites) => {
+        this.assignedSitesByUsername = sites || [];
+        this.assignedSitesMessage = this.assignedSitesByUsername.length
+          ? `Found ${this.assignedSitesByUsername.length} assigned site(s) for ${username}.`
+          : `No assigned sites found for ${username}.`;
+        this.isLoadingAssignedSites = false;
+      },
+      error: (error) => {
+        this.assignedSitesByUsername = [];
+        this.assignedSitesMessage = '';
+        this.errorMessage = error?.error?.message || 'Could not fetch assigned sites by username.';
+        this.isLoadingAssignedSites = false;
       }
     });
   }

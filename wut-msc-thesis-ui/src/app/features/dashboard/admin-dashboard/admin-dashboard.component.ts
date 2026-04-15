@@ -23,15 +23,12 @@ export class AdminDashboardComponent {
 features = [
   // User features
   { icon: '📁', title: 'Projects',       description: 'Manage your projects',       button: 'View Projects',  link: '/projects' },
-  { icon: '🐞', title: 'Bugs',           description: 'Track and report bugs',      button: 'View Bugs',      link: '/view-bugs' },
-  { icon: '📊', iconImage: 'assets/image/ai-images/ai-02.png', title: 'AI Estimations Analysis', description: 'Predict bug fix time',       button: 'AI Analysis',    link: '/ai-analysis' },
-  { icon: '📊', title: 'View History',   description: 'View past estimates',        button: 'History',        link: '/check-history' },
+  { icon: '🐞', title: 'Bugs',           description: 'Track and report bugs',      button: 'View Bugs',      link: '/mcp/projects' },
+  { icon: '📊', iconImage: 'assets/image/ai-images/ai-02.png', title: 'Estimation Analysis', description: 'AI estimation, history, and reports', button: 'Open Estimation Analysis', link: '/admin/estimation-analysis' },
 
   // Admin-specific features
+  { icon: '⚙️', title: 'Site Configuration', description: 'Manage site setup and user assignments', button: 'Open Site Configuration', link: '/admin/site-configuration' },
   { icon: '👥', title: 'User Management', description: 'Add, edit, or remove users', button: 'Manage Users',   link: '/admin/users' },
-  { icon: '⚙️', title: 'Site Management', description: 'Register Jira site connections', button: 'Manage Sites', link: '/admin/sites' },
-  { icon: '🔗', title: 'Site Assignment', description: 'Assign sites to users', button: 'Assign Sites', link: '/admin/site-assignments' },
-  { icon: '📑', title: 'Reports',        description: 'View detailed usage reports', button: 'View Reports',   link: '/admin/reports' },
   { icon: '🛡️', title: 'Roles & Access', description: 'Manage roles and permissions', button: 'Access Control', link: '/admin/roles' },
   { icon: '📦', title: 'Modules',        description: 'Enable or disable modules',  button: 'Manage Modules',  link: '/admin/modules' },
   { icon: '👤', title: 'Profile',        description: 'Edit your profile',          button: 'My Profile',     link: '/view-profile' }
@@ -85,7 +82,8 @@ features = [
       return;
     }
 
-    // Navigate to the link - AuthGuard will handle authentication
-    this.router.navigate([link]);
+    // Always navigate by absolute URL to avoid accidental relative path routing.
+    const target = link.startsWith('/') ? link : `/${link}`;
+    this.router.navigateByUrl(target);
   }
 }

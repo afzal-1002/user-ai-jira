@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { NgIf, NgFor, SlicePipe, NgClass } from '@angular/common';
-import { Router, RouterLink } from '@angular/router';
-import { ProjectService } from '../../../services/project/project.service';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../services/auth/auth.service';
 import { McpAssignedSite, McpFrontendService, McpProjectSource } from '../../../services/mcp/mcp-frontend.service';
 import { McpFrontendStateService } from '../../../services/mcp/mcp-frontend-state.service';
+import { JiraProjectResponse } from '../../../models/interface/mcp-server.interface';
+import { SiteService } from '../../../services/site/site.service';
 
 @Component({
   selector: 'app-projects-home',
@@ -14,32 +15,42 @@ import { McpFrontendStateService } from '../../../services/mcp/mcp-frontend-stat
   styleUrls: ['./projects-home.component.css']
 })
 export class ProjectsHomeComponent implements OnInit {
-  projects: any[] = [];
+  projects: JiraProjectResponse[] = [];
   assignedSites: McpAssignedSite[] = [];
   selectedSite: McpAssignedSite | null = null;
+  hasSelectedSite = false;
   isLoading = true;
   errorMessage = '';
-  deleteConfirmationProjectId: string | null = null;
+  currentUserLabel = '';
   projectSource: McpProjectSource = 'jira';
   userId: number | string | null = null;
+  isBugsFlow = false;
 
   constructor(
     public router: Router,
-    private projectService: ProjectService,
+    private route: ActivatedRoute,
     private authService: AuthService,
     private mcpFrontendService: McpFrontendService,
-    private mcpFrontendStateService: McpFrontendStateService
+    private mcpFrontendStateService: McpFrontendStateService,
+    private siteService: SiteService
   ) {}
 
   ngOnInit(): void {
     const user = this.authService.currentUser;
     this.userId = user?.id ?? null;
+    this.currentUserLabel = `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || user?.userName || 'Current User';
+    
+    // Check if this is the bugs flow
+    this.isBugsFlow = this.router.url.includes('/mcp/bugs');
+    
     this.initializeMcpContext();
   }
 
   initializeMcpContext(): void {
     this.isLoading = true;
     this.errorMessage = '';
+    this.projects = [];
+    this.hasSelectedSite = false;
 
     this.mcpFrontendService.getContext().subscribe({
       next: (context) => {
@@ -47,19 +58,34 @@ export class ProjectsHomeComponent implements OnInit {
         this.assignedSites = context?.sites || [];
         this.selectedSite = this.mcpFrontendStateService.selectedSite;
 
-        if (!this.selectedSite && this.assignedSites.length) {
-          this.selectedSite = this.assignedSites[0];
-          this.mcpFrontendStateService.selectSiteById(this.selectedSite.id);
-        }
-
-        if (!this.selectedSite) {
+        if (!this.assignedSites.length) {
           this.isLoading = false;
-          this.projects = [];
           this.errorMessage = 'No Jira sites are assigned to your account.';
           return;
         }
 
-        this.loadProjects();
+        if (!this.selectedSite) {
+          const persistedSiteId = this.mcpFrontendStateService.selectedSiteId;
+          if (persistedSiteId) {
+            this.selectedSite = this.assignedSites.find((site) => site.id === persistedSiteId) || null;
+            if (this.selectedSite) {
+              this.mcpFrontendStateService.selectSiteById(this.selectedSite.id);
+            }
+          }
+        }
+
+        if (this.selectedSite) {
+          this.hasSelectedSite = true;
+          this.isLoading = false;
+          if (this.isBugsFlow) {
+            this.goToBugs();
+          } else {
+            this.loadProjects();
+          }
+          return;
+        }
+
+        this.isLoading = false;
       },
       error: (error) => {
         this.isLoading = false;
@@ -69,6 +95,12 @@ export class ProjectsHomeComponent implements OnInit {
   }
 
   loadProjects(): void {
+    if (this.isBugsFlow) {
+      this.projects = [];
+      this.isLoading = false;
+      return;
+    }
+    
     if (!this.selectedSite) {
       this.projects = [];
       this.isLoading = false;
@@ -78,12 +110,20 @@ export class ProjectsHomeComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
+    const hostPart = (this.selectedSite.hostPart || '').trim();
+    if (this.projectSource === 'jira' && !hostPart) {
+      this.isLoading = false;
+      this.projects = [];
+      this.errorMessage = 'Selected site is missing hostPart. Please reselect a valid site.';
+      return;
+    }
+
     const projectCall = this.projectSource === 'jira'
-      ? this.mcpFrontendService.getJiraProjects(this.selectedSite.id)
+      ? this.mcpFrontendService.getJiraProjectsByHostPart(hostPart)
       : this.mcpFrontendService.getLocalProjects(this.selectedSite.id);
 
     projectCall.subscribe({
-      next: (data: any) => {
+      next: (data: JiraProjectResponse[] | JiraProjectResponse) => {
         this.isLoading = false;
         this.projects = Array.isArray(data) ? data : [data];
       },
@@ -97,45 +137,56 @@ export class ProjectsHomeComponent implements OnInit {
   toggleProjectSource(source: McpProjectSource): void {
     this.projectSource = source;
     this.mcpFrontendStateService.setSelectedSource(source);
-    this.loadProjects();
+    if (this.hasSelectedSite) {
+      this.loadProjects();
+    }
   }
 
   onSiteChange(siteIdRaw: string): void {
     const siteId = Number(siteIdRaw);
     if (!siteId) {
+      this.hasSelectedSite = false;
+      this.selectedSite = null;
+      this.projects = [];
       return;
     }
 
-    this.mcpFrontendStateService.selectSiteById(siteId);
-    this.selectedSite = this.mcpFrontendStateService.selectedSite;
-    this.loadProjects();
-  }
-
-  deleteProject(projectKey: string): void {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.projectService.deleteProject(projectKey).subscribe(
-      () => {
-        this.isLoading = false;
-        console.log('✅ Project deleted:', projectKey);
-        this.projects = this.projects.filter(p => p.key !== projectKey);
-        this.deleteConfirmationProjectId = null;
+    this.mcpFrontendStateService.selectSiteById(siteId);
+    this.selectedSite = this.mcpFrontendStateService.selectedSite;
+
+    this.siteService.getSiteById(siteId).subscribe({
+      next: (siteDetails) => {
+        this.assignedSites = this.assignedSites.map((site) =>
+          site.id === siteId ? ({ ...site, ...siteDetails }) : site
+        );
+
+        this.mcpFrontendStateService.setSites(this.assignedSites);
+        this.selectedSite = this.mcpFrontendStateService.selectedSite;
+        this.hasSelectedSite = true;
+        
+        if (this.isBugsFlow) {
+          this.goToBugs();
+        } else {
+          this.loadProjects();
+        }
       },
-      (error) => {
+      error: (error) => {
         this.isLoading = false;
-        console.error('❌ Failed to delete project:', error);
-        this.errorMessage = error.error?.message || 'Failed to delete project. Please try again.';
-        this.deleteConfirmationProjectId = null;
+        this.hasSelectedSite = false;
+        this.projects = [];
+        this.errorMessage = error?.error?.message || 'Failed to resolve selected site details.';
       }
-    );
+    });
   }
 
-  editProject(project: any): void {
+  editProject(project: JiraProjectResponse): void {
     this.router.navigate(['/edit-project', project.key], { state: { project } });
   }
 
-  viewProjectDetails(project: any): void {
+  viewProjectDetails(project: JiraProjectResponse): void {
     this.router.navigate(['/project-details', project.key], { state: { project } });
   }
 
@@ -144,19 +195,36 @@ export class ProjectsHomeComponent implements OnInit {
       return;
     }
 
-    this.router.navigate(['/issues', projectKey], {
+    this.mcpFrontendStateService.setSelectedProjectKey(projectKey);
+
+    this.router.navigate(['/mcp/projects', projectKey, 'issues'], {
       queryParams: {
-        siteId: this.selectedSite.id,
+        projectKey,
+        hostPart: this.selectedSite.hostPart || undefined,
         source: this.projectSource
       }
     });
   }
 
-  toggleDeleteConfirmation(projectKey: string): void {
-    this.deleteConfirmationProjectId = this.deleteConfirmationProjectId === projectKey ? null : projectKey;
+  goToBugs(): void {
+    if (!this.selectedSite) {
+      return;
+    }
+
+    const hostPart = (this.selectedSite.hostPart || '').trim();
+    if (!hostPart) {
+      this.errorMessage = 'Selected site is missing hostPart. Please reselect a valid site.';
+      return;
+    }
+
+    // Redirect to issues page to show all bugs/issues for this site
+    this.router.navigate(['/mcp/projects', 'all', 'issues'], {
+      queryParams: {
+        hostPart: hostPart,
+        source: 'jira',
+        showAllIssues: 'true'
+      }
+    });
   }
 
-  cancelDelete(): void {
-    this.deleteConfirmationProjectId = null;
-  }
 }

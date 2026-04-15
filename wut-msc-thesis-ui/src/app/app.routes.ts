@@ -37,6 +37,9 @@ import { AdminJiraConfigComponent } from './features/authentication/admin-jira-c
 import { AdminUserManagementComponent } from './features/authentication/admin-user-management/admin-user-management.component';
 import { AdminSiteManagementComponent } from './features/authentication/admin-site-management/admin-site-management.component';
 import { AdminSiteAssignmentComponent } from './features/authentication/admin-site-assignment/admin-site-assignment.component';
+import { SiteConfigurationComponent } from './features/dashboard/site-configuration/site-configuration.component';
+import { EstimationAnalysisComponent } from './features/dashboard/estimation-analysis/estimation-analysis.component';
+import { UserEstimationsAnalysisComponent } from './features/dashboard/user-estimations-analysis/user-estimations-analysis.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -52,17 +55,19 @@ export const routes: Routes = [
     { path: 'user-profile/:id', component: UserProfileComponent, canActivate: [AuthGuard] },
     { path: 'update-profile/:id', component: UpdateProfileComponent, canActivate: [AuthGuard] },
 
-    // Project routes
-    { path: 'projects', component: ProjectsHomeComponent, canActivate: [AuthGuard] },
+    // Project and MCP routes
+    { path: 'mcp', redirectTo: 'mcp/projects', pathMatch: 'full' },
     { path: 'mcp/projects', component: ProjectsHomeComponent, canActivate: [AuthGuard] },
-    { path: 'view-bugs', component: ProjectsHomeComponent, canActivate: [AuthGuard] },
+    { path: 'mcp/bugs', component: ProjectsHomeComponent, canActivate: [AuthGuard] },
+    { path: 'projects', component: ProjectsHomeComponent, canActivate: [AuthGuard] },
+    { path: 'mcp/sites', component: ProjectsHomeComponent, canActivate: [AuthGuard] },
+    { path: 'mcp/projects/:key/issues', component: IssuesHomeComponent, canActivate: [AuthGuard] },
     { path: 'create-project', component: CreateProjectComponent, canActivate: [AuthGuard] },
     { path: 'edit-project/:key', component: CreateProjectComponent, canActivate: [AuthGuard] },
     { path: 'project-details/:key', component: ProjectDetailComponent, canActivate: [AuthGuard] },
     { path: 'issues/:key', component: IssuesHomeComponent, canActivate: [AuthGuard] },
-    { path: 'mcp/issues/:key', component: IssuesHomeComponent, canActivate: [AuthGuard] },
+    { path: 'mcp/issues/:issueKey', component: IssueDetailComponent, canActivate: [AuthGuard] },
     { path: 'issue-details/:issueKey', component: IssueDetailComponent, canActivate: [AuthGuard] },
-    { path: 'mcp/issues/details/:issueKey', component: IssueDetailComponent, canActivate: [AuthGuard] },
     { path: 'issue-details/:issueKey/ai-analysis', component: AiAnalysisPageComponent, canActivate: [AuthGuard] },
     { path: 'mcp/issues/:issueKey/analysis', component: AiAnalysisPageComponent, canActivate: [AuthGuard] },
 
@@ -90,13 +95,17 @@ export const routes: Routes = [
     },
 
     // Dashboards (by user id)
+    { path: 'admin', component: AdminDashboardComponent, canActivate: [AuthGuard, AdminGuard] },
     { path: 'user-dashboard/:userId', component: UserDashboardComponent, canActivate: [AuthGuard] },
+    { path: 'user/estimations-analysis', component: UserEstimationsAnalysisComponent, canActivate: [AuthGuard] },
     { path: 'admin-dashboard/:userId', component: AdminDashboardComponent, canActivate: [AuthGuard, AdminGuard] },
 
     // Admin settings
     { path: 'admin/jira-platform', component: AdminJiraConfigComponent, canActivate: [AuthGuard, AdminGuard] },
     { path: 'admin/user-management', component: AdminUserManagementComponent, canActivate: [AuthGuard, AdminGuard] },
     { path: 'admin/users', component: AdminUserManagementComponent, canActivate: [AuthGuard, AdminGuard] },
+    { path: 'admin/site-configuration', component: SiteConfigurationComponent, canActivate: [AuthGuard, AdminGuard] },
+    { path: 'admin/estimation-analysis', component: EstimationAnalysisComponent, canActivate: [AuthGuard, AdminGuard] },
     { path: 'admin/sites', component: AdminSiteManagementComponent, canActivate: [AuthGuard, AdminGuard] },
     { path: 'admin/site-assignments', component: AdminSiteAssignmentComponent, canActivate: [AuthGuard, AdminGuard] },
 

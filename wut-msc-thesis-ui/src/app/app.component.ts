@@ -30,7 +30,14 @@ export class AppComponent {
     });
     // Dump router config for debugging
     try {
-      console.log('🧭 Router config:', this.router.config.map(r => ({ path: r.path, component: (r.component as any)?.name }))); 
+      console.log(
+        '🧭 Router config:',
+        this.router.config.map((r) => ({
+          path: r.path,
+          component: (r.component as any)?.name,
+          redirectTo: r.redirectTo || null
+        }))
+      );
     } catch (e) {
       console.warn('Could not dump router config', e);
     }

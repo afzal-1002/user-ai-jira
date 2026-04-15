@@ -88,12 +88,12 @@
             </thead>
             <tbody>
               <tr *ngFor="let user of users">
-                <td>{{ user.userName }}</td>
+                <td>{{ getUsername(user) }}</td>
                 <td>{{ user.firstName }} {{ user.lastName }}</td>
-                <td>{{ toRoles(user.userRole) }}</td>
+                <td>{{ toRoles(getRoles(user)) }}</td>
                 <td>
-                  <span class="badge" [class.bg-success]="user.active" [class.bg-secondary]="!user.active">
-                    {{ user.active ? 'Active' : 'Inactive' }}
+                  <span class="badge" [class.bg-success]="isActive(user)" [class.bg-secondary]="!isActive(user)">
+                    {{ isActive(user) ? 'Active' : 'Inactive' }}
                   </span>
                 </td>
                 <td class="text-end">

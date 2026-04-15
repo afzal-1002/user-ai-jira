@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { McpFrontendService, McpProjectSource } from '../../../services/mcp/mcp-frontend.service';
+import { McpFrontendStateService } from '../../../services/mcp/mcp-frontend-state.service';
 import { IssueResponseComponent } from './issue-response/issue-response.component';
 import { BugDetailsComponent } from './bug-details/bug-details.component';
 import { JiraIssueResponse } from '../../../models/interface/jira-issue.interface';
@@ -25,7 +26,8 @@ export class IssueDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private mcpFrontendService: McpFrontendService
+    private mcpFrontendService: McpFrontendService,
+    private mcpFrontendStateService: McpFrontendStateService
   ) {}
 
   // Debug: log construction
@@ -35,10 +37,21 @@ export class IssueDetailComponent implements OnInit {
   ngOnInit(): void {
     this.route.params.subscribe((params: any) => {
       this.issueKey = params['issueKey'] || '';
+      if (this.issueKey) {
+        this.mcpFrontendStateService.setSelectedIssueKey(this.issueKey);
+      }
       this.route.queryParams.subscribe((queryParams) => {
-        this.siteId = queryParams['siteId'] ? Number(queryParams['siteId']) : null;
+        this.siteId = queryParams['siteId'] ? Number(queryParams['siteId']) : this.mcpFrontendStateService.selectedSiteId;
         this.source = queryParams['source'] === 'local' ? 'local' : 'jira';
-        this.projectKey = queryParams['projectKey'] || null;
+        this.projectKey = queryParams['projectKey'] || this.mcpFrontendStateService.selectedProjectKey || null;
+
+        if (this.projectKey) {
+          this.mcpFrontendStateService.setSelectedProjectKey(this.projectKey);
+        }
+
+        if (this.siteId) {
+          this.mcpFrontendStateService.selectSiteById(this.siteId);
+        }
 
         if (this.issueKey) {
           this.loadIssueDetails();
@@ -51,7 +64,7 @@ export class IssueDetailComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.mcpFrontendService.getIssueDetails(this.issueKey).subscribe({
+    this.mcpFrontendService.getIssueWithComments(this.issueKey, this.siteId || undefined).subscribe({
       next: (data: any) => {
         this.isLoading = false;
         this.issue = data;
@@ -92,9 +105,15 @@ export class IssueDetailComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/issues', this.projectKey || this.issue?.fields?.project?.key || 'BUG'], {
+    const savedProjectKey = this.projectKey || this.issue?.fields?.project?.key || this.mcpFrontendStateService.selectedProjectKey || 'BUG';
+    const resolvedHostPart = this.mcpFrontendStateService.selectedHostPart || undefined;
+
+    this.mcpFrontendStateService.setSelectedProjectKey(savedProjectKey);
+
+    this.router.navigate(['/mcp/projects', savedProjectKey, 'issues'], {
       queryParams: {
         siteId: this.siteId,
+        hostPart: resolvedHostPart,
         source: this.source
       }
     });

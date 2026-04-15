@@ -37,14 +37,10 @@
           </ul>
         </li>
 
-        <!-- Home link to welcome dashboard -->
-        <ng-container *ngIf="authService.currentUser$ | async as user">
+        <!-- Home Dashboard (normal users only) -->
+        <ng-container *ngIf="(authService.isUser$ | async) && (authService.currentUser$ | async) as user">
           <li class="nav-item">
-            <a class="nav-link"
-               [routerLink]="(authService.isAdmin$ | async) ? ['/admin-dashboard', user.id]
-                                                   : ['/user-dashboard',  user.id]">
-              Home
-            </a>
+            <a class="nav-link" [routerLink]="['/user-dashboard', user.id]">Home Dashboard</a>
           </li>
         </ng-container>
 
@@ -66,15 +62,6 @@
         <ng-container *ngIf="authService.currentUser$ | async as user">
           <li class="nav-item" *ngIf="authService.isAdmin$ | async">
             <a class="nav-link" [routerLink]="['/admin-dashboard', user.id]">Admin Dashboard</a>
-          </li>
-          <li class="nav-item" *ngIf="authService.isAdmin$ | async">
-            <a class="nav-link" routerLink="/admin/sites">Sites</a>
-          </li>
-          <li class="nav-item" *ngIf="authService.isAdmin$ | async">
-            <a class="nav-link" routerLink="/admin/users">Users</a>
-          </li>
-          <li class="nav-item" *ngIf="authService.isAdmin$ | async">
-            <a class="nav-link" routerLink="/admin/site-assignments">Assignments</a>
           </li>
 
           <!-- User dropdown -->

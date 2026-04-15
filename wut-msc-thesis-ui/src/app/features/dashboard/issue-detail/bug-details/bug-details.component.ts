@@ -3,9 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CommentRendererComponent } from '../issue-response/comment-renderer/comment-renderer.component';
 import { JiraIssueResponse, Comment, DocumentBody, DocumentNode } from '../../../../models/interface/jira-issue.interface';
-import { IssueService } from '../../../../services/issue/issue.service';
-import { AuthService } from '../../../../services/auth/auth.service';
-import { JiraCommentService, JiraCommentUpdateRequest } from '../../../../services/ai/jira-comment.service';
+import { McpFrontendService } from '../../../../services/mcp/mcp-frontend.service';
+import { CreateCommentRequest, IssueResponse, UpdateCommentRequest } from '../../../../models/interface/mcp-server.interface';
 
 @Component({
   selector: 'app-bug-details',
@@ -22,7 +21,6 @@ export class BugDetailsComponent implements OnInit {
   displayedComments: Comment[] = [];
   totalComments = 0;
 
-  private baseUrl: string | null = null;
   deleteErrorMessage = '';
 
   editingCommentId: string | null = null;
@@ -35,19 +33,14 @@ export class BugDetailsComponent implements OnInit {
   addErrorMessage = '';
 
   constructor(
-    private issueService: IssueService,
-    private authService: AuthService,
-    private jiraCommentService: JiraCommentService
+    private mcpFrontendService: McpFrontendService
   ) {}
 
   ngOnInit() {
-    this.authService.currentUser$.subscribe(user => {
-      this.baseUrl = user?.baseUrl || null;
-      if (this.bug?.fields?.comment) {
-        this.totalComments = this.bug.fields.comment.total;
-        this.loadCommentPage(1);
-      }
-    });
+    if (this.bug?.fields?.comment) {
+      this.totalComments = this.bug.fields.comment.total;
+      this.loadCommentPage(1);
+    }
   }
 
   loadCommentPage(page: number) {
@@ -159,13 +152,13 @@ export class BugDetailsComponent implements OnInit {
   }
 
   deleteComment(comment: Comment): void {
-    if (!this.bug || !this.baseUrl || !comment.id) {
+    if (!this.bug || !comment.id) {
       return;
     }
 
     const issueKey = this.bug.key;
 
-    this.issueService.deleteIssueComment(issueKey, comment.id, this.baseUrl).subscribe({
+    this.mcpFrontendService.deleteIssueComment(issueKey, comment.id).subscribe({
       next: () => {
         if (!this.bug) return;
         const all = this.bug.fields.comment?.comments || [];
@@ -196,13 +189,13 @@ export class BugDetailsComponent implements OnInit {
   }
 
   saveEditedComment(comment: Comment): void {
-    if (!this.bug || !this.baseUrl || !comment.id || !this.editedCommentText.trim()) {
+    if (!this.bug || !comment.id || !this.editedCommentText.trim()) {
       return;
     }
 
     const issueKey = this.bug.key;
 
-    const payload = {
+    const payload: UpdateCommentRequest = {
       body: {
         type: 'doc',
         version: 1,
@@ -222,7 +215,7 @@ export class BugDetailsComponent implements OnInit {
     };
 
     this.updateInProgress = true;
-    this.issueService.updateIssueComment(issueKey, comment.id, payload, this.baseUrl).subscribe({
+    this.mcpFrontendService.updateIssueComment(issueKey, comment.id, payload).subscribe({
       next: () => {
         this.updateInProgress = false;
         comment.body = payload.body as DocumentBody;
@@ -264,7 +257,7 @@ export class BugDetailsComponent implements OnInit {
 
     const text = this.newCommentText.trim();
 
-    const request: JiraCommentUpdateRequest = {
+    const request: CreateCommentRequest = {
       body: {
         type: 'doc',
         version: 1,
@@ -287,24 +280,22 @@ export class BugDetailsComponent implements OnInit {
     this.addInProgress = true;
     this.addErrorMessage = '';
 
-    this.jiraCommentService.createComment(issueKey, request).subscribe({
+    this.mcpFrontendService.createIssueComment(issueKey, request).subscribe({
       next: () => {
         this.addInProgress = false;
         this.newCommentText = '';
 
         // reload issue to pick up new comment
-        if (this.baseUrl) {
-          this.issueService.getIssueByKey(issueKey, this.baseUrl).subscribe({
-            next: (updated: JiraIssueResponse) => {
-              this.bug = updated;
-              this.totalComments = updated.fields.comment?.total || updated.fields.comment?.comments?.length || 0;
-              this.loadCommentPage(this.commentPage);
-            },
-            error: (err: any) => {
-              console.error('Failed to refresh issue after adding comment', err);
-            }
-          });
-        }
+        this.mcpFrontendService.getIssueWithComments(issueKey).subscribe({
+          next: (updated: IssueResponse) => {
+            this.bug = updated as unknown as JiraIssueResponse;
+            this.totalComments = updated.fields.comment?.total || updated.fields.comment?.comments?.length || 0;
+            this.loadCommentPage(this.commentPage);
+          },
+          error: (err: any) => {
+            console.error('Failed to refresh issue after adding comment', err);
+          }
+        });
       },
       error: (err: any) => {
         this.addInProgress = false;

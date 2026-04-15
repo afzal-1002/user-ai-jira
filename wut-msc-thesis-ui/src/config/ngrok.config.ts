@@ -13,7 +13,7 @@ export const ngrokConfig = {
   backend: 'https://e0bfde46d21b.ngrok-free.app',
 
   // Local backend URL (fallback/primary)
-  localBackend: 'http://localhost:9001',
+  localBackend: 'http://127.0.0.1:9001',
 };
 
 // Helper function to get the API URL based on context

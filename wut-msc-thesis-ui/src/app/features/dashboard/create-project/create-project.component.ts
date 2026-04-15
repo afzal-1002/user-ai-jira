@@ -2,8 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { NgClass, NgIf } from '@angular/common';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { ProjectService } from '../../../services/project/project.service';
-import { AuthService } from '../../../services/auth/auth.service';
+import { McpFrontendService } from '../../../services/mcp/mcp-frontend.service';
+import { JiraProjectResponse, UpdateProjectRequest } from '../../../models/interface/mcp-server.interface';
 
 @Component({
   selector: 'app-create-project',
@@ -16,17 +16,17 @@ export class CreateProjectComponent implements OnInit {
   constructor(
     public router: Router,
     private route: ActivatedRoute,
-    private projectService: ProjectService,
-    private authService: AuthService
+    private mcpFrontendService: McpFrontendService
   ) {}
 
-  createdProject: any = null;
+  createdProject: JiraProjectResponse | null = null;
   isLoading = false;
   projectError = '';
   projectSuccess = '';
 
   isEditMode = false;
   originalProjectKey: string | null = null;
+  originalProjectId: number | string | null = null;
 
   projectForm = new FormGroup({
     key: new FormControl('', [Validators.required, Validators.pattern(/^[A-Z0-9]+$/)]),
@@ -48,33 +48,29 @@ export class CreateProjectComponent implements OnInit {
       if (state?.project && state.project.key === key) {
         this.patchFormFromProject(state.project);
       } else {
-        // Fallback: load projects for current user and find matching key
-        const user = this.authService.currentUser;
-        if (user && user.baseUrl) {
-          this.projectService.getProjectsByBaseUrl(user.baseUrl).subscribe({
-            next: (projects: any[]) => {
-              const proj = (projects || []).find(p => p.key === key);
-              if (proj) {
-                this.patchFormFromProject(proj);
-              }
-            },
-            error: (err: any) => {
-              console.error('Failed to load project for edit', err);
-            }
-          });
-        }
+        this.mcpFrontendService.getProjectDetails(key, 'jira').subscribe({
+          next: (project: JiraProjectResponse) => {
+            this.patchFormFromProject(project);
+          },
+          error: (err: any) => {
+            console.error('Failed to load project for edit', err);
+            this.projectError = err?.error?.message || err?.message || 'Failed to load project details.';
+          }
+        });
       }
     }
   }
 
-  private patchFormFromProject(project: any): void {
+  private patchFormFromProject(project: JiraProjectResponse): void {
+    const legacyProject = project as any;
+    this.originalProjectId = project.id ?? null;
     this.projectForm.patchValue({
       key: project.key || '',
-      projectName: project.name || project.projectName || '',
+      projectName: project.name || legacyProject.projectName || '',
       description: project.description || '',
-      projectTypeKey: project.projectTypeKey || project.projectType?.key || 'software',
+      projectTypeKey: project.projectTypeKey || legacyProject.projectType?.key || 'software',
       projectTemplateKey: project.projectTemplateKey || '',
-      leadAccountId: project.lead?.accountId || project.leadAccountId || '',
+      leadAccountId: project.lead?.accountId || legacyProject.leadAccountId || '',
       assigneeType: project.assigneeType || 'PROJECT_LEAD'
     });
   }
@@ -93,26 +89,23 @@ export class CreateProjectComponent implements OnInit {
 
     const projectData = this.projectForm.value;
 
-    const payload = {
-      key: projectData.key || '',
+    const payload: UpdateProjectRequest = {
       projectName: projectData.projectName || '',
       projectTypeKey: projectData.projectTypeKey || 'software',
-      projectTemplateKey: projectData.projectTemplateKey || 'com.pyxis.greenhopper.jira:gh-simplified-scrum-classic',
       description: projectData.description || '',
-      leadAccountId: projectData.leadAccountId || '',
-      assigneeType: projectData.assigneeType || 'PROJECT_LEAD'
+      leadAccountId: projectData.leadAccountId || ''
     };
 
-    if (this.isEditMode && this.originalProjectKey) {
+    if (this.isEditMode && this.originalProjectKey && this.originalProjectId) {
       console.log('📤 Sending project update data:', payload);
-      this.projectService.updateProject(this.originalProjectKey, payload as any).subscribe({
-        next: (response: any) => {
+      this.mcpFrontendService.updateProject(this.originalProjectId, payload).subscribe({
+        next: (response: JiraProjectResponse) => {
           this.isLoading = false;
           console.log('✅ Project updated successfully:', response);
-          this.projectSuccess = `Project '${response.projectName || payload.projectName}' updated successfully!`;
+          this.projectSuccess = `Project '${response.name || payload.projectName}' updated successfully!`;
 
           setTimeout(() => {
-            this.router.navigate(['/projects']);
+            this.router.navigate(['/mcp/projects']);
           }, 1500);
         },
         error: (error) => {
@@ -132,44 +125,8 @@ export class CreateProjectComponent implements OnInit {
       return;
     }
 
-    console.log('📤 Sending project creation data:', payload);
-
-    this.projectService.createProject(payload as any).subscribe(
-      (response: any) => {
-        this.isLoading = false;
-        console.log('✅ Project created successfully:', response);
-
-        this.createdProject = response;
-        this.projectSuccess = `Project '${response.projectName || projectData.projectName}' created successfully!`;
-        this.projectForm.reset();
-        this.projectForm.patchValue({
-          projectTypeKey: 'software',
-          projectTemplateKey: 'com.pyxis.greenhopper.jira:gh-simplified-scrum-classic',
-          assigneeType: 'PROJECT_LEAD'
-        });
-
-        setTimeout(() => {
-          this.router.navigate(['/projects']);
-        }, 2000);
-      },
-      (error) => {
-        this.isLoading = false;
-        console.error('❌ Project creation failed:', error);
-        console.error('Error status:', error.status);
-        console.error('Error details:', error.error);
-
-        let errorMessage = 'Project creation failed. Please try again.';
-        if (error.error?.message) {
-          errorMessage = error.error.message;
-        } else if (error.error?.error) {
-          errorMessage = error.error.error;
-        } else if (error.message) {
-          errorMessage = error.message;
-        }
-
-        this.projectError = errorMessage;
-      }
-    );
+    this.isLoading = false;
+    this.projectError = 'Project creation is not supported in MCP server flow. Use an existing Jira project and edit it if needed.';
   }
 
   getValidationClass(controlName: string) {

@@ -25,33 +25,11 @@
     <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
   </div>
 
-  <!-- Warning: Jira profile not available -->
-  <div *ngIf="!isLoading && !jiraUser && appUser" class="alert alert-warning alert-dismissible fade show" role="alert">
-    <strong>Note:</strong> Could not load Jira profile details. Application profile is displayed below.
-    <button type="button" class="btn-close" (click)="jiraUser = null"></button>
-  </div>
-
   <!-- Profile Content -->
   <div *ngIf="!isLoading && !errorMessage" class="profile-content">
     
-    <!-- Avatar and Name Section (Jira info if available, otherwise app user) -->
-    <div class="profile-card profile-header-card" *ngIf="jiraUser">
-      <div class="profile-avatar">
-        <div class="avatar-placeholder">
-          {{ jiraUser.displayName?.charAt(0)?.toUpperCase() || 'U' }}
-        </div>
-      </div>
-      <div class="profile-name-section">
-        <h3 class="profile-display-name">{{ jiraUser.displayName }}</h3>
-        <p class="profile-account-id">{{ jiraUser.accountId }}</p>
-        <span class="badge" [ngClass]="jiraUser.active ? 'bg-success' : 'bg-danger'">
-          {{ jiraUser.active ? '● Active' : '● Inactive' }}
-        </span>
-      </div>
-    </div>
-
-    <!-- Avatar and Name Section (Fallback to app user if Jira not available) -->
-    <div class="profile-card profile-header-card" *ngIf="!jiraUser && appUser">
+    <!-- Avatar and Name Section -->
+    <div class="profile-card profile-header-card" *ngIf="appUser">
       <div class="profile-avatar">
         <div class="avatar-placeholder">
           {{ appUser.firstName?.charAt(0)?.toUpperCase() || appUser.userName?.charAt(0)?.toUpperCase() || 'U' }}
@@ -60,41 +38,6 @@
       <div class="profile-name-section">
         <h3 class="profile-display-name">{{ appUser.firstName }} {{ appUser.lastName }}</h3>
         <p class="profile-account-id">{{ appUser.userName }}</p>
-      </div>
-    </div>
-
-    <!-- Jira Details Card -->
-    <div *ngIf="jiraUser" class="profile-card details-card">
-      <h4 class="card-title">Jira Account Information</h4>
-      
-      <div class="details-grid">
-        
-        <!-- Email Address -->
-        <div class="detail-section">
-          <label class="detail-label">Email Address</label>
-          <p class="detail-value">{{ jiraUser.emailAddress }}</p>
-        </div>
-
-        <!-- Account Type -->
-        <div class="detail-section">
-          <label class="detail-label">Account Type</label>
-          <p class="detail-value">
-            <span class="badge bg-info">{{ jiraUser.accountType }}</span>
-          </p>
-        </div>
-
-        <!-- Time Zone -->
-        <div class="detail-section">
-          <label class="detail-label">Time Zone</label>
-          <p class="detail-value">{{ jiraUser.timeZone }}</p>
-        </div>
-
-        <!-- Locale -->
-        <div class="detail-section">
-          <label class="detail-label">Locale</label>
-          <p class="detail-value">{{ jiraUser.locale }}</p>
-        </div>
-
       </div>
     </div>
 
@@ -130,12 +73,6 @@
               {{ role }}
             </span>
           </p>
-        </div>
-
-        <!-- Base URL -->
-        <div class="detail-section">
-          <label class="detail-label">Jira Base URL</label>
-          <p class="detail-value text-break">{{ appUser.baseUrl }}</p>
         </div>
 
       </div>

@@ -21,7 +21,7 @@ export class HeaderComponent {
   logOut(): void {
     this.authService.logout();
     this.mcpFrontendStateService.clear();
-    this.router.navigate(['home'], { queryParams: { userLogedin: false } });
+    this.router.navigate(['/login']);
   }
 
   userLoggedIn(): void {

@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, NgIf, NgFor } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ProjectService } from '../../../services/project/project.service';
-import { AuthService } from '../../../services/auth/auth.service';
+import { McpFrontendService } from '../../../services/mcp/mcp-frontend.service';
 
 @Component({
   selector: 'app-project-detail',
@@ -20,8 +19,7 @@ export class ProjectDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private projectService: ProjectService,
-    private authService: AuthService
+    private mcpFrontendService: McpFrontendService
   ) {}
 
   ngOnInit(): void {
@@ -43,20 +41,10 @@ export class ProjectDetailComponent implements OnInit {
       return;
     }
 
-    // Fallback: load projects from API and find this one
-    const user = this.authService.currentUser;
-    if (!user || !user.baseUrl) {
-      this.isLoading = false;
-      this.errorMessage = 'User information not available. Please log in again.';
-      return;
-    }
-
-    this.projectService.getProjectsByBaseUrl(user.baseUrl).subscribe({
-      next: (projects: any[]) => {
+    this.mcpFrontendService.getProjectDetails(this.projectKey, 'jira').subscribe({
+      next: (project: any) => {
         this.isLoading = false;
-        if (Array.isArray(projects)) {
-          this.project = projects.find(p => p.key === this.projectKey) || null;
-        }
+        this.project = project || null;
         if (!this.project) {
           this.errorMessage = `Project with key ${this.projectKey} not found.`;
         }
@@ -70,12 +58,12 @@ export class ProjectDetailComponent implements OnInit {
   }
 
   goBackToProjects(): void {
-    this.router.navigate(['/projects']);
+    this.router.navigate(['/mcp/projects']);
   }
 
   viewBugs(): void {
     if (this.projectKey) {
-      this.router.navigate(['/issues', this.projectKey]);
+      this.router.navigate(['/mcp/projects', this.projectKey, 'issues']);
     }
   }
 }

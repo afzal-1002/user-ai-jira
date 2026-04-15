@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { McpFrontendService, McpProjectSource } from '../../../../services/mcp/mcp-frontend.service';
+import { McpFrontendStateService } from '../../../../services/mcp/mcp-frontend-state.service';
 import { AiIssueAnalysis } from '../../../../models/interface/ai-response.interface';
 import { AiBackendModel } from '../../../../models/interface/ai-analysis-options.interface';
 import { AiResponseComponent } from '../ai-response/ai-response.component';
-import { JiraCommentService, JiraCommentUpdateRequest } from '../../../../services/ai/jira-comment.service';
 
 @Component({
   selector: 'app-ai-analysis-page',
@@ -48,16 +48,20 @@ export class AiAnalysisPageComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private mcpFrontendService: McpFrontendService,
-    private jiraCommentService: JiraCommentService
+    private mcpFrontendStateService: McpFrontendStateService
   ) {}
 
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.issueKey = params['issueKey'] || '';
       this.route.queryParams.subscribe((queryParams) => {
-        this.siteId = queryParams['siteId'] ? Number(queryParams['siteId']) : null;
+        this.siteId = queryParams['siteId'] ? Number(queryParams['siteId']) : this.mcpFrontendStateService.selectedSiteId;
         this.source = queryParams['source'] === 'local' ? 'local' : 'jira';
         this.projectKey = queryParams['projectKey'] || null;
+
+        if (this.siteId) {
+          this.mcpFrontendStateService.selectSiteById(this.siteId);
+        }
       });
 
       if (!this.issueKey) {
@@ -70,6 +74,11 @@ export class AiAnalysisPageComponent implements OnInit {
 
   runAnalysis(): void {
     if (!this.issueKey || this.isLoading) {
+      return;
+    }
+
+    if (!this.siteId) {
+      this.errorMessage = 'Please select a Jira site before running analysis.';
       return;
     }
 
@@ -120,7 +129,7 @@ export class AiAnalysisPageComponent implements OnInit {
   }
 
   goBackToIssue(): void {
-    this.router.navigate(['/issue-details', this.issueKey], {
+    this.router.navigate(['/mcp/issues', this.issueKey], {
       queryParams: {
         siteId: this.siteId,
         source: this.source,
@@ -179,7 +188,7 @@ export class AiAnalysisPageComponent implements OnInit {
     // Build AI Analysis header with metadata
     const content = this.buildAIAnalysisCommentContent(texts);
 
-    const request: JiraCommentUpdateRequest = {
+    const request = {
       body: {
         type: 'doc',
         version: 1,
@@ -198,8 +207,10 @@ export class AiAnalysisPageComponent implements OnInit {
     this.errorMessage = '';
 
     // First check if AI comments already exist
-    this.jiraCommentService.getAIComments(issueKey).subscribe({
-      next: (existingComments: any[]) => {
+    this.mcpFrontendService.getIssueWithComments(issueKey).subscribe({
+      next: (issueWithComments: any) => {
+        const comments = issueWithComments?.fields?.comment?.comments || issueWithComments?.comments || [];
+        const existingComments = comments.filter((comment: any) => this.isAiComment(comment));
         console.log('🔍 Checking for existing AI comments:', existingComments);
         
         if (existingComments && existingComments.length > 0) {
@@ -208,7 +219,7 @@ export class AiAnalysisPageComponent implements OnInit {
           
           // Check if comments are actually visible or hidden
           const commentCount = existingComments.length;
-          const isVisible = existingComments.some(c => c?.visible !== false);
+          const isVisible = existingComments.some((c: any) => c?.visible !== false);
           
           this.errorMessage = `⚠️ AI Analysis Comments Already Exist: This issue already has ${commentCount} AI analysis comment(s).
 
@@ -251,8 +262,8 @@ This is likely a temporary backend issue. Try again in a moment.`;
   /**
    * Helper method to create a new Jira comment
    */
-  private createNewComment(issueKey: string, request: JiraCommentUpdateRequest): void {
-    this.jiraCommentService.createComment(issueKey, request).subscribe({
+  private createNewComment(issueKey: string, request: any): void {
+    this.mcpFrontendService.createIssueComment(issueKey, request).subscribe({
       next: () => {
         this.isUpdating = false;
         this.updateSuccessMessage = '✅ Comment added to Jira successfully with selected AI content.';
@@ -289,6 +300,27 @@ Or contact your administrator if the issue persists.`;
         }
       }
     });
+  }
+
+  private isAiComment(comment: any): boolean {
+    const text = this.extractText(comment?.body || {});
+    return text.toLowerCase().includes('ai analysis') || text.toLowerCase().includes('root cause');
+  }
+
+  private extractText(node: any): string {
+    if (!node) {
+      return '';
+    }
+
+    if (typeof node.text === 'string') {
+      return node.text;
+    }
+
+    if (Array.isArray(node.content)) {
+      return node.content.map((child: any) => this.extractText(child)).join(' ');
+    }
+
+    return '';
   }
 
   onCommentModelChoiceChange(): void {

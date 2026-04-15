@@ -18,15 +18,14 @@ import { AuthService } from '../../../services/auth/auth.service';
 export class UserDashboardComponent implements OnInit {
   userList: User[] = [];
   user: User | null | undefined = null;
+  private readonly adminOnlyTitles = new Set(['Site Configuration', 'User Management', 'Roles & Access']);
  
  features = [
    // User features
-   { icon: '📁', title: 'Projects',       description: 'Manage your projects',       button: 'View Projects',  link: '/mcp/projects' },
-   { icon: '🐞', title: 'Bugs',           description: 'Track and report bugs',      button: 'View Bugs',      link: '/mcp/projects' },
-  { icon: '📊', iconImage: 'assets/image/ai-images/ai-02.png', title: 'AI Estimations Analysis', description: 'Predict bug fix time',       button: 'Open AI Estimations',    link: '/ai-estimations' },
-  { icon: '📊', title: 'Model Comparison', description: 'Compare AI models (Gemini vs DeepSeek)', button: 'Open Comparison', link: '/ai-estimations/comparison' },
-  { icon: '🧪', title: 'AI Research', description: 'Bias, stability, explainability and human-in-the-loop analysis', button: 'Open AI Research', link: '/ai-research' },
-  { icon: '🕒', title: 'Historical AI Performance',   description: 'Analyse past estimations and accuracy over time',        button: 'Open History',        link: '/history' },
+   { icon: '🌐', title: 'Select Site',    description: 'Choose one of your assigned Jira sites to work with', button: 'Select Site', link: '/mcp/projects' },
+   { icon: '📁', title: 'Projects',       description: 'Manage projects in your selected site', button: 'View Projects',  link: '/mcp/projects' },
+  { icon: '🐞', title: 'Bugs',           description: 'Track and report bugs for your selected site', button: 'View Bugs',      link: '/mcp/projects' },
+  { icon: '📊', iconImage: 'assets/image/ai-images/ai-02.png', title: 'Estimations Analysis', description: 'AI estimations, model comparison, research, and history', button: 'Open Estimations Analysis', link: '/user/estimations-analysis' },
   { icon: '📋', title: 'API Logs', description: 'Monitor and analyze API calls and errors', button: 'View API Logs', link: '/api-logs' },
     { icon: '🔔', title: 'Notifications',  description: 'Stay up to date',            button: 'Alerts',         link: '/notifications' },
     { icon: '👤', title: 'Profile',        description: 'Edit your profile',          button: 'My Profile',     link: '/view-profile' },
@@ -54,6 +53,9 @@ export class UserDashboardComponent implements OnInit {
          if (userId != null) {
            this.user = this.userList.find(u => u.id === userId) ?? this.user;
          }
+
+        // Defensive filtering: normal users should never see admin-only cards.
+        this.features = this.features.filter((feature) => !this.adminOnlyTitles.has(feature.title));
    
          console.log(this.user ? '✅ User found:' : '❌ No user found', this.user);
        },
@@ -81,8 +83,9 @@ export class UserDashboardComponent implements OnInit {
        return;
      }
  
-     // Navigate to the link - AuthGuard will handle authentication
-     this.router.navigate([link]);
+    // Always navigate by absolute URL to avoid accidental relative path routing.
+    const target = link.startsWith('/') ? link : `/${link}`;
+    this.router.navigateByUrl(target);
    }
 
    viewProfile(): void {
