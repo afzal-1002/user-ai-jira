@@ -27,7 +27,7 @@ export class AiAnalysisPageComponent implements OnInit {
   updateSuccessMessage = '';
 
   // configuration state for AI request
-  aiModel: AiBackendModel | null = 'GEMINI';
+  aiModel: AiBackendModel = 'GEMINI';
   markdown = true;
   explanation = true;
   userPrompt = '';
@@ -38,8 +38,7 @@ export class AiAnalysisPageComponent implements OnInit {
   includeGeneration = true;
   visibilityRole = 'Administrators';
 
-  // when both models are requested, allow choosing which response to use for Jira comment
-  commentModelChoice: AiBackendModel = 'DEEPSEEK';
+  commentModelChoice: AiBackendModel = 'GEMINI';
 
   // optional selection of specific markdown sections from the chosen AI response
   sectionSelections: { title: string; content: string; selected: boolean }[] = [];
@@ -108,12 +107,7 @@ export class AiAnalysisPageComponent implements OnInit {
           gemini: geminiText || undefined
         };
 
-        // default comment model choice when BOTH is selected from UI
-        if (this.aiModel === 'BOTH') {
-          this.commentModelChoice = deepseekText ? 'DEEPSEEK' : 'GEMINI';
-        } else if (this.aiModel) {
-          this.commentModelChoice = this.aiModel;
-        }
+        this.commentModelChoice = 'GEMINI';
 
         this.rebuildSectionSelections();
 
@@ -323,30 +317,12 @@ Or contact your administrator if the issue persists.`;
     return '';
   }
 
-  onCommentModelChoiceChange(): void {
-    this.rebuildSectionSelections();
-  }
-
   private getCurrentModelTextForComment(): string {
     if (!this.analysis) {
       return '';
     }
 
-    let base = this.analysis.generation || '';
-
-    if (this.aiModel === 'DEEPSEEK' && this.analysis.deepseek) {
-      base = this.analysis.deepseek;
-    } else if (this.aiModel === 'GEMINI' && this.analysis.gemini) {
-      base = this.analysis.gemini;
-    } else if (this.aiModel === 'BOTH') {
-      if (this.commentModelChoice === 'DEEPSEEK' && this.analysis.deepseek) {
-        base = this.analysis.deepseek;
-      } else if (this.commentModelChoice === 'GEMINI' && this.analysis.gemini) {
-        base = this.analysis.gemini;
-      }
-    }
-
-    return base || '';
+    return this.analysis.gemini || this.analysis.generation || '';
   }
 
   private rebuildSectionSelections(): void {
@@ -504,7 +480,7 @@ Or contact your administrator if the issue persists.`;
         },
         {
           type: 'text',
-          text: ` | Model: ${this.aiModel === 'BOTH' ? this.commentModelChoice : this.aiModel}`
+          text: ` | Model: ${this.aiModel}`
         }
       ]
     });

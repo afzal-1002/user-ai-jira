@@ -4,10 +4,7 @@
 /* Background with image */
 .login-bg {
   min-height: 100vh;
-  background-image: url('../../../assets/image/main-image/KeryBrd01.jpg');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  background: linear-gradient(135deg, #f5f7fb 0%, #e8eef7 100%);
 }
 
 /* Input field */
