@@ -7,11 +7,12 @@ import { McpFrontendStateService } from '../../../../services/mcp/mcp-frontend-s
 import { AiIssueAnalysis } from '../../../../models/interface/ai-response.interface';
 import { AiBackendModel } from '../../../../models/interface/ai-analysis-options.interface';
 import { AiResponseComponent } from '../ai-response/ai-response.component';
+import { AiAnalysisHeaderComponent } from './ai-analysis-header/ai-analysis-header.component'; // Import the new header component
 
 @Component({
   selector: 'app-ai-analysis-page',
   standalone: true,
-  imports: [CommonModule, FormsModule, AiResponseComponent],
+  imports: [CommonModule, FormsModule, AiResponseComponent, AiAnalysisHeaderComponent], // Add AiAnalysisHeaderComponent to imports
   templateUrl: './ai-analysis-page.component.html',
   styleUrls: ['./ai-analysis-page.component.css']
 })
