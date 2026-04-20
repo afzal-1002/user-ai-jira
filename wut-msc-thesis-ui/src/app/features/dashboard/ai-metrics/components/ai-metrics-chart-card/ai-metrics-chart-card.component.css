@@ -1,0 +1,85 @@
+.chart-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1rem;
+  background-color: #ffffff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  width: 100%;
+}
+
+.chart-card--dense {
+  padding: 0.5rem 0.65rem;
+}
+
+.chart-card--dense .chart-card__caption {
+  margin-top: 0.35rem;
+}
+
+.chart-card--constrained {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.chart-card__header {
+  text-align: center;
+  margin-bottom: 0.35rem;
+}
+
+.chart-card__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.chart-card__subtitle {
+  margin: 0.1rem 0 0.35rem;
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.chart-card__body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.chart-card__canvas {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+}
+
+.chart-card__canvas canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+.chart-card__body canvas,
+.chart-card__body--compact canvas {
+  width: 100%;
+}
+
+.chart-card__addon {
+  width: 100%;
+}
+
+.chart-card__caption {
+  margin-top: 0.35rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.chart-card__empty {
+  padding: 1.25rem;
+  text-align: center;
+  color: #94a3b8;
+  font-size: 0.9rem;
+  border: 1px dashed #cbd5f5;
+  border-radius: 8px;
+  background: #f8fafc;
+}

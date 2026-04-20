@@ -1,0 +1,124 @@
+<div class="container py-4 admin-site-wrap">
+  <div class="row g-4">
+    <div class="col-lg-5">
+      <div class="card shadow-sm p-4 h-100">
+        <h4>{{ editingSiteId ? 'Update Jira Site Connection' : 'Create Jira Site Connection' }}</h4>
+        <p class="text-muted small">Admin-only setup. Jira token is encrypted in backend storage.</p>
+
+        <div *ngIf="successMessage" class="alert alert-success py-2">{{ successMessage }}</div>
+        <div *ngIf="errorMessage" class="alert alert-danger py-2">{{ errorMessage }}</div>
+
+        <form [formGroup]="siteForm" (ngSubmit)="saveSite()">
+          <div class="mb-2">
+            <label class="form-label">Site Name</label>
+            <input class="form-control" formControlName="siteName" type="text" placeholder="My Jira" />
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Host Part</label>
+            <input class="form-control" formControlName="hostPart" type="text" placeholder="your-domain" />
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Base URL</label>
+            <input class="form-control" formControlName="baseUrl" type="text" placeholder="https://your-domain.atlassian.net" />
+          </div>
+
+          <div class="mb-2">
+            <label class="form-label">Jira Username</label>
+            <input class="form-control" formControlName="username" type="text" placeholder="jira-admin@company.com" />
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Jira Token</label>
+            <input class="form-control" formControlName="jiraToken" type="password" placeholder="Jira API token" />
+          </div>
+
+          <button class="btn btn-primary me-2" type="submit" [disabled]="isSaving">
+            {{ isSaving ? 'Saving...' : (editingSiteId ? 'Update Site' : 'Create Site Connection') }}
+          </button>
+          <button *ngIf="editingSiteId" class="btn btn-outline-secondary" type="button" (click)="cancelEditSite()" [disabled]="isSaving">
+            Cancel Edit
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      <div class="card shadow-sm p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h4 class="mb-0">Configured Sites</h4>
+          <button class="btn btn-sm btn-outline-primary" type="button" (click)="loadSites()">Refresh</button>
+        </div>
+
+        <div class="row g-2 align-items-end mb-3">
+          <div class="col-md-7">
+            <label class="form-label mb-1">Filter by Username</label>
+            <input
+              class="form-control form-control-sm"
+              type="text"
+              [formControl]="usernameFilter"
+              placeholder="user1@gmail.com"
+            />
+            <div class="invalid-hint small" *ngIf="usernameFilter.invalid && usernameFilter.touched">
+              Username is required.
+            </div>
+          </div>
+          <div class="col-md-5 d-flex gap-2">
+            <button
+              class="btn btn-sm btn-outline-primary"
+              type="button"
+              (click)="filterSitesByUsername()"
+              [disabled]="isFiltering"
+            >
+              {{ isFiltering ? 'Filtering...' : 'Filter' }}
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" type="button" (click)="clearSiteFilter()">
+              Clear
+            </button>
+          </div>
+        </div>
+
+        <div *ngIf="filterMessage" class="alert alert-info py-2 mb-2">{{ filterMessage }}</div>
+
+        <div *ngIf="isLoading" class="text-muted">Loading sites...</div>
+
+        <div class="table-responsive" *ngIf="!isLoading">
+          <table class="table table-sm align-middle">
+            <thead>
+              <tr>
+                <th>Site Name</th>
+                <th>Host</th>
+                <th>Base URL</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let site of sites">
+                <td>{{ site.siteName }}</td>
+                <td>{{ site.hostPart || '-' }}</td>
+                <td>{{ getDisplayBaseUrl(site) }}</td>
+                <td class="text-end">
+                  <button class="btn btn-sm btn-outline-primary me-2" type="button" (click)="startEditSite(site)">
+                    Edit
+                  </button>
+                  <button
+                    class="btn btn-sm btn-outline-danger"
+                    type="button"
+                    (click)="deleteSite(site)"
+                    [disabled]="deletingSiteId === site.id"
+                  >
+                    {{ deletingSiteId === site.id ? 'Deleting...' : 'Delete' }}
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="sites.length === 0">
+                <td colspan="4" class="text-center text-muted">No sites found.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

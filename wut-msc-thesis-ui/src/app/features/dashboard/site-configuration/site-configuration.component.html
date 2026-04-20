@@ -1,0 +1,33 @@
+<div class="container mt-5 site-config-section">
+  <div class="welcome-banner text-center p-3 mb-3">
+    <h3 class="mb-0">Site Configuration</h3>
+  </div>
+
+  <div class="row g-4 mt-1 justify-content-center site-config-cards">
+    <div class="col-12 col-sm-10 col-md-6 col-lg-4 config-card-col">
+      <div class="card customCard h-100">
+        <div class="card-body text-center">
+          <div class="fs-1 mb-2">⚙️</div>
+          <h5 class="card-title mt-3">Site Management</h5>
+          <p class="card-text">Register Jira site connections</p>
+          <a class="btn btn-primary dashboard-feature-btn" routerLink="/admin/sites">Manage Sites</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-10 col-md-6 col-lg-4 config-card-col">
+      <div class="card customCard h-100">
+        <div class="card-body text-center">
+          <div class="fs-1 mb-2">🔗</div>
+          <h5 class="card-title mt-3">Site Assignment</h5>
+          <p class="card-text">Assign sites to users</p>
+          <a class="btn btn-primary dashboard-feature-btn" routerLink="/admin/site-assignments">Assign Sites</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="text-center mt-4">
+    <a class="btn btn-secondary dashboard-feature-btn" routerLink="/admin">Back to Admin Dashboard</a>
+  </div>
+</div>

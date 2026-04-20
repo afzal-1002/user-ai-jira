@@ -1,0 +1,34 @@
+.auto-fix-card {
+  background: #ffffff;
+  border-radius: 10px;
+  border: 1px solid #dfe4ea;
+  padding: 16px;
+  margin-top: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.auto-fix-header {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.progress-text {
+  font-weight: 600;
+  color: #334155;
+}
+
+.result-panel {
+  border: 1px solid #dbeafe;
+  background: #f8fbff;
+  border-radius: 8px;
+  padding: 14px;
+}
+
+@media (max-width: 768px) {
+  .auto-fix-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

@@ -1,0 +1,66 @@
+<section class="review-page">
+  <header class="card review-header">
+    <div>
+      <p class="eyebrow">Review Result</p>
+      <h1>AI Session Review</h1>
+      <p class="mb-0">Session: <strong>{{ sessionId }}</strong></p>
+    </div>
+    <button class="btn btn-outline-secondary btn-sm" type="button" (click)="goBackToWorkspace()">
+      Back To Workspace
+    </button>
+  </header>
+
+  <div *ngIf="isLoading" class="card centered-state">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2 mb-0">Loading review details...</p>
+  </div>
+
+  <div *ngIf="!isLoading && errorMessage" class="alert alert-danger">
+    {{ errorMessage }}
+  </div>
+
+  <section *ngIf="!isLoading && session" class="card review-card">
+    <div class="detail-grid">
+      <p><strong>Status:</strong> {{ session.status }}</p>
+      <p><strong>Repository:</strong> {{ session.repositoryName || session.repoName || 'N/A' }}</p>
+      <p><strong>Branch:</strong> {{ session.branchName || 'N/A' }}</p>
+      <p><strong>Base Branch:</strong> {{ session.baseBranch || 'N/A' }}</p>
+      <p><strong>Created:</strong> {{ session.createdAt || 'N/A' }}</p>
+      <p><strong>Updated:</strong> {{ session.updatedAt || 'N/A' }}</p>
+    </div>
+
+    <div class="action-links">
+      <a
+        *ngIf="session.compareUrl"
+        class="btn btn-outline-primary btn-sm"
+        [href]="session.compareUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Open Compare
+      </a>
+      <a
+        *ngIf="session.pullRequestUrl"
+        class="btn btn-primary btn-sm"
+        [href]="session.pullRequestUrl"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Open Pull Request
+      </a>
+    </div>
+
+    <div *ngIf="session.changedFiles?.length" class="changed-files">
+      <h2>Changed Files</h2>
+      <ul>
+        <li *ngFor="let file of session.changedFiles">{{ file }}</li>
+      </ul>
+    </div>
+
+    <div *ngIf="session.userMessage" class="alert alert-info mt-3 mb-0">
+      {{ session.userMessage }}
+    </div>
+  </section>
+</section>

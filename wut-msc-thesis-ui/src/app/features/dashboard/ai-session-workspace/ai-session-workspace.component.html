@@ -1,0 +1,158 @@
+<section class="session-workspace">
+  <header class="workspace-header card">
+    <div>
+      <p class="eyebrow">AI Session Workspace</p>
+      <h1>Copilot Flow for {{ issueKey || 'Selected Issue' }}</h1>
+      <p class="session-meta">
+        Session: <strong>{{ sessionId }}</strong>
+      </p>
+    </div>
+
+    <div class="header-actions">
+      <span class="status-pill" [ngClass]="statusClass(sessionStatus)">{{ sessionStatus }}</span>
+      <button class="btn btn-outline-secondary btn-sm" type="button" (click)="goToIssueDetails()" [disabled]="!issueKey">
+        Open Issue
+      </button>
+    </div>
+  </header>
+
+  <div *ngIf="isSessionLoading" class="card centered-state">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2 mb-0">Loading session state from backend...</p>
+  </div>
+
+  <div *ngIf="!isSessionLoading && sessionError" class="alert alert-danger">
+    {{ sessionError }}
+  </div>
+
+  <div *ngIf="!isSessionLoading && !sessionError" class="workspace-grid">
+    <aside class="left-column card">
+      <h2>Issue Context</h2>
+      <p class="issue-title">{{ selectedIssueSummary }}</p>
+
+      <div class="meta-row">
+        <span>Project</span>
+        <strong>{{ projectKey || 'N/A' }}</strong>
+      </div>
+      <div class="meta-row">
+        <span>Repository</span>
+        <strong>{{ analysis?.repositoryName || session?.repositoryName || session?.repoName || 'N/A' }}</strong>
+      </div>
+      <div class="meta-row">
+        <span>Branch</span>
+        <strong>{{ session?.branchName || 'N/A' }}</strong>
+      </div>
+
+      <hr />
+
+      <h3>Analysis</h3>
+      <p *ngIf="analysis?.analysisSummary" class="analysis-text">{{ analysis?.analysisSummary }}</p>
+      <p *ngIf="!analysis?.analysisSummary" class="analysis-empty">No analysis yet. Run analysis to continue.</p>
+
+      <div *ngIf="analysisError" class="alert alert-danger mt-2 mb-0">{{ analysisError }}</div>
+
+      <button class="btn btn-primary btn-sm mt-3" type="button" (click)="runAnalysis()" [disabled]="isAnalyzing">
+        <span *ngIf="!isAnalyzing">{{ analysis ? 'Re-run Analysis' : 'Run Analysis' }}</span>
+        <span *ngIf="isAnalyzing">Analyzing...</span>
+      </button>
+
+      <div class="mt-3" *ngIf="analysis?.candidateFiles?.length">
+        <h3>Candidate Files</h3>
+        <select class="form-select" [(ngModel)]="selectedFilePath">
+          <option *ngFor="let file of analysis?.candidateFiles" [value]="file">{{ file }}</option>
+        </select>
+      </div>
+
+      <div class="mt-3" *ngIf="possibleSolutions.length">
+        <h3>Possible Solutions</h3>
+        <ul class="solution-list">
+          <li *ngFor="let solution of possibleSolutions">{{ solution }}</li>
+        </ul>
+      </div>
+    </aside>
+
+    <main class="center-column">
+      <section class="card snippet-card">
+        <h2>Recommended Snippet</h2>
+        <p class="recommended-file" *ngIf="analysis?.recommendedFile">{{ analysis?.recommendedFile }}</p>
+        <pre class="snippet-view" *ngIf="analysis?.impactedCodeSnippet">{{ analysis?.impactedCodeSnippet }}</pre>
+        <p *ngIf="!analysis?.impactedCodeSnippet" class="analysis-empty mb-0">No code snippet available yet.</p>
+      </section>
+
+      <section class="card diff-card">
+        <div class="diff-header">
+          <div>
+            <h2>Diff Preview</h2>
+            <p class="mb-0" *ngIf="preview?.filePath">File: {{ preview?.filePath }}</p>
+          </div>
+          <button class="btn btn-primary btn-sm" type="button" (click)="generatePreview()" [disabled]="!canGeneratePreview">
+            <span *ngIf="!isPreviewLoading">{{ previewButtonText }}</span>
+            <span *ngIf="isPreviewLoading">Generating...</span>
+          </button>
+        </div>
+
+        <div *ngIf="previewError" class="alert alert-danger mt-2">{{ previewError }}</div>
+
+        <p class="change-summary" *ngIf="preview?.changeSummary">{{ preview?.changeSummary }}</p>
+        <pre class="diff-view" *ngIf="preview?.diffText">{{ preview?.diffText }}</pre>
+        <p *ngIf="!preview?.diffText" class="analysis-empty mb-0">
+          Generate a preview to inspect before/after changes.
+        </p>
+      </section>
+    </main>
+
+    <aside class="right-column card">
+      <h2>Actions</h2>
+
+      <label class="form-label" for="prompt">Prompt Refinement</label>
+      <textarea
+        id="prompt"
+        class="form-control"
+        rows="6"
+        [(ngModel)]="prompt"
+        placeholder="Keep the fix minimal and safe."
+      ></textarea>
+
+      <label class="form-label mt-3" for="commitMessage">Commit Message</label>
+      <input
+        id="commitMessage"
+        type="text"
+        class="form-control"
+        [(ngModel)]="commitMessage"
+        placeholder="AI fix for issue"
+      />
+
+      <div class="button-stack mt-3">
+        <button class="btn btn-primary" type="button" (click)="generatePreview()" [disabled]="!canGeneratePreview">
+          {{ previewButtonText }}
+        </button>
+        <button class="btn btn-success" type="button" (click)="applyFix()" [disabled]="!canApplyFix">
+          <span *ngIf="!isApplying">Apply Fix</span>
+          <span *ngIf="isApplying">Applying...</span>
+        </button>
+        <button class="btn btn-outline-primary" type="button" (click)="sendForReview()" [disabled]="!canSendForReview">
+          <span *ngIf="!isSendingReview">Send For Review</span>
+          <span *ngIf="isSendingReview">Sending...</span>
+        </button>
+      </div>
+
+      <div *ngIf="applyError" class="alert alert-danger mt-3 mb-0">{{ applyError }}</div>
+      <div *ngIf="reviewError" class="alert alert-danger mt-3 mb-0">{{ reviewError }}</div>
+
+      <div class="result-box mt-3" *ngIf="applyResult || session?.compareUrl || session?.pullRequestUrl">
+        <p class="mb-1"><strong>Apply Result</strong></p>
+        <p class="mb-1" *ngIf="applyResult?.userMessage || session?.userMessage">{{ applyResult?.userMessage || session?.userMessage }}</p>
+        <p class="mb-1" *ngIf="applyResult?.compareUrl || session?.compareUrl">
+          Compare URL:
+          <a [href]="applyResult?.compareUrl || session?.compareUrl" target="_blank" rel="noopener noreferrer">Open compare</a>
+        </p>
+        <p class="mb-0" *ngIf="applyResult?.pullRequestUrl || session?.pullRequestUrl">
+          PR URL:
+          <a [href]="applyResult?.pullRequestUrl || session?.pullRequestUrl" target="_blank" rel="noopener noreferrer">Open pull request</a>
+        </p>
+      </div>
+    </aside>
+  </div>
+</section>

@@ -1,0 +1,13 @@
+.card-title {
+  font-weight: 600;
+}
+
+.summary-header-row {
+  gap: 0.75rem;
+}
+
+.summary-back-btn {
+  border-radius: 999px;
+  padding: 0.2rem 0.9rem;
+  font-size: 0.8rem;
+}

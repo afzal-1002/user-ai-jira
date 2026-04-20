@@ -1,0 +1,13 @@
+.section-title {
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.dashboard-feature-btn {
+  border-radius: 999px;
+  padding-inline: 1.5rem;
+}
+
+.site-config-cards .config-card-col {
+  max-width: 440px;
+}

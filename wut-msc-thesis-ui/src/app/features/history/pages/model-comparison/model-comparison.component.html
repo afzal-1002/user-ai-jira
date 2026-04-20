@@ -1,0 +1,31 @@
+<div class="container mt-4 history-page">
+  <div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+      <h2 class="mb-1">Model Comparison</h2>
+      <p class="text-muted mb-0">Average absolute error across history for Gemini vs DeepSeek.</p>
+    </div>
+    <div>
+      <button class="btn btn-outline-secondary btn-sm history-back-btn" (click)="goBack()">
+        &larr; Back to History
+      </button>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h5 class="card-title mb-1">Historical Model Comparison</h5>
+      <p class="text-muted small mb-3">Performance comparison between AI models across all historical data.</p>
+
+      <div *ngIf="isLoading" class="small text-muted">Loading model comparison...</div>
+      <div *ngIf="error" class="small text-danger">{{ error }}</div>
+
+      <ng-container *ngIf="!isLoading && !error && (values[0] || values[1])">
+        <app-bar-comparison-chart [labels]="labels" [values]="values"></app-bar-comparison-chart>
+      </ng-container>
+
+      <div *ngIf="!isLoading && !error && !(values[0] || values[1])" class="small text-muted">
+        No model comparison data available.
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,31 @@
+<table *ngIf="history?.length; else noData" class="table">
+  <thead>
+    <tr>
+      <th>Date</th>
+      <th>Model</th>
+      <th>Estimated → Actual (h)</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let record of history">
+      <td>{{ record.createdAt | date:'short' }}</td>
+      <td>{{ record.aiProvider }}</td>
+      <td>
+        <ng-container *ngIf="record.actualHours != null; else noActual">
+          {{ record.estimatedHours }} → {{ record.actualHours }}
+        </ng-container>
+        <ng-template #noActual>-</ng-template>
+      </td>
+      <td>
+        <span>
+          {{ record.explanationEnabled ? 'Explanation ON' : 'Explanation OFF' }}
+          {{ record.userPromptProvided ? '| Human-in-loop' : '' }}
+        </span>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<ng-template #noData>
+  <div>No estimation history available.</div>
+</ng-template>

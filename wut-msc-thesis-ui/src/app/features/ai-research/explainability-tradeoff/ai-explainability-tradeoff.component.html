@@ -1,0 +1,48 @@
+<div class="container mt-4 ai-research-page">
+  <div class="research-header">
+    <div>
+      <h2 class="research-header__title">Explainability Trade-off</h2>
+      <p class="research-header__subtitle">
+        Mirrors the AI metrics dashboard grouping by contrasting quality vs latency when explanations are toggled.
+      </p>
+    </div>
+    <button type="button" class="btn btn-outline-secondary research-back-btn" (click)="goBack()">
+      &larr; Back
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="research-status research-status--loading">Loading explainability analysis&#8230;</div>
+  <div *ngIf="!isLoading && error" class="research-status research-status--error">{{ error }}</div>
+
+  <div class="chart-stack" *ngIf="!isLoading && !error">
+    <app-ai-metrics-chart-card
+      title="Quality vs Latency"
+      subtitle="Explanation enabled vs disabled"
+      caption="Figure: Shared grouped-bar motif comparing quality and responsiveness when explanations are switched on."
+      [chartType]="'bar'"
+      [chartData]="explainabilityChartData"
+      [chartOptions]="explainabilityChartOptions">
+      <div class="metric-band" *ngIf="explainabilitySummaryChips.length">
+        <div class="metric-chip" *ngFor="let chip of explainabilitySummaryChips">
+          <span class="metric-chip__label">{{ chip.label }}</span>
+          <span class="metric-chip__value">{{ chip.value }}</span>
+        </div>
+      </div>
+    </app-ai-metrics-chart-card>
+
+    <app-ai-metrics-chart-card
+      title="Run Distribution"
+      subtitle="Share of runs with explanations enabled"
+      caption="Figure: Doughnut view in line with the metrics tab pie charts, highlighting focus on explainable experiments."
+      [chartType]="'doughnut'"
+      [chartData]="explanationDistributionChartData"
+      [chartOptions]="explanationDistributionChartOptions"
+      [dense]="true">
+    </app-ai-metrics-chart-card>
+  </div>
+
+  <section class="raw-result-card" *ngIf="result">
+    <h5 class="mb-2">Raw Explainability Metrics</h5>
+    <pre class="small mb-0">{{ result | json }}</pre>
+  </section>
+</div>

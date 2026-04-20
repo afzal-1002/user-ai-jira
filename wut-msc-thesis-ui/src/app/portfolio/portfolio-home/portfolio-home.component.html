@@ -1,0 +1,114 @@
+<div class="container">
+    <div>
+        <h1> {{userName}}</h1>
+    </div>
+</div>
+
+<div class="container mt-5 emp-profile bg-white p-4 rounded shadow">
+    <form method="post">
+        <div class="row">
+            <div class="col-md-4 text-center">
+                <img class="img-fluid rounded-circle mb-3"
+                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS52y5aInsxSm31CvHOFHWujqUx_wWTS9iM6s7BAm21oEN_RiGoog"
+                    alt="Profile Image" width="150" />
+                <div class="btn btn-primary btn-sm">
+                    Change Photo
+                    <input type="file" name="file" hidden />
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="profile-head">
+                    <h5>Muhammad Afzal</h5>
+                    <h6>AI Developer & Spring Boot Microservices Engineer</h6>
+                    <p class="text-muted">Thesis: AI for Bug Resolution Time Estimation</p>
+
+                    <ul class="nav nav-tabs mt-3" id="profileTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="about-tab" data-bs-toggle="tab" data-bs-target="#about"
+                                type="button" role="tab">About</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="timeline-tab" data-bs-toggle="tab" data-bs-target="#timeline"
+                                type="button" role="tab">Timeline</button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-2 d-flex align-items-start justify-content-end">
+                <button type="submit" class="btn btn-outline-primary mt-2">Edit Profile</button>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="profile-work">
+                    <p class="fw-bold">Links</p>
+                    <a href="#">Thesis GitHub</a><br />
+                    <a href="#">LinkedIn</a><br />
+                    <a href="#">Personal Website</a><br />
+
+                    <p class="fw-bold mt-4">Skills</p>
+                    <span class="badge bg-secondary me-1">Java</span>
+                    <span class="badge bg-secondary me-1">Spring Boot</span>
+                    <span class="badge bg-secondary me-1">Microservices</span>
+                    <span class="badge bg-secondary me-1">AI Integration</span>
+                    <span class="badge bg-secondary">Angular</span>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="tab-content" id="profileTabContent">
+                    <!-- About Tab -->
+                    <div class="tab-pane fade show active" id="about" role="tabpanel">
+                        <div class="row mb-2">
+                            <div class="col-md-6"><strong>User ID</strong></div>
+                            <div class="col-md-6">afzal10002</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-6"><strong>Email</strong></div>
+                            <div class="col-md-6">afzalgmail.com</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-6"><strong>Phone</strong></div>
+                            <div class="col-md-6">+48 123 456 789</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-6"><strong>Profession</strong></div>
+                            <div class="col-md-6">Software Engineer</div>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Tab -->
+                    <div class="tab-pane fade" id="timeline" role="tabpanel">
+                        <div class="row mb-2">
+                            <div class="col-md-6"><strong>Thesis Stage</strong></div>
+                            <div class="col-md-6">Development Phase</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-6"><strong>Target Completion</strong></div>
+                            <div class="col-md-6">June 2025</div>
+                        </div>
+                        <div class="row mb-2">
+                            <div class="col-md-6"><strong>Supervisor</strong></div>
+                            <div class="col-md-6">doc. dr inż. Roman Podraza</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 mt-2">
+                                <strong>Thesis Summary</strong>
+                                <p>
+                                    This project leverages AI to estimate bug resolution times in a microservices
+                                    architecture. Using
+                                    Spring Boot, Angular, and Jira API integration, it aims to streamline software
+                                    maintenance through
+                                    intelligent predictions.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

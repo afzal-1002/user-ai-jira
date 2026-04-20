@@ -1,0 +1,20 @@
+<div class="container mt-4 ai-research-page">
+  <h2 class="mb-2">AI Research Evaluation Dashboard</h2>
+  <p class="text-muted mb-3">
+    Modular research views for bias, explainability, stability, human-in-the-loop impact, hybrid strategy, and overall thesis summary.
+  </p>
+
+  <!-- Centered card with pill-style research tabs -->
+  <div class="ai-research-tabs-card">
+    <ul class="nav nav-pills mb-0 ai-research-tabs justify-content-center">
+      <li class="nav-item"><a routerLink="bias" routerLinkActive="active" class="nav-link">Bias &amp; Error</a></li>
+      <li class="nav-item"><a routerLink="explainability" routerLinkActive="active" class="nav-link">Explainability Trade-off</a></li>
+      <li class="nav-item"><a routerLink="stability" routerLinkActive="active" class="nav-link">Stability &amp; Variance</a></li>
+      <li class="nav-item"><a routerLink="human-in-loop" routerLinkActive="active" class="nav-link">Human-in-the-Loop</a></li>
+      <li class="nav-item"><a routerLink="hybrid" routerLinkActive="active" class="nav-link">Hybrid Strategy</a></li>
+      <li class="nav-item"><a routerLink="summary" routerLinkActive="active" class="nav-link">Research Summary</a></li>
+    </ul>
+  </div>
+
+  <router-outlet></router-outlet>
+</div>

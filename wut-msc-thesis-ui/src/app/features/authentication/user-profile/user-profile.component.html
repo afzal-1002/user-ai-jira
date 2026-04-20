@@ -1,0 +1,57 @@
+<!-- <app-view-profile [userId]="user?.id"></app-view-profile> -->
+
+<div class="container rounded bg-white mt-5 mb-5 shadow p-4" style="max-width: 800px; margin-top: 200px;" *ngIf="user">
+    <div class="row d-flex align-items-center">
+        <!-- Left: Profile Picture & Username -->
+        <div class="col-md-4 text-center">
+            <img class="rounded-circle" width="120" src="https://cdn-icons-png.flaticon.com/512/921/921347.png"
+                alt="Profile" />
+            <h5 class="mt-3">{{ user.firstName }}</h5>
+        </div>
+
+        <!-- Right: Profile Info -->
+        <div class="col-md-8">
+            <h4 class="mb-4 text-center">
+                <i class="bi bi-person-fill text-primary" style="margin-left: -180px;"></i>
+                👤 User Profile
+            </h4>
+            <hr />
+
+            <div class="row mb-3">
+                <div class="col-5 fw-semibold">First Name:</div>
+                <div class="col-7">{{ user.firstName }}</div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-5 fw-semibold">Last Name:</div>
+                <div class="col-7">{{ user.lastName }}</div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-5 fw-semibold">Phone Number:</div>
+                <div class="col-7">{{ user.phoneNumber }}</div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-5 fw-semibold">Email:</div>
+                <div class="col-7">{{ user.userEmail }}</div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-5 fw-semibold">Password:</div>
+                <!-- mask for safety -->
+                <div class="col-7">{{user.password}}</div>
+            </div>
+
+            <div class="text-center mt-4 d-flex justify-content-center gap-3">
+                <button class="btn btn-outline-primary" (click)="updateProfile()">
+                    Update Profile
+                </button>
+
+                <button class="btn btn-outline-secondary" (click)="goHome()">
+                    Home
+                </button>
+            </div>
+
+        </div>
+    </div>

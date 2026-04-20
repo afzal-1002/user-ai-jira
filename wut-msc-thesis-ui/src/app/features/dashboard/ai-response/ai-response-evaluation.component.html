@@ -1,0 +1,18 @@
+<div class="container mt-4 ai-response-evaluation-page">
+  <!-- Card 1: Top heading and back button -->
+
+
+  <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
+    <h4 class="mb-1 ai-response-eval-title">AI Response Evaluation</h4>
+    <button class="btn btn-outline-secondary rounded-pill response-eval-back-btn" (click)="goBack()">
+      &larr; Back to AI Estimations
+    </button>
+  </div>
+
+  <div class="ai-response-eval-subtitle text-muted mb-3" style="font-size: 1.05rem; font-weight: 400;">
+    Detailed response time analysis and extremes for AI models.
+  </div>
+
+  <!-- Card 2 & 3: AI Response Timing UI -->
+  <app-ai-response-timing></app-ai-response-timing>
+</div>

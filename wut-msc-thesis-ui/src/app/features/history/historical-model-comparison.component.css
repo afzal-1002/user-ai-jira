@@ -1,0 +1,8 @@
+.chart-caption {
+  font-style: italic;
+}
+
+.history-comp-table {
+  max-height: 260px;
+  overflow-y: auto;
+}

@@ -1,0 +1,45 @@
+<!-- Card 2: Timing heading and buttons -->
+<div class="ai-timing-btn-group mb-4" style="max-width: 420px; margin: 0 auto; border-radius: 2rem; background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.04); border: 1.5px solid #e5e7eb;">
+  <ul class="nav nav-pills small ai-comparison-tabs mb-0 justify-content-center" style="list-style: none; padding-left: 0;">
+    <li class="nav-item">
+      <button class="nav-link ai-timing-btn-custom"
+              [class.active]="activeResponseView === 'stats'"
+              (click)="setActiveResponseView('stats')">
+        Stats
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link ai-timing-btn-custom"
+              [class.active]="activeResponseView === 'summary'"
+              (click)="setActiveResponseView('summary')">
+        Extremes
+      </button>
+    </li>
+  </ul>
+</div>
+
+<app-ai-response-stats
+  *ngIf="activeResponseView === 'stats'"
+  [isLoading]="isLoadingResponseTime"
+  [error]="responseTimeError"
+  [stats]="responseTimeStats"
+  [barChartData]="barChartData"
+  [barChartOptions]="barChartOptions"
+  [barChartType]="barChartType"
+  [boxChartData]="boxChartData"
+  [boxChartOptions]="boxChartOptions"
+  [boxChartType]="boxChartType"
+  [radarChartData]="radarChartData"
+  [radarChartOptions]="radarChartOptions"
+  [radarChartType]="radarChartType"
+  [lineChartData]="lineChartData"
+  [lineChartOptions]="lineChartOptions"
+  [lineChartType]="lineChartType">
+</app-ai-response-stats>
+
+<app-ai-response-extremes
+  *ngIf="activeResponseView === 'summary'"
+  [isLoading]="isLoadingResponseTime"
+  [error]="responseTimeError"
+  [summary]="responseTimeSummary">
+</app-ai-response-extremes>

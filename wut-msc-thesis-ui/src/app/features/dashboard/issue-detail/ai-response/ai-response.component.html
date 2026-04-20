@@ -1,0 +1,28 @@
+<div class="ai-response-container" *ngIf="analysis">
+  <div class="ai-header">
+    <h3>🧠 AI Analysis for {{ analysis?.issueKey }}</h3>
+    <span class="ai-badge">Preview</span>
+  </div>
+
+  <div class="ai-body">
+    <div class="ai-summary" *ngIf="hasDetails">
+      <h4 class="ai-title">{{ analysis?.details?.title }}</h4>
+      <p class="ai-description">{{ analysis?.details?.description }}</p>
+    </div>
+
+    <div class="ai-generation">
+      <h4 class="section-title">AI Recommendation</h4>
+      <div class="ai-generation-content" [innerHTML]="generationHtml"></div>
+    </div>
+
+    <div class="ai-comments" *ngIf="analysis?.details?.comments?.length">
+      <h5 class="section-title">Comments considered ({{ analysis?.details?.comments?.length || 0 }})</h5>
+      <ul>
+        <li *ngFor="let c of (analysis?.details?.comments || [])" class="ai-comment-item">
+          <span class="comment-title">{{ c.title }}</span>
+          <span *ngIf="c.hasAttachment" class="attachment-pill">Has attachment</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

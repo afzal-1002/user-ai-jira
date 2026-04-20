@@ -1,0 +1,8 @@
+.dashboard-feature-btn {
+  border-radius: 999px;
+  padding-inline: 1.5rem;
+}
+
+.analysis-cards .analysis-card-col {
+  max-width: 440px;
+}

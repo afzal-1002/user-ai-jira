@@ -1,0 +1,11 @@
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.table th, .table td {
+  border: 1px solid #ccc;
+  padding: 8px;
+}
+.table th {
+  background: #f4f4f4;
+}

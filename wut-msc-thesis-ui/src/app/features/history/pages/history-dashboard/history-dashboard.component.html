@@ -1,0 +1,32 @@
+<div class="container mt-5 history-landing">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h2 class="mb-1">AI Estimation History Analysis</h2>
+      <p class="text-muted mb-0 small">Thesis-ready visual analysis of historical AI data.</p>
+    </div>
+    <button class="btn btn-outline-secondary btn-sm history-back-btn" (click)="goBackToDashboard()">
+      Back to Home
+    </button>
+  </div>
+
+  <div class="d-flex gap-2 flex-wrap mb-4 history-tabs">
+    <button class="btn history-tab-btn" [class.active]="activeView === 'history'" (click)="setActive('history')">Estimation History</button>
+    <button class="btn history-tab-btn" [class.active]="activeView === 'accuracy'" (click)="setActive('accuracy')">Accuracy Trend</button>
+    <button class="btn history-tab-btn" [class.active]="activeView === 'comparison'" (click)="setActive('comparison')">Model Comparison</button>
+    <button class="btn history-tab-btn" [class.active]="activeView === 'explainability'" (click)="setActive('explainability')">Explainability Impact</button>
+    <button class="btn history-tab-btn" [class.active]="activeView === 'human'" (click)="setActive('human')">Human-in-Loop</button>
+    <button class="btn history-tab-btn" [class.active]="activeView === 'stability'" (click)="setActive('stability')">Stability & Variance</button>
+  </div>
+
+  <!-- Active content display below the cards -->
+  <div class="history-content mt-4">
+    <ng-container [ngSwitch]="activeView">
+      <app-estimation-history *ngSwitchCase="'history'"></app-estimation-history>
+      <app-accuracy-trend *ngSwitchCase="'accuracy'"></app-accuracy-trend>
+      <app-model-comparison *ngSwitchCase="'comparison'"></app-model-comparison>
+      <app-explainability-impact *ngSwitchCase="'explainability'"></app-explainability-impact>
+      <app-human-in-loop *ngSwitchCase="'human'"></app-human-in-loop>
+      <app-stability-variance *ngSwitchCase="'stability'"></app-stability-variance>
+    </ng-container>
+  </div>
+</div>

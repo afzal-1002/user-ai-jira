@@ -1,0 +1,48 @@
+.ai-research-page h2 {
+  font-weight: 600;
+}
+
+.ai-research-tabs-card {
+  max-width: 820px;
+  margin: 0 auto 1.5rem;
+  padding: 0.9rem 0.75rem 1rem;
+  border-radius: 0.9rem;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+.ai-research-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  row-gap: 0.6rem;
+  margin-top: 0.1rem;
+}
+
+.ai-research-tabs .nav-link {
+  cursor: pointer;
+  border-radius: 999px;
+  text-align: center;
+  padding: 0.35rem 0.95rem;
+  font-weight: 300 !important;
+  font-size: 0.85rem !important;
+  color: #1d4ed8;
+  background-color: #e0ecff;
+  border: 1px solid #c4d0ff;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.ai-research-tabs .nav-item + .nav-item {
+  margin-left: 0.9rem;
+}
+
+.ai-research-tabs .nav-link:hover:not(.active) {
+  background-color: #d1ddff;
+  transform: translateY(-1px);
+}
+
+.ai-research-tabs .nav-link.active {
+  background: linear-gradient(90deg, #0b5ed7, #1d4ed8);
+  color: #ffffff;
+  box-shadow: 0 0.25rem 0.5rem rgba(37, 99, 235, 0.35);
+}

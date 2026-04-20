@@ -1,0 +1,123 @@
+<section class="auto-fix-card" *ngIf="normalizedIssueKey">
+  <div class="auto-fix-header">
+    <div>
+      <h3 class="mb-1">AutoFix</h3>
+      <p class="text-muted mb-0">
+        Run one-click AI fix for issue {{ normalizedIssueKey }} under project {{ normalizedProjectKey || 'N/A' }}.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="runAutoFix()"
+      [disabled]="isSubmitting || !normalizedProjectKey || !normalizedIssueKey"
+    >
+      {{ isSubmitting ? 'Running AutoFix...' : 'Analyze and Fix with AI' }}
+    </button>
+  </div>
+
+  <div class="mt-3" *ngIf="isSubmitting">
+    <div class="progress-text">{{ currentProgressText }}</div>
+    <div class="progress mt-2">
+      <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+    </div>
+  </div>
+
+  <div class="alert alert-warning mt-3" *ngIf="!normalizedProjectKey">
+    Project key is missing. Open this issue from a project context so AutoFix can resolve repository mapping.
+  </div>
+
+  <div class="mt-3">
+    <button type="button" class="btn btn-sm btn-outline-secondary" (click)="toggleAdvanced()">
+      {{ showAdvanced ? 'Hide Advanced Options' : 'Show Advanced Options' }}
+    </button>
+  </div>
+
+  <form class="row g-3 mt-1" [formGroup]="form" *ngIf="showAdvanced">
+    <div class="col-md-4">
+      <label class="form-label">Branch Name</label>
+      <input class="form-control" formControlName="branchName" placeholder="ai-fix-bug-123" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Base Branch</label>
+      <input class="form-control" formControlName="baseBranch" placeholder="main" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Repository Name (optional)</label>
+      <input class="form-control" formControlName="repoName" placeholder="org/repo" />
+    </div>
+
+    <div class="col-md-12">
+      <label class="form-label">User Prompt</label>
+      <textarea class="form-control" rows="2" formControlName="userPrompt"></textarea>
+    </div>
+
+    <div class="col-md-4">
+      <label class="form-label">File Path (optional)</label>
+      <input class="form-control" formControlName="filePath" placeholder="src/main/java/..." />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Commit Message (optional)</label>
+      <input class="form-control" formControlName="commitMessage" placeholder="AI fix for BUG-123" />
+    </div>
+    <div class="col-md-4">
+      <label class="form-label">Credential Id (optional)</label>
+      <input class="form-control" type="number" formControlName="credentialId" placeholder="1" />
+    </div>
+
+    <div class="col-md-12 form-check mt-2">
+      <input class="form-check-input" id="createPullRequest" type="checkbox" formControlName="createPullRequest" />
+      <label class="form-check-label" for="createPullRequest">Create Pull Request</label>
+    </div>
+
+    <div class="col-md-6" *ngIf="form.controls.createPullRequest.value">
+      <label class="form-label">PR Title</label>
+      <input class="form-control" formControlName="pullRequestTitle" placeholder="AI fix for BUG-123" />
+    </div>
+    <div class="col-md-6" *ngIf="form.controls.createPullRequest.value">
+      <label class="form-label">PR Description</label>
+      <textarea class="form-control" rows="2" formControlName="pullRequestDescription" placeholder="Automated AI-generated fix for review."></textarea>
+    </div>
+  </form>
+
+  <div class="alert alert-danger mt-3" *ngIf="errorMessage">{{ errorMessage }}</div>
+
+  <div class="result-panel mt-3" *ngIf="result">
+    <h4 class="mb-3">AutoFix Result</h4>
+
+    <div class="row g-2">
+      <div class="col-md-6"><strong>Issue:</strong> {{ result.issueKey || normalizedIssueKey }}</div>
+      <div class="col-md-6"><strong>Status:</strong> {{ result.status || 'N/A' }}</div>
+      <div class="col-md-6"><strong>Repository:</strong> {{ result.repositoryName || 'N/A' }}</div>
+      <div class="col-md-6"><strong>Branch:</strong> {{ result.branchName || 'N/A' }}</div>
+      <div class="col-md-6"><strong>Base Branch:</strong> {{ result.baseBranch || 'N/A' }}</div>
+      <div class="col-md-6"><strong>Commit Message:</strong> {{ result.commitMessage || 'N/A' }}</div>
+    </div>
+
+    <div class="mt-3" *ngIf="result.changedFiles?.length">
+      <strong>Changed Files</strong>
+      <ul class="mb-0 mt-1">
+        <li *ngFor="let file of result.changedFiles">{{ file }}</li>
+      </ul>
+    </div>
+
+    <div class="alert alert-info mt-3 mb-2" *ngIf="result.userMessage">
+      {{ result.userMessage }}
+    </div>
+
+    <div class="d-flex flex-wrap gap-2 mt-2">
+      <button class="btn btn-outline-primary btn-sm" type="button" (click)="openUrl(result.repositoryUrl)">Open Repository</button>
+      <button class="btn btn-outline-primary btn-sm" type="button" (click)="openUrl(result.compareUrl)">Open Compare</button>
+      <button class="btn btn-outline-secondary btn-sm" type="button" (click)="copyBranchName()">Copy Branch Name</button>
+      <button
+        class="btn btn-outline-success btn-sm"
+        type="button"
+        *ngIf="result.pullRequestUrl"
+        (click)="openUrl(result.pullRequestUrl)"
+      >
+        Open PR
+      </button>
+    </div>
+  </div>
+</section>

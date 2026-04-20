@@ -1,0 +1,72 @@
+.review-page {
+  min-height: 100vh;
+  padding: 1.5rem;
+  background: linear-gradient(140deg, #f2f7ff 0%, #f8fbff 45%, #eefaf6 100%);
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid #dce6f0;
+  border-radius: 0.9rem;
+  box-shadow: 0 8px 24px rgba(16, 40, 70, 0.06);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.review-card {
+  padding: 1rem 1.2rem;
+}
+
+.eyebrow {
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.72rem;
+  color: #4f6c8f;
+  font-weight: 700;
+}
+
+h1 {
+  margin: 0.2rem 0;
+  font-size: 1.35rem;
+}
+
+h2 {
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.centered-state {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.45rem 1rem;
+}
+
+.action-links {
+  margin-top: 0.8rem;
+  display: flex;
+  gap: 0.6rem;
+}
+
+.changed-files {
+  margin-top: 1rem;
+}
+
+.changed-files ul {
+  margin: 0;
+  padding-left: 1.1rem;
+}

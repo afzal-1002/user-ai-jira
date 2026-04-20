@@ -1,0 +1,173 @@
+<div class="ai-analysis-page">
+  <!-- Configuration panel for AI analysis request -->
+  <div class="config-panel card p-3 mb-3">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <div class="d-flex align-items-center gap-2">
+        <h1 class="mb-0">AI Analysis - {{ issueKey }}</h1>
+        <button
+          class="btn btn-primary btn-sm"
+          type="button"
+          (click)="runAnalysis()"
+          [disabled]="isLoading"
+        >
+          <span *ngIf="!isLoading">Get AI Analysis</span>
+          <span *ngIf="isLoading">
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span class="ms-1">Requesting…</span>
+          </span>
+        </button>
+      </div>
+      <button class="btn btn-secondary btn-sm" (click)="goBackToIssue()">← Back to Issues</button>
+    </div>
+
+    <div class="mb-3 config-section">
+      <h5 class="config-section-title">Output Options <span class="config-section-sub">(Choose how the AI formats and explains results)</span></h5>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="optMarkdown" [(ngModel)]="markdown" />
+        <label class="form-check-label" for="optMarkdown">Markdown</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="optExplanation" [(ngModel)]="explanation" />
+        <label class="form-check-label" for="optExplanation">Explanation</label>
+      </div>
+      <small class="form-text text-muted mt-1">
+        Markdown adds headings and lists for nicer formatting. Explanation controls how much reasoning the AI includes.
+      </small>
+    </div>
+
+    <div class="mb-3 config-section">
+      <h5 class="config-section-title">Temperature <span class="config-section-sub">(Control how creative vs. strict the AI is)</span></h5>
+      <input
+        id="temperature"
+        type="number"
+        class="form-control form-control-sm"
+        [(ngModel)]="temperature"
+        min="0"
+        max="10"
+        step="0.5"
+      />
+      <small class="form-text text-muted mt-1">
+        Temperature controls how creative the AI is: lower values (0–2) are more strict and deterministic, higher values (5–10) are more exploratory and diverse.
+      </small>
+    </div>
+
+    <div class="mt-3 config-section">
+      <h5 class="config-section-title">Additional Instructions <span class="config-section-sub">(Tell the AI what to focus on)</span></h5>
+      <textarea
+        id="userPrompt"
+        class="form-control"
+        rows="2"
+        [(ngModel)]="userPrompt"
+        placeholder="e.g., Focus on backend root cause and suggest database-level fixes."
+      ></textarea>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="loading-container">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Loading AI analysis...</span>
+    </div>
+    <p class="mt-3">Fetching AI analysis for this issue…</p>
+  </div>
+
+  <div *ngIf="!isLoading && errorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>Error:</strong> {{ errorMessage }}
+    <button type="button" class="btn-close" (click)="errorMessage = ''"></button>
+  </div>
+
+  <div *ngIf="!isLoading && !errorMessage && analysis">
+    <app-ai-response [analysis]="analysis"></app-ai-response>
+
+    <div class="selection-panel mt-4">
+      <h4>Select AI content to push as Jira comment</h4>
+
+      <div class="form-check mb-2">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          id="includeGeneration"
+          [(ngModel)]="includeGeneration"
+        />
+        <label class="form-check-label" for="includeGeneration">
+          Include full AI analysis text (generation)
+        </label>
+      </div>
+
+      <div
+        class="mt-2 section-pick-list"
+        *ngIf="includeGeneration && sectionSelections.length > 0"
+      >
+        <p class="small text-muted mb-1">
+          Or select specific sections from the AI response to include:
+        </p>
+        <div
+          class="form-check"
+          *ngFor="let s of sectionSelections; let i = index"
+        >
+          <input
+            class="form-check-input"
+            type="checkbox"
+            [id]="'section-' + i"
+            [(ngModel)]="s.selected"
+          />
+          <label class="form-check-label" [for]="'section-' + i">
+            {{ s.title }}
+          </label>
+        </div>
+      </div>
+
+      <div class="comment-selection" *ngIf="analysis?.details?.comments?.length">
+        <p class="small text-muted mb-1">Select any AI-generated comments to include:</p>
+        <div
+          class="form-check"
+          *ngFor="let c of (analysis?.details?.comments || []); let i = index"
+        >
+          <input
+            class="form-check-input"
+            type="checkbox"
+            [id]="'comment-' + i"
+            (ngModel)="false"
+            (ngModelChange)="toggleCommentSelection(i, $event)"
+          />
+          <label class="form-check-label" [for]="'comment-' + i">
+            {{ c.title }}
+            <span *ngIf="c.hasAttachment" class="badge bg-warning text-dark ms-1">Has attachment</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="mt-3 d-flex align-items-center gap-3 flex-wrap">
+        <div class="input-group input-group-sm visibility-input" style="max-width: 260px;">
+          <span class="input-group-text">Visibility role</span>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="visibilityRole"
+          />
+        </div>
+
+        <button
+          class="btn btn-success btn-sm"
+          type="button"
+          (click)="updateCommentsFromSelection()"
+          [disabled]="!hasSelection || isUpdating"
+        >
+          <span *ngIf="!isUpdating">Add Comment</span>
+          <span *ngIf="isUpdating">
+            <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+            <span class="ms-1">Adding…</span>
+          </span>
+        </button>
+
+        <span class="text-muted small" *ngIf="!hasSelection">
+          Select at least one item above to enable update.
+        </span>
+      </div>
+
+      <div *ngIf="updateSuccessMessage" class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+        {{ updateSuccessMessage }}
+        <button type="button" class="btn-close" (click)="updateSuccessMessage = ''"></button>
+      </div>
+    </div>
+  </div>
+</div>

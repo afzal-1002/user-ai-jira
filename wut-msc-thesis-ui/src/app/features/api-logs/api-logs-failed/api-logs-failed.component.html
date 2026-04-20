@@ -1,0 +1,55 @@
+<div class="failed-logs-container">
+  <div class="section-header">
+    <h3>❌ Failed API Requests</h3>
+    <span class="badge badge-danger">{{ failedLogs.length }} Failed</span>
+  </div>
+
+  <div *ngIf="failedLogs.length === 0" class="empty-state">
+    <div class="empty-icon">✨</div>
+    <h4>No Failed Requests</h4>
+    <p>All API requests are successful!</p>
+  </div>
+
+  <div *ngIf="failedLogs.length > 0" class="failed-cards">
+    <div *ngFor="let log of failedLogs" class="failed-card">
+      <div class="card-header">
+        <div class="header-top">
+          <span class="badge method" [ngClass]="'method-' + log.method.toLowerCase()">
+            {{ log.method }}
+          </span>
+          <span class="badge status" [ngClass]="getStatusClass(log.statusCode)">
+            {{ log.statusCode || 'Error' }}
+          </span>
+          <span class="timestamp">{{ log.timestamp | slice:0:19 }}</span>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <div class="detail-row">
+          <span class="label">Endpoint:</span>
+          <span class="value">{{ log.endpoint }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">URL:</span>
+          <span class="value">{{ log.url }}</span>
+        </div>
+        <div class="detail-row" *ngIf="log.errorMessage">
+          <span class="label">Error:</span>
+          <span class="value error">{{ log.errorMessage }}</span>
+        </div>
+        <div class="detail-row" *ngIf="log.component">
+          <span class="label">Component:</span>
+          <span class="value">{{ log.component }}</span>
+        </div>
+        <div class="detail-row" *ngIf="log.frontend">
+          <span class="label">Frontend:</span>
+          <span class="value">{{ log.frontend }}</span>
+        </div>
+        <div class="detail-row" *ngIf="log.responseTime">
+          <span class="label">Response Time:</span>
+          <span class="value">{{ log.responseTime }}ms</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

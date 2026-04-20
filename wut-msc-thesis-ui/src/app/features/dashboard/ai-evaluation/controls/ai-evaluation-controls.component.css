@@ -1,0 +1,38 @@
+.controls-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.95rem;
+  padding: 1rem 1.2rem;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+}
+
+.ai-comparison-tabs-card {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.9rem;
+  border: 1px solid #e5e7eb;
+  background-color: #f9fafb;
+}
+
+.ai-comparison-tabs .nav-link {
+  cursor: pointer;
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  font-weight: 500;
+  color: #1d4ed8;
+  background-color: #e0ecff;
+  border: 1px solid #c4d0ff;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.ai-comparison-tabs .nav-link:hover:not(.active) {
+  background-color: #d1ddff;
+  transform: translateY(-1px);
+}
+
+.ai-comparison-tabs .nav-link.active {
+  background: linear-gradient(90deg, #0b5ed7, #1d4ed8);
+  color: #fff;
+  box-shadow: 0 0.25rem 0.5rem rgba(37, 99, 235, 0.35);
+}

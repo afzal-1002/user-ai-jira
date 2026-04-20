@@ -1,0 +1,154 @@
+<!-- PROJECT CREATION FORM VIEW -->
+<div *ngIf="!createdProject" class="container d-flex justify-content-center align-items-center default-bg">
+  <div class="card p-4 shadow formDiv">
+
+    <button type="button" routerLink="/home" class="btn-close position-absolute top-0 end-0 m-3"
+      aria-label="Close"></button>
+
+    <h4 class="text-center mb-4">{{ isEditMode ? 'Edit Project' : 'Create New Project' }}</h4>
+
+    <!-- Error Message -->
+    <div class="alert alert-danger" role="alert" *ngIf="projectError">
+      {{ projectError }}
+    </div>
+
+    <!-- Success Message -->
+    <div class="alert alert-success" role="alert" *ngIf="projectSuccess">
+      {{ projectSuccess }}
+    </div>
+
+    <form [formGroup]="projectForm" (ngSubmit)="createProject()" novalidate>
+
+      <!-- Project Key -->
+      <div class="mb-3">
+        <label for="key" class="form-label">Project Key</label>
+        <input type="text" class="form-control" id="key" formControlName="key" 
+          [ngClass]="getValidationClass('key')" placeholder="KEY010" [readonly]="isEditMode" />
+        <div class="invalid-feedback" *ngIf="key?.hasError('required')">
+          Project key is required.
+        </div>
+        <div class="invalid-feedback" *ngIf="key?.hasError('pattern')">
+          Project key must contain only uppercase letters and numbers.
+        </div>
+        <small class="form-text text-muted">Unique identifier for your project (uppercase letters and numbers only)</small>
+      </div>
+
+      <!-- Project Name -->
+      <div class="mb-3">
+        <label for="projectName" class="form-label">Project Name</label>
+        <input type="text" class="form-control" id="projectName" formControlName="projectName" 
+          [ngClass]="getValidationClass('projectName')" placeholder="Project010" />
+        <div class="invalid-feedback" *ngIf="projectName?.hasError('required')">
+          Project name is required.
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="mb-3">
+        <label for="description" class="form-label">Description</label>
+        <textarea class="form-control" id="description" formControlName="description" 
+          [ngClass]="getValidationClass('description')" placeholder="Example Scrum project created via API" rows="3"></textarea>
+        <div class="invalid-feedback" *ngIf="description?.hasError('required')">
+          Description is required.
+        </div>
+      </div>
+
+      <!-- Project Type Key -->
+      <div class="mb-3">
+        <label for="projectTypeKey" class="form-label">Project Type Key</label>
+        <select class="form-select" id="projectTypeKey" formControlName="projectTypeKey" 
+          [ngClass]="getValidationClass('projectTypeKey')">
+          <option value="software">Software</option>
+          <option value="service_management">Service Management</option>
+          <option value="business">Business</option>
+        </select>
+        <div class="invalid-feedback" *ngIf="projectTypeKey?.hasError('required')">
+          Project type key is required.
+        </div>
+      </div>
+
+      <!-- Project Template Key -->
+      <div class="mb-3">
+        <label for="projectTemplateKey" class="form-label">Project Template Key</label>
+        <input type="text" class="form-control" id="projectTemplateKey" formControlName="projectTemplateKey" 
+          [ngClass]="getValidationClass('projectTemplateKey')" placeholder="com.pyxis.greenhopper.jira:gh-simplified-scrum-classic" />
+        <div class="invalid-feedback" *ngIf="projectTemplateKey?.hasError('required')">
+          Project template key is required.
+        </div>
+        <small class="form-text text-muted">Template identifier from Jira (e.g., com.pyxis.greenhopper.jira:gh-simplified-scrum-classic)</small>
+      </div>
+
+      <!-- Lead Account ID -->
+      <div class="mb-3">
+        <label for="leadAccountId" class="form-label">Lead Account ID</label>
+        <input type="text" class="form-control" id="leadAccountId" formControlName="leadAccountId" 
+          [ngClass]="getValidationClass('leadAccountId')" placeholder="712020:0306160e-f103-45d5-a2f4-b2d20c16e447" />
+        <div class="invalid-feedback" *ngIf="leadAccountId?.hasError('required')">
+          Lead account ID is required.
+        </div>
+        <small class="form-text text-muted">Account ID of the project lead from Jira</small>
+      </div>
+
+      <!-- Assignee Type -->
+      <div class="mb-3">
+        <label for="assigneeType" class="form-label">Assignee Type</label>
+        <select class="form-select" id="assigneeType" formControlName="assigneeType" 
+          [ngClass]="getValidationClass('assigneeType')">
+          <option value="PROJECT_LEAD">Project Lead</option>
+          <option value="UNASSIGNED">Unassigned</option>
+        </select>
+        <div class="invalid-feedback" *ngIf="assigneeType?.hasError('required')">
+          Assignee type is required.
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div class="d-grid gap-2">
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+          <span *ngIf="!isLoading">{{ isEditMode ? 'Update Project' : 'Create Project' }}</span>
+          <span *ngIf="isLoading">
+            <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+            {{ isEditMode ? 'Updating...' : 'Creating...' }}
+          </span>
+        </button>
+      </div>
+    </form>
+
+    <!-- Login Link -->
+    <div class="text-center mt-3">
+      <small>
+        Back to <a routerLink="/home">Home</a>
+      </small>
+    </div>
+  </div>
+</div>
+
+<!-- PROJECT CREATION SUCCESS VIEW -->
+<div *ngIf="createdProject" class="container d-flex justify-content-center align-items-center default-bg">
+  <div class="card p-4 shadow formDiv text-center">
+
+    <h4 class="text-success mb-4">✓ Project Created Successfully!</h4>
+
+    <div class="alert alert-success" role="alert">
+      <strong>{{ createdProject.projectName || createdProject.name }}</strong> has been created.
+    </div>
+
+    <!-- Project Details -->
+    <div class="project-details text-start mb-4">
+      <p><strong>Project Key:</strong> {{ createdProject.key }}</p>
+      <p><strong>Project Name:</strong> {{ createdProject.projectName || createdProject.name }}</p>
+      <p *ngIf="createdProject.id"><strong>Project ID:</strong> {{ createdProject.id }}</p>
+      <p *ngIf="createdProject.description"><strong>Description:</strong> {{ createdProject.description }}</p>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="d-grid gap-2">
+      <button type="button" class="btn btn-primary" (click)="router.navigate(['/admin-dashboard'])">
+        Go to Dashboard
+      </button>
+      <button type="button" class="btn btn-secondary" (click)="router.navigate(['/home'])">
+        Back to Home
+      </button>
+    </div>
+  </div>
+</div>

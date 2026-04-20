@@ -1,0 +1,48 @@
+<div class="container mt-4 ai-research-page">
+  <div class="research-header">
+    <div>
+      <h2 class="research-header__title">Bias &amp; Error Analysis</h2>
+      <p class="research-header__subtitle">
+        Mirrors the evaluation dashboard layout while focusing on provider-level MAE, MSE, and aggregate bias.
+      </p>
+    </div>
+    <button type="button" class="btn btn-outline-secondary research-back-btn" (click)="goBack()">
+      &larr; Back
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="research-status research-status--loading">Loading bias analysis&#8230;</div>
+  <div *ngIf="!isLoading && error" class="research-status research-status--error">{{ error }}</div>
+
+  <div class="chart-stack" *ngIf="!isLoading && !error">
+    <app-ai-metrics-chart-card
+      title="MAE Comparison"
+      subtitle="Mean absolute error per AI provider"
+      caption="Figure: Mean absolute error differences between Gemini, DeepSeek, and any additional models captured in the dataset."
+      [chartType]="'bar'"
+      [chartData]="maeChartData"
+      [chartOptions]="maeChartOptions">
+      <div class="metric-band" *ngIf="biasSummaryChips.length">
+        <div class="metric-chip" *ngFor="let chip of biasSummaryChips">
+          <span class="metric-chip__label">{{ chip.label }}</span>
+          <span class="metric-chip__value">{{ chip.value }}</span>
+        </div>
+      </div>
+    </app-ai-metrics-chart-card>
+
+    <app-ai-metrics-chart-card
+      title="Error Breakdown"
+      subtitle="Relative contribution of MAE, MSE, and bias score"
+      caption="Figure: Mirrors the comparison dashboard pie visuals by compressing three core error metrics into a single glance."
+      [chartType]="'pie'"
+      [chartData]="errorBreakdownChartData"
+      [chartOptions]="errorBreakdownChartOptions"
+      [dense]="true">
+    </app-ai-metrics-chart-card>
+  </div>
+
+  <section class="raw-result-card" *ngIf="result">
+    <h5 class="mb-2">Raw Bias &amp; Error Metrics</h5>
+    <pre class="small mb-0">{{ result | json }}</pre>
+  </section>
+</div>

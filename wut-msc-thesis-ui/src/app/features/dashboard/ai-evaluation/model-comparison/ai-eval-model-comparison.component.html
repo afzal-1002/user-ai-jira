@@ -1,0 +1,318 @@
+<div class="evaluation-wrapper">
+  <div *ngIf="isLoading" class="small text-muted text-center">
+    Comparing providers...
+  </div>
+
+  <div *ngIf="!isLoading && error" class="alert alert-danger py-1 small">
+    {{ error }}
+  </div>
+
+  <app-ai-eval-bug-model-comparison class="mb-4"></app-ai-eval-bug-model-comparison>
+
+  <ng-container *ngIf="!isLoading && !error">
+    <div class="metric-band" *ngIf="summaryMetrics.length">
+      <div class="metric-chip" *ngFor="let metric of summaryMetrics">
+        <span class="metric-chip__label">{{ metric.label }}</span>
+        <span class="metric-chip__value">{{ metric.value }}</span>
+      </div>
+    </div>
+
+    <div class="evaluation-grid">
+      <figure class="chart-card">
+        <h5 class="chart-title">Performance Analysis</h5>
+        <p class="chart-subtitle">Average response time (seconds).</p>
+
+        <canvas
+          *ngIf="comparisonPerfAvgBarData?.labels?.length"
+          baseChart
+          [data]="comparisonPerfAvgBarData"
+          [options]="comparisonPerfAvgBarOptions"
+          [type]="comparisonPerfAvgBarType"
+          style="max-height: 300px;">
+        </canvas>
+
+        <p *ngIf="!comparisonPerfAvgBarData?.labels?.length" class="text-muted small text-center mt-3">
+          Comparative averages are not available yet.
+        </p>
+
+        <figcaption class="chart-caption">
+          Figure: Average response time for Gemini vs DeepSeek across all runs.
+        </figcaption>
+      </figure>
+
+      <figure class="chart-card">
+        <h5 class="chart-title">Distribution Breakdown</h5>
+        <p class="chart-subtitle">Min | Avg | Max | Std Dev per model.</p>
+
+        <canvas
+          *ngIf="comparisonPerfDetailBarData?.labels?.length"
+          baseChart
+          [data]="comparisonPerfDetailBarData"
+          [options]="comparisonPerfDetailBarOptions"
+          [type]="comparisonPerfDetailBarType"
+          style="max-height: 320px;">
+        </canvas>
+
+        <p *ngIf="!comparisonPerfDetailBarData?.labels?.length" class="text-muted small text-center mt-3">
+          Detailed distribution metrics are unavailable.
+        </p>
+
+        <figcaption class="chart-caption">
+          Figure: Spread of response times highlighting speed and variability per model.
+        </figcaption>
+      </figure>
+
+      <app-ai-metrics-chart-card
+        title="Capability Radar"
+        subtitle="Normalized trade-offs across speed, estimation, stability, relevance, and verbosity."
+        caption="Figure: Relative strengths per provider after normalizing every metric to a 0–1 scale."
+        emptyMessage="Radar synthesis requires a full comparison payload."
+        [chartType]="comparisonRadarType"
+        [chartData]="comparisonRadarData"
+        [chartOptions]="comparisonRadarOptions"
+        [dense]="true"
+        [canvasMaxWidth]="720"
+        [canvasMinHeight]="300">
+      </app-ai-metrics-chart-card>
+
+      <figure class="chart-card">
+        <h5 class="chart-title">Composite Decision Score</h5>
+        <p class="chart-subtitle">Weighted blend of speed, stability, relevance, and estimation discipline.</p>
+
+        <canvas
+          *ngIf="compositeScoreBarData?.labels?.length"
+          baseChart
+          [data]="compositeScoreBarData"
+          [options]="compositeScoreBarOptions"
+          [type]="compositeScoreBarType"
+          style="max-height: 320px;">
+        </canvas>
+
+        <p *ngIf="!compositeScoreBarData?.labels?.length" class="text-muted small text-center mt-3">
+          Composite scores activate when all four core metrics are available.
+        </p>
+
+        <figcaption class="chart-caption">
+          Figure: Single decision-support score routinely used in academic benchmarking.
+        </figcaption>
+      </figure>
+
+      <figure class="chart-card">
+        <h5 class="chart-title">Advantage Divergence</h5>
+        <p class="chart-subtitle">Positive values favor the alphabetically leading model.</p>
+
+        <canvas
+          *ngIf="advantageDivergingBarData?.datasets?.length"
+          baseChart
+          [data]="advantageDivergingBarData"
+          [options]="advantageDivergingBarOptions"
+          [type]="advantageDivergingBarType"
+          style="max-height: 320px;">
+        </canvas>
+
+        <p *ngIf="!advantageDivergingBarData?.datasets?.length" class="text-muted small text-center mt-3">
+          Diverging bars rely on at least two providers with overlapping metrics.
+        </p>
+
+        <figcaption class="chart-caption">
+          Figure: Shows who leads each dimension without scanning multiple bar groups.
+        </figcaption>
+      </figure>
+
+      <figure class="chart-card">
+        <h5 class="chart-title">Estimation Drift</h5>
+        <p class="chart-subtitle">Average estimated engineering hours for identical issues.</p>
+
+        <canvas
+          *ngIf="estimationComparisonBarData?.labels?.length"
+          baseChart
+          [data]="estimationComparisonBarData"
+          [options]="estimationComparisonBarOptions"
+          [type]="estimationComparisonBarType"
+          style="max-height: 320px;">
+        </canvas>
+
+        <p *ngIf="!estimationComparisonBarData?.labels?.length" class="text-muted small text-center mt-3">
+          Estimation variance will appear once both providers finish the benchmark set.
+        </p>
+
+        <figcaption class="chart-caption">
+          Figure: How conservative each model is when forecasting delivery effort.
+        </figcaption>
+      </figure>
+
+      <figure class="chart-card">
+        <h5 class="chart-title">Estimation Range Stack</h5>
+        <p class="chart-subtitle">Minimum → average → tail risk stacked to show planning volatility.</p>
+
+        <canvas
+          *ngIf="estimationRangeStackedData?.datasets?.length"
+          baseChart
+          [data]="estimationRangeStackedData"
+          [options]="estimationRangeStackedOptions"
+          [type]="estimationRangeStackedType"
+          style="max-height: 320px;">
+        </canvas>
+
+        <p *ngIf="!estimationRangeStackedData?.datasets?.length" class="text-muted small text-center mt-3">
+          Need minimum and maximum estimates per provider to render the stacked range.
+        </p>
+
+        <figcaption class="chart-caption">
+          Figure: Highlights conservative vs aggressive estimation envelopes.
+        </figcaption>
+      </figure>
+
+      <figure class="chart-card">
+        <h5 class="chart-title">Stability Share</h5>
+        <p class="chart-subtitle">Relative contribution to overall stability score.</p>
+
+        <canvas
+          *ngIf="stabilityComparisonPieData?.datasets?.length"
+          baseChart
+          [data]="stabilityComparisonPieData"
+          [options]="stabilityComparisonPieOptions"
+          [type]="stabilityComparisonPieType"
+          style="max-height: 280px;">
+        </canvas>
+
+        <p *ngIf="!stabilityComparisonPieData?.datasets?.length" class="text-muted small text-center mt-3">
+          Stability scoring is pending until the run history finishes ingesting.
+        </p>
+
+        <figcaption class="chart-caption">
+          Figure: Share of stable runs attributed to each provider.
+        </figcaption>
+      </figure>
+
+      <figure class="chart-card">
+        <h5 class="chart-title">Quality vs Speed</h5>
+        <p class="chart-subtitle">Scatter plot relating response time (x) to engineering relevance (y).</p>
+
+        <canvas
+          *ngIf="qualityVsSpeedScatterData?.datasets?.length"
+          baseChart
+          [data]="qualityVsSpeedScatterData"
+          [options]="qualityVsSpeedScatterOptions"
+          [type]="qualityVsSpeedScatterType"
+          style="max-height: 420px;">
+        </canvas>
+
+        <p *ngIf="!qualityVsSpeedScatterData?.datasets?.length" class="text-muted small text-center mt-3">
+          Quality vs speed points appear once both response relevance and timing are captured.
+        </p>
+
+        <figcaption class="chart-caption">
+          Figure: Each point balances responsiveness with the usefulness of the generated engineering rationale.
+        </figcaption>
+      </figure>
+
+      <figure class="chart-card">
+        <h5 class="chart-title">Speed × Quality × Stability Bubble</h5>
+        <p class="chart-subtitle">Bubble radius encodes stability while axes show latency vs relevance.</p>
+
+        <canvas
+          *ngIf="speedQualityBubbleData?.datasets?.length"
+          baseChart
+          [data]="speedQualityBubbleData"
+          [options]="speedQualityBubbleOptions"
+          [type]="speedQualityBubbleType"
+          style="max-height: 420px;">
+        </canvas>
+
+        <p *ngIf="!speedQualityBubbleData?.datasets?.length" class="text-muted small text-center mt-3">
+          Bubble chart needs response time, relevance, and stability for every provider.
+        </p>
+
+        <figcaption class="chart-caption">
+          Figure: Communicates three dimensions in a single glance.
+        </figcaption>
+      </figure>
+
+      <figure class="chart-card heatmap-card">
+        <h5 class="chart-title">Model × Metric Heatmap</h5>
+        <p class="chart-subtitle">Color scale encodes normalized strength (teal = strong, pale = weak).</p>
+
+        <div *ngIf="comparisonHeatmapMatrix?.length" class="heatmap-grid">
+          <div class="heatmap-row heatmap-row--header" [style.gridTemplateColumns]="heatmapColumnTemplate">
+            <div class="heatmap-cell heatmap-cell--header">Model</div>
+            <div
+              class="heatmap-cell heatmap-cell--header"
+              *ngFor="let metric of comparisonHeatmapMatrix?.[0]?.metrics">
+              {{ metric.label }}
+            </div>
+          </div>
+
+          <div class="heatmap-row" *ngFor="let row of comparisonHeatmapMatrix" [style.gridTemplateColumns]="heatmapColumnTemplate">
+            <div class="heatmap-cell heatmap-cell--label">{{ row.label }}</div>
+            <div
+              class="heatmap-cell"
+              *ngFor="let metric of row.metrics"
+              [ngStyle]="heatmapStyle(metric.normalized)"
+              [attr.title]="metric.label + ': ' + (metric.value | number:'1.2-2')">
+              {{ metric.value | number:'1.2-2' }}
+            </div>
+          </div>
+        </div>
+
+        <p *ngIf="!comparisonHeatmapMatrix?.length" class="text-muted small text-center mt-3">
+          Heatmap activates once at least one provider reports every metric.
+        </p>
+
+        <figcaption class="chart-caption">
+          Figure: Common research staple summarizing multi-dimensional performance in a compact grid.
+        </figcaption>
+      </figure>
+
+      <figure class="chart-card">
+        <h5 class="chart-title">Response Time Box Plot</h5>
+        <p class="chart-subtitle">Approximate quartiles derived from average ± σ when quartiles are absent.</p>
+
+        <div *ngIf="responseTimeBoxPlotData?.length" class="boxplot-grid">
+          <div class="boxplot-row" *ngFor="let box of responseTimeBoxPlotData">
+            <div class="boxplot-label">{{ box.label }}</div>
+            <div class="boxplot-track">
+              <div class="boxplot-whisker" [style.left.%]="boxScale(box.min)" [style.width.%]="boxWidth(box.min, box.max)"></div>
+              <div class="boxplot-box" [style.left.%]="boxScale(box.q1)" [style.width.%]="boxWidth(box.q1, box.q3)"></div>
+              <div class="boxplot-median" [style.left.%]="boxScale(box.median)"></div>
+            </div>
+            <div class="boxplot-values">
+              <span>Min {{ box.min | number:'1.2-2' }}s</span>
+              <span>Max {{ box.max | number:'1.2-2' }}s</span>
+            </div>
+          </div>
+        </div>
+
+        <p *ngIf="!responseTimeBoxPlotData?.length" class="text-muted small text-center mt-3">
+          Need min, max, and deviation data to approximate a statistical box plot.
+        </p>
+
+        <figcaption class="chart-caption">
+          Figure: Visualizes dispersion and outliers beyond simple min/avg/max bars.
+        </figcaption>
+      </figure>
+
+      <figure class="chart-card">
+        <h5 class="chart-title">Stability-Adjusted Slope</h5>
+        <p class="chart-subtitle">Connects raw response time to a stability-adjusted proxy.</p>
+
+        <canvas
+          *ngIf="stabilitySlopeData?.datasets?.length"
+          baseChart
+          [data]="stabilitySlopeData"
+          [options]="stabilitySlopeOptions"
+          [type]="stabilitySlopeType"
+          style="max-height: 320px;">
+        </canvas>
+
+        <p *ngIf="!stabilitySlopeData?.datasets?.length" class="text-muted small text-center mt-3">
+          Slope view unlocks after computing stability-adjusted response times.
+        </p>
+
+        <figcaption class="chart-caption">
+          Figure: Classic slope chart used to highlight change between two related measures.
+        </figcaption>
+      </figure>
+    </div>
+  </ng-container>
+</div>

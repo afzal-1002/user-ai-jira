@@ -1,0 +1,58 @@
+<section class="ai-research-section">
+  <div class="ai-research-section__header">
+    <h5 class="ai-research-section__title">Research Summary &amp; Thesis Conclusion</h5>
+    <button type="button" class="btn btn-outline-secondary btn-sm" (click)="goBack()">Back to Home</button>
+  </div>
+
+  <p class="ai-research-section__description">
+    Synthesises the key findings from bias, stability, explainability and human-in-the-loop experiments into a thesis-ready conclusion.
+  </p>
+
+  <div *ngIf="isLoading" class="ai-research-status text-muted">Loading research summary...</div>
+  <div *ngIf="error" class="ai-research-status text-danger">{{ error }}</div>
+
+  <div *ngIf="result">
+    <div class="ai-research-raw-card">
+      <h6 class="mb-1">Key Findings</h6>
+      <p class="small" *ngIf="result.keyFindings">{{ result.keyFindings }}</p>
+      <ul class="small mb-0" *ngIf="result.keyFinding1 || result.keyFinding2 || result.keyFinding3">
+        <li *ngIf="result.keyFinding1">{{ result.keyFinding1 }}</li>
+        <li *ngIf="result.keyFinding2">{{ result.keyFinding2 }}</li>
+        <li *ngIf="result.keyFinding3">{{ result.keyFinding3 }}</li>
+      </ul>
+    </div>
+
+    <div class="ai-research-raw-card mt-3">
+      <h6 class="mb-1">Extra Research Insights</h6>
+      <ul class="small mb-0">
+        <li>
+          <strong>Confidence vs accuracy mismatch:</strong>
+          High-confidence AI outputs do not always yield higher estimation accuracy; this is observed by contrasting verbose explanations with bias and error scores.
+        </li>
+        <li class="mt-1">
+          <strong>Prompt sensitivity:</strong>
+          Small changes in prompt wording can lead to noticeable variance in estimated effort, highlighting the importance of prompt engineering in industrial use.
+        </li>
+        <li class="mt-1">
+          <strong>Temporal drift:</strong>
+          Grouping experiments by issue creation time suggests model behaviour can drift as the underlying issue mix and complexity evolve.
+        </li>
+      </ul>
+    </div>
+
+    <div class="ai-research-raw-card mt-3">
+      <h6 class="mb-1">Future Work</h6>
+      <p class="small mb-0" *ngIf="result.futureResearch">{{ result.futureResearch }}</p>
+    </div>
+
+    <div class="ai-research-raw-card mt-3">
+      <h6 class="mb-1">Thesis Slide Narrative</h6>
+      <pre class="small p-2" *ngIf="result.presentationText">{{ result.presentationText }}</pre>
+    </div>
+
+    <div class="ai-research-raw-card mt-3">
+      <h6 class="mb-1">Raw Summary Payload</h6>
+      <pre class="small p-2">{{ result | json }}</pre>
+    </div>
+  </div>
+</section>

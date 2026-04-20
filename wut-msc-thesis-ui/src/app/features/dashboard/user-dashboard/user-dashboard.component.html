@@ -1,0 +1,33 @@
+<!-- admin-dashboard.component.html -->
+<div class="container mt-5">
+  <div class="welcome-banner text-center p-3">
+    <h3 class="mb-0">Welcome, {{ user?.firstName || 'Guest' }}!</h3>
+  </div>
+
+  <div class="row g-4 mt-3">
+    <div class="col-md-4" *ngFor="let feature of features">
+      <div class="card customCard h-100">
+        <div class="card-body text-center">
+          <div class="mb-2">
+            <img *ngIf="feature.iconImage" [src]="feature.iconImage" [alt]="feature.title + ' icon'" style="width: 64px; height: 64px; object-fit: contain;" />
+            <div *ngIf="!feature.iconImage" class="fs-1">{{ feature.icon }}</div>
+          </div>
+          <h5 class="card-title mt-3">{{ feature.title }}</h5>
+          <p class="card-text">{{ feature.description }}</p>
+
+          <!-- Option A: Use routerLink (requires RouterLink in imports) -->
+          <!-- <a class="btn btn-primary" [routerLink]="feature.link">{{ feature.button }}</a> -->
+
+          <!-- Option B: Or use a click handler -->
+          <button class="btn btn-primary dashboard-feature-btn" (click)="goToLink(feature.link)">{{ feature.button }}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div *ngIf="!user" class="text-center mt-5">
+  <p>Please log in to access the admin dashboard features.</p>
+  <a routerLink="/login" class="btn btn-primary dashboard-feature-btn">Go to Login</a>
+</div>

@@ -1,0 +1,142 @@
+<!-- ...existing code... -->
+
+
+<!-- Main evaluation card content ... -->
+
+<div class="container mt-4 ai-estimations-page">
+  <div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+      <h2 class="mb-1">Evaluation Analysis</h2>
+      <p class="text-muted mb-0">High-level insights: How good is the AI? Which model performs better?</p>
+    </div>
+    <div>
+      <button class="btn btn-outline-secondary btn-sm metrics-back-btn" (click)="goBack()">
+        &larr; Back to AI Evaluation
+      </button>
+    </div>
+  </div>
+
+
+
+  <div class="evaluation-controls-shell">
+    <app-ai-evaluation-controls class="mb-3" [activeTab]="activeEvaluationTab" [isLoading]="isLoadingEvaluation"
+      [evalIssueKey]="evalIssueKey" (evalIssueKeyChange)="evalIssueKey = $event" [evalProvider]="evalProvider"
+      (evalProviderChange)="evalProvider = $event" [stabilityIssueKey]="stabilityIssueKey"
+      (stabilityIssueKeyChange)="stabilityIssueKey = $event" (runRequested)="runEvaluation()"
+      (tabChange)="selectTab($event)">
+    </app-ai-evaluation-controls>
+  </div>
+
+  <div class="chart-stack" *ngIf="evaluationResult">
+    <ng-container [ngSwitch]="activeEvaluationTab">
+      <ng-container *ngSwitchCase="'by-issue'">
+        <app-ai-eval-by-issue [evaluationResult]="evaluationResult" [hasProviderStats]="hasProviderStats"
+          [maxProviderAvgHours]="maxProviderAvgHours" [providerBarData]="providerBarData"
+          [providerBarOptions]="providerBarOptions" [providerBarType]="providerBarType"
+          [byIssueTimeBarData]="byIssueTimeBarData" [byIssueTimeBarOptions]="byIssueTimeBarOptions"
+          [byIssueTimeBarType]="byIssueTimeBarType" [byIssueAllStatsBarData]="byIssueAllStatsBarData"
+          [byIssueAllStatsBarOptions]="byIssueAllStatsBarOptions" [byIssueAllStatsBarType]="byIssueAllStatsBarType"
+          [byIssueOverallBarData]="byIssueOverallBarData" [byIssueOverallBarOptions]="byIssueOverallBarOptions"
+          [byIssueOverallBarType]="byIssueOverallBarType">
+        </app-ai-eval-by-issue>
+      </ng-container>
+
+      <ng-container *ngSwitchCase="'comparison'">
+        <app-ai-eval-model-comparison
+          [isLoading]="isLoadingEvaluation"
+          [error]="evaluationResult?.error ?? ''"
+          [comparisonPerfAvgBarData]="comparisonPerfAvgBarData"
+          [comparisonPerfAvgBarOptions]="comparisonPerfAvgBarOptions"
+          [comparisonPerfAvgBarType]="comparisonPerfAvgBarType"
+          [comparisonPerfDetailBarData]="comparisonPerfDetailBarData"
+          [comparisonPerfDetailBarOptions]="comparisonPerfDetailBarOptions"
+          [comparisonPerfDetailBarType]="comparisonPerfDetailBarType"
+          [comparisonRadarData]="comparisonRadarData"
+          [comparisonRadarOptions]="comparisonRadarOptions"
+          [comparisonRadarType]="comparisonRadarType"
+          [estimationComparisonBarData]="estimationComparisonBarData"
+          [estimationComparisonBarOptions]="estimationComparisonBarOptions"
+          [estimationComparisonBarType]="estimationComparisonBarType"
+          [stabilityComparisonPieData]="stabilityComparisonPieData"
+          [stabilityComparisonPieOptions]="stabilityComparisonPieOptions"
+          [stabilityComparisonPieType]="stabilityComparisonPieType"
+          [qualityVsSpeedScatterData]="qualityVsSpeedScatterData"
+          [qualityVsSpeedScatterOptions]="qualityVsSpeedScatterOptions"
+          [qualityVsSpeedScatterType]="qualityVsSpeedScatterType"
+          [compositeScoreBarData]="compositeScoreBarData"
+          [compositeScoreBarOptions]="compositeScoreBarOptions"
+          [compositeScoreBarType]="compositeScoreBarType"
+          [advantageDivergingBarData]="advantageDivergingBarData"
+          [advantageDivergingBarOptions]="advantageDivergingBarOptions"
+          [advantageDivergingBarType]="advantageDivergingBarType"
+          [comparisonHeatmapMatrix]="comparisonHeatmapMatrix"
+          [responseTimeBoxPlotData]="responseTimeBoxPlotData"
+          [responseTimeBoxPlotRange]="responseTimeBoxPlotRange"
+          [speedQualityBubbleData]="speedQualityBubbleData"
+          [speedQualityBubbleOptions]="speedQualityBubbleOptions"
+          [speedQualityBubbleType]="speedQualityBubbleType"
+          [estimationRangeStackedData]="estimationRangeStackedData"
+          [estimationRangeStackedOptions]="estimationRangeStackedOptions"
+          [estimationRangeStackedType]="estimationRangeStackedType"
+          [stabilitySlopeData]="stabilitySlopeData"
+          [stabilitySlopeOptions]="stabilitySlopeOptions"
+          [stabilitySlopeType]="stabilitySlopeType">
+        </app-ai-eval-model-comparison>
+      </ng-container>
+
+      <ng-container *ngSwitchCase="'by-model'">
+        <app-ai-eval-by-model
+          [isLoading]="isLoadingEvaluation"
+          [error]="evaluationResult?.error ?? ''"
+          [evaluationResult]="evaluationResult"
+          [selectedProvider]="evalProvider"
+          [modelByModelPieData]="modelByModelPieData"
+          [modelByModelPieOptions]="modelByModelPieOptions"
+          [modelByModelPieType]="modelByModelPieType"
+          [modelByModelBarData]="modelByModelBarData"
+          [modelByModelBarOptions]="modelByModelBarOptions"
+          [modelByModelBarType]="modelByModelBarType">
+        </app-ai-eval-by-model>
+      </ng-container>
+
+      <ng-container *ngSwitchCase="'features'">
+        <app-ai-eval-feature-impact
+          [isLoading]="isLoadingEvaluation"
+          [error]="evaluationResult?.error ?? ''"
+          [markdownEnabledPieData]="markdownEnabledPieData"
+          [markdownDisabledPieData]="markdownDisabledPieData"
+          [markdownPieOptions]="markdownPieOptions"
+          [markdownPieType]="markdownPieType"
+          [markdownBarData]="markdownBarData"
+          [markdownBarOptions]="markdownBarOptions"
+          [markdownBarType]="markdownBarType">
+        </app-ai-eval-feature-impact>
+      </ng-container>
+
+      <ng-container *ngSwitchCase="'stability'">
+        <app-ai-eval-stability
+          [isLoading]="isLoadingEvaluation"
+          [error]="evaluationResult?.error ?? ''"
+          [issueLabel]="stabilityIssueLabel"
+          [stabilityBarData]="stabilityBarData"
+          [stabilityBarOptions]="stabilityBarOptions"
+          [stabilityBarType]="stabilityBarType"
+          [stabilityLineData]="stabilityLineData"
+          [stabilityLineOptions]="stabilityLineOptions"
+          [stabilityLineType]="stabilityLineType"
+          [stabilityPieData]="stabilityPieData"
+          [stabilityPieOptions]="stabilityPieOptions"
+          [stabilityPieType]="stabilityPieType"
+          [stabilityRadarData]="stabilityRadarData"
+          [stabilityRadarOptions]="stabilityRadarOptions"
+          [stabilityRadarType]="stabilityRadarType">
+        </app-ai-eval-stability>
+      </ng-container>
+    </ng-container>
+  </div>
+
+  <div class="chart-card raw-result-card mt-3" *ngIf="evaluationResult">
+    <h5 class="chart-title mb-2">Raw Evaluation Result</h5>
+    <pre class="small mb-0">{{ evaluationResult | json }}</pre>
+  </div>
+</div>

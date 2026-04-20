@@ -1,0 +1,42 @@
+
+
+.default-bg{
+    background-color: whitesmoke;
+    min-width:  100vh; 
+    min-height:  100vh; 
+}
+
+.formDiv{
+    margin-top: -50px;
+    border-radius: 10px;
+    border: 1px cornsilk solid;
+}
+
+
+.signUpBtn{
+    background-color: blueviolet;
+    color: white;
+}
+
+.signUpBtn:hover{
+    background-color: rgb(105, 87, 47);
+    color: wheat;
+}
+
+input[readonly] {
+  background-color: #f8f9fa;
+  border: none;
+  font-weight: bold;
+}
+
+
+.fw-semibold {
+  font-weight: 600;
+}
+
+
+option[value=""][disabled] {
+  color: #888;
+  font-style: italic;
+}
+

@@ -1,0 +1,110 @@
+<div class="container py-4 page-wrap">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Project Repositories</h2>
+    <a routerLink="/admin" class="btn btn-outline-secondary btn-sm">Back to Admin</a>
+  </div>
+
+  <div class="card p-3 mb-3">
+    <h5 class="mb-1">{{ editingRepositoryId ? 'Edit Repository' : 'Add Repository To Project' }}</h5>
+    <p class="text-muted small mb-3">Each repository belongs to one Jira project and references one saved GitHub credential.</p>
+    <form [formGroup]="form" (ngSubmit)="save()" class="row g-3">
+      <div class="col-md-4">
+        <label class="form-label">Project</label>
+        <select class="form-select" formControlName="projectKey">
+          <option value="">Select project</option>
+          <option *ngFor="let project of projects" [value]="project.projectKey">{{ project.projectKey }} - {{ project.projectName }}</option>
+        </select>
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Repository Name</label>
+        <input type="text" class="form-control" formControlName="repoName" placeholder="owner/repo (for example afzal-1002/atos-ai-user)">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Repository URL</label>
+        <input type="text" class="form-control" formControlName="repoUrl" placeholder="https://github.com/org/project-service">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Default Branch</label>
+        <input type="text" class="form-control" formControlName="defaultBranch" placeholder="main">
+      </div>
+      <div class="col-md-4">
+        <label class="form-label">Credential</label>
+        <select class="form-select" formControlName="credentialId">
+          <option [ngValue]="null">Select GitHub credential</option>
+          <option *ngFor="let credential of credentials" [ngValue]="credential.id">{{ credential.name }} ({{ credential.username }})</option>
+        </select>
+      </div>
+      <div class="col-md-4 d-flex align-items-end">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="primaryRepository" formControlName="primaryRepository">
+          <label class="form-check-label" for="primaryRepository">
+            Primary Repository
+          </label>
+        </div>
+      </div>
+      <div class="col-md-4 d-flex align-items-end">
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="active" formControlName="active">
+          <label class="form-check-label" for="active">
+            Active
+          </label>
+        </div>
+      </div>
+      <div class="col-12">
+        <button class="btn btn-primary me-2" type="submit" [disabled]="isSaving">{{ isSaving ? 'Saving...' : (editingRepositoryId ? 'Update Repository' : 'Save Repository') }}</button>
+        <button *ngIf="editingRepositoryId" class="btn btn-outline-secondary" type="button" (click)="cancelEdit()">Cancel</button>
+      </div>
+    </form>
+  </div>
+
+  <div *ngIf="successMessage" class="alert alert-success">{{ successMessage }}</div>
+  <div *ngIf="errorMessage" class="alert alert-danger">{{ errorMessage }}</div>
+
+  <div class="card p-3">
+    <h5 class="mb-3">Configured Repositories</h5>
+    <div *ngIf="isLoading || isLoadingRepositories" class="text-muted">Loading repositories...</div>
+    <div *ngIf="!isLoading && !isLoadingRepositories && !mappings.length" class="text-muted">No repositories configured for this project yet. Select a project and add a repository above.</div>
+
+    <div class="table-responsive" *ngIf="!isLoading && mappings.length">
+      <table class="table table-striped mb-0">
+        <thead>
+          <tr>
+            <th>Project</th>
+            <th>Repository</th>
+            <th>URL</th>
+            <th>Branch</th>
+            <th>Credential</th>
+            <th>Primary</th>
+            <th>Active</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let mapping of mappings">
+            <td>{{ getProjectLabel(mapping.projectKey) }}</td>
+            <td>{{ mapping.repoName }}</td>
+            <td>{{ mapping.repoUrl }}</td>
+            <td>{{ mapping.defaultBranch }}</td>
+            <td>{{ getCredentialLabel(mapping.credentialId) }}</td>
+            <td>
+              <span class="badge" [class.bg-success]="mapping.primaryRepository" [class.bg-secondary]="!mapping.primaryRepository">
+                {{ mapping.primaryRepository ? 'Primary' : 'Secondary' }}
+              </span>
+            </td>
+            <td>
+              <span class="badge" [class.bg-success]="mapping.active" [class.bg-secondary]="!mapping.active">
+                {{ mapping.active ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td class="text-end">
+              <button class="btn btn-sm btn-outline-primary me-2" type="button" (click)="startEdit(mapping)">Edit</button>
+              <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteMapping(mapping)" [disabled]="deletingRepositoryId === (mapping.id || mapping.repositoryId)">
+                {{ deletingRepositoryId === (mapping.id || mapping.repositoryId) ? 'Deleting...' : 'Delete' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

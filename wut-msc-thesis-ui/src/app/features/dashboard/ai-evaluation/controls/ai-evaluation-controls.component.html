@@ -1,0 +1,47 @@
+<div class="controls-card">
+  <div class="d-flex flex-wrap align-items-end gap-3">
+    <button class="btn btn-primary btn-sm evaluation-run-btn"
+            (click)="runRequested.emit()"
+            [disabled]="isLoading">
+      <span *ngIf="!isLoading">Run Evaluation</span>
+      <span *ngIf="isLoading">Running...</span>
+    </button>
+
+    <div class="flex-grow-1">
+      <ng-container [ngSwitch]="activeTab">
+        <input *ngSwitchCase="'by-issue'"
+               class="form-control form-control-sm"
+               [ngModel]="evalIssueKey"
+               (ngModelChange)="trackIssue($event)"
+               placeholder="Issue Key (e.g. BUG-5)" />
+
+        <select *ngSwitchCase="'by-model'"
+                class="form-select form-select-sm"
+                [ngModel]="evalProvider"
+                (ngModelChange)="trackProvider($event)">
+          <option [ngValue]="null" disabled>Select AI Provider</option>
+          <option value="GEMINI">Gemini</option>
+          <option value="DEEPSEEK">DeepSeek</option>
+        </select>
+
+        <input *ngSwitchCase="'stability'"
+               class="form-control form-control-sm"
+               [ngModel]="stabilityIssueKey"
+               (ngModelChange)="trackStability($event)"
+               placeholder="Issue Key for stability (e.g. BUG-5)" />
+      </ng-container>
+    </div>
+  </div>
+
+  <div class="ai-comparison-tabs-card mt-3">
+    <ul class="nav nav-pills small ai-comparison-tabs mb-0 justify-content-center">
+      <li class="nav-item" *ngFor="let tab of tabDefinitions">
+        <button class="nav-link"
+                [class.active]="activeTab === tab.value"
+                (click)="selectTab(tab.value)">
+          {{ tab.label }}
+        </button>
+      </li>
+    </ul>
+  </div>
+</div>

@@ -1,0 +1,65 @@
+<div class="customDiv">
+
+    <hr>
+
+
+    <h1 *ngIf="show"> This is Directive </h1>
+
+    <div style="width: 400px; background-color: bisque; color: blueviolet; text-align: center;">
+        <h1> Directive </h1>
+    </div>
+
+
+    <div *ngIf="count == 0" style="width: 400px; background-color: bisque; color: blueviolet; text-align: center;">
+        <h1> Heading 0 </h1>
+    </div>
+
+    <div *ngIf="count == 1" style="width: 400px; background-color: bisque; color: blueviolet; text-align: center;">
+        <h1> Heading 1 </h1>
+    </div>
+    <div *ngIf="count == 2" style="width: 400px; background-color: bisque; color: blueviolet; text-align: center;">
+        <h1> Heading 2 </h1>
+    </div>
+    
+
+
+    <div  style="width: 400px; background-color: bisque; color: blueviolet; text-align: center; align-items: center;">
+        <table style="display: block; background-color: beige; text-align: center;">
+            <thead> 
+                <tr>
+                    <th># </th>
+                    <th>Name</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let student of students">
+                    <td> {{student.id}}</td>
+                    <td> {{student.name}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    
+    <hr>
+
+
+    
+    <div [ngSwitch]="color" style="width: 400px; background-color: bisque; color: blueviolet; text-align: center;">
+        
+        <button class="btn " (click)="changeColor('red')"> Red  </button>
+        <button class="btn " (click)="changeColor('green')"> Green  </button>
+        <button class="btn " (click)="changeColor('yellow')"> Yellow  </button>
+        <button class="btn " (click)="changeColor('pink')"> Default Pink  </button>
+
+        <h1 *ngSwitchCase = "'red'"    style="background-color: red;"> Heading Red </h1>
+        <h1 *ngSwitchCase = "'green'"   style="background-color: green;"> Heading Green </h1>
+        <h1 *ngSwitchCase = "'yellow'"    style="background-color: yellow;"> Heading Yellow </h1>
+        <h1 *ngSwitchCase = "'gray'"    style="background-color: gray;"> Heading Gray </h1>
+        <h1  *ngSwitchCase = "'blue'"   style="background-color: blue;"> Heading Blue </h1>
+        <h1  *ngSwitchDefault   style="background-color: pink;"> Default </h1>
+    </div>
+
+
+
+
+</div>

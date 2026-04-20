@@ -1,0 +1,45 @@
+<div class="response-extremes-panel">
+  <div *ngIf="isLoading" class="response-extremes-note text-muted">Calling response-time API...</div>
+  <div *ngIf="error" class="alert alert-danger py-2 small response-extremes-alert">{{ error }}</div>
+
+  <section *ngIf="hasSummary && !isLoading && !error" class="response-extremes-card">
+    <header class="response-extremes-header">
+      <div>
+        <h5 class="response-extremes-title">Fastest vs Slowest Models</h5>
+        <p class="response-extremes-subtitle">Comparison derived from the latest response-time benchmark window.</p>
+      </div>
+    </header>
+
+    <div class="response-extremes-grid">
+      <article class="extreme-tile extreme-tile--fastest">
+        <h6>Fastest Model</h6>
+        <p class="extreme-model">{{ summary?.fastestModel || '—' }}</p>
+        <p class="extreme-value">{{ formatValue(summary?.fastestValue) }}</p>
+        <p class="extreme-caption">Consistently lowest mean latency across all recorded runs.</p>
+      </article>
+
+      <article class="extreme-tile extreme-tile--slowest">
+        <h6>Slowest Model</h6>
+        <p class="extreme-model">{{ summary?.slowestModel || '—' }}</p>
+        <p class="extreme-value">{{ formatValue(summary?.slowestValue) }}</p>
+        <p class="extreme-caption">Highest latency outlier when aggregating identical samples.</p>
+      </article>
+
+      <article class="extreme-tile extreme-tile--delta">
+        <h6>Delta</h6>
+        <p class="extreme-model">Spread</p>
+        <p class="extreme-value">{{ formatValue(summary?.deltaSeconds) }}</p>
+        <p class="extreme-caption">Shows how much slower the worst performer is compared to the leader.</p>
+      </article>
+    </div>
+
+    <div *ngIf="summary?.recommendation" class="extreme-recommendation">
+      <strong>Recommendation</strong>
+      <p class="mb-0">{{ summary?.recommendation }}</p>
+    </div>
+  </section>
+
+  <div *ngIf="!isLoading && !error && !hasSummary" class="response-extremes-note text-muted">
+    Activate "Extremes" to load fastest vs slowest guidance.
+  </div>
+</div>

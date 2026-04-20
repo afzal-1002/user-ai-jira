@@ -1,0 +1,24 @@
+<div class="performance-wrapper">
+  <figure class="chart-card">
+    <h5 class="chart-title">Performance - Average Response Time</h5>
+    <p class="chart-subtitle small text-muted mb-2">
+      X: Gemini, DeepSeek &nbsp;·&nbsp; Y: Avg response time (seconds)
+    </p>
+
+    <div *ngIf="isLoading" class="small text-muted">Loading performance comparison...</div>
+    <div *ngIf="error" class="alert alert-danger py-1 small">{{ error }}</div>
+
+    <div *ngIf="chartData">
+      <canvas
+        baseChart
+        [data]="chartData"
+        [options]="chartOptions"
+        [type]="'bar'"
+        style="min-height: 260px;">
+      </canvas>
+      <figcaption class="chart-caption small text-muted mt-2">
+        Figure: Average response time (seconds) of Gemini and DeepSeek across all evaluation runs.
+      </figcaption>
+    </div>
+  </figure>
+</div>

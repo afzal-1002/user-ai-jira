@@ -1,0 +1,19 @@
+<div class="card shadow-sm h-100">
+  <div class="card-body">
+    <h5 class="card-title mb-2">Accuracy Over Time</h5>
+    <p class="text-muted small mb-2">
+      Line chart of absolute estimation error over time across historical issues.
+    </p>
+
+    <div *ngIf="errorSeries.length; else noData">
+      <app-line-trend-chart [points]="errorSeries"></app-line-trend-chart>
+      <p class="chart-caption small text-muted mt-2">
+        Figure: Temporal evolution of |estimated − actual| hours, useful for analysing whether AI estimations improve over time.
+      </p>
+    </div>
+
+    <ng-template #noData>
+      <div class="small text-muted">Not enough data with actual hours to compute error trends.</div>
+    </ng-template>
+  </div>
+</div>

@@ -1,0 +1,98 @@
+<div class="filter-container">
+  <div class="filter-header">
+    <h3>🔍 Advanced Filters</h3>
+    <button class="toggle-btn" (click)="toggleAdvanced()">
+      {{ showAdvanced ? '▼ Hide Filters' : '▶ Show Filters' }}
+    </button>
+  </div>
+
+  <div *ngIf="showAdvanced" class="filter-panel">
+    <div class="filter-row">
+      <div class="filter-group">
+        <label for="method">HTTP Method</label>
+        <select id="method" [(ngModel)]="filter.method" class="form-control">
+          <option value="">All Methods</option>
+          <option *ngFor="let method of methods" [value]="method">
+            {{ method }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="status">Status Code</label>
+        <select id="status" [(ngModel)]="filter.statusCode" class="form-control">
+          <option value="">All Status Codes</option>
+          <option *ngFor="let code of statusCodes" [value]="code">
+            {{ code }}
+          </option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label for="frontend">Frontend App</label>
+        <select id="frontend" [(ngModel)]="filter.frontend" class="form-control">
+          <option value="">All Apps</option>
+          <option *ngFor="let app of frontends" [value]="app">
+            {{ app }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="filter-row">
+      <div class="filter-group">
+        <label for="startDate">Start Date</label>
+        <input
+          id="startDate"
+          type="date"
+          [(ngModel)]="filter.startDate"
+          class="form-control"
+        />
+      </div>
+
+      <div class="filter-group">
+        <label for="endDate">End Date</label>
+        <input
+          id="endDate"
+          type="date"
+          [(ngModel)]="filter.endDate"
+          class="form-control"
+        />
+      </div>
+    </div>
+
+    <div class="filter-row">
+      <div class="filter-group full-width">
+        <label for="keyword">Search Endpoint</label>
+        <input
+          id="keyword"
+          type="text"
+          [(ngModel)]="filter.keyword"
+          placeholder="e.g., /api/issues, /api/projects"
+          class="form-control"
+        />
+      </div>
+    </div>
+
+    <div class="filter-row">
+      <div class="checkbox-group">
+        <input
+          id="successOnly"
+          type="checkbox"
+          [(ngModel)]="filter.successOnly"
+          class="checkbox"
+        />
+        <label for="successOnly">Show Only Successful Requests</label>
+      </div>
+    </div>
+
+    <div class="filter-actions">
+      <button class="btn btn-primary" (click)="applyFilters()">
+        ✓ Apply Filters
+      </button>
+      <button class="btn btn-secondary" (click)="resetFilters()">
+        ↻ Reset
+      </button>
+    </div>
+  </div>
+</div>

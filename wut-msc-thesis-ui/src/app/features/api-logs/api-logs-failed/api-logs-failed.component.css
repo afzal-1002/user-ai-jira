@@ -1,0 +1,203 @@
+.failed-logs-container {
+  padding: 1.5rem;
+  background-color: #fafafa;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  border-bottom: 2px solid #e53935;
+  padding-bottom: 0.75rem;
+}
+
+.section-header h3 {
+  margin: 0;
+  color: #d32f2f;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.badge-danger {
+  background-color: #ffebee;
+  color: #d32f2f;
+  padding: 0.4rem 0.8rem;
+  border-radius: 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid #ef5350;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem 1rem;
+  text-align: center;
+  background-color: #fff;
+  border-radius: 8px;
+  border: 2px dashed #e0e0e0;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.empty-state h4 {
+  margin: 0 0 0.5rem 0;
+  color: #424242;
+  font-size: 1.1rem;
+}
+
+.empty-state p {
+  margin: 0;
+  color: #757575;
+  font-size: 0.95rem;
+}
+
+.failed-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .failed-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+.failed-card {
+  background-color: #fff;
+  border-left: 4px solid #d32f2f;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.failed-card:hover {
+  box-shadow: 0 4px 12px rgba(211, 47, 47, 0.2);
+  transform: translateY(-2px);
+}
+
+.card-header {
+  padding: 1rem;
+  background-color: #ffebee;
+  border-bottom: 1px solid #ffcdd2;
+}
+
+.header-top {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.badge {
+  padding: 0.4rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.method {
+  background-color: #fff3e0;
+  color: #e65100;
+  border: 1px solid #ffe0b2;
+}
+
+.method-post {
+  background-color: #c8e6c9;
+  color: #1b5e20;
+}
+
+.method-put {
+  background-color: #ffe0b2;
+  color: #e65100;
+}
+
+.method-delete {
+  background-color: #ffcdd2;
+  color: #b71c1c;
+}
+
+.method-patch {
+  background-color: #f3e5f5;
+  color: #6a1b9a;
+}
+
+.method-get {
+  background-color: #bbdefb;
+  color: #01579b;
+}
+
+.status {
+  background-color: #ffcdd2;
+  color: #c62828;
+  border: 1px solid #ef5350;
+}
+
+.status-4xx {
+  background-color: #fff9c4;
+  color: #f57f17;
+}
+
+.status-5xx {
+  background-color: #ffcdd2;
+  color: #c62828;
+}
+
+.timestamp {
+  margin-left: auto;
+  color: #757575;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.card-body {
+  padding: 1rem;
+}
+
+.detail-row {
+  display: flex;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid #f5f5f5;
+}
+
+.detail-row:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.label {
+  font-weight: 600;
+  color: #424242;
+  min-width: 120px;
+  margin-right: 0.75rem;
+}
+
+.value {
+  color: #616161;
+  word-break: break-all;
+  flex: 1;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  padding: 0.25rem 0.5rem;
+  background-color: #f5f5f5;
+  border-radius: 3px;
+}
+
+.value.error {
+  background-color: #ffebee;
+  color: #d32f2f;
+  font-weight: 500;
+}

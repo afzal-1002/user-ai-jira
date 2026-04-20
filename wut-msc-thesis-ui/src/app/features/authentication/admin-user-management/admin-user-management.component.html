@@ -1,0 +1,232 @@
+<div class="container py-4 admin-user-wrap">
+  <div class="card shadow-sm p-3 mb-4 section-switcher">
+    <div class="d-flex flex-wrap gap-2 align-items-center">
+      <button
+        class="btn"
+        type="button"
+        [class.btn-primary]="activeSection === 'create'"
+        [class.btn-outline-primary]="activeSection !== 'create'"
+        (click)="setSection('create')"
+      >
+        Create User
+      </button>
+      <button
+        class="btn"
+        type="button"
+        [class.btn-primary]="activeSection === 'list'"
+        [class.btn-outline-primary]="activeSection !== 'list'"
+        (click)="setSection('list')"
+      >
+        List All Users
+      </button>
+      <button
+        class="btn"
+        type="button"
+        [class.btn-primary]="activeSection === 'assign'"
+        [class.btn-outline-primary]="activeSection !== 'assign'"
+        (click)="setSection('assign')"
+      >
+        User Site Assignment
+      </button>
+
+      <a routerLink="/home" class="btn btn-outline-secondary ms-auto">Back to Home</a>
+    </div>
+  </div>
+
+  <div class="card shadow-sm p-4" *ngIf="activeSection === 'create'">
+    <h4>{{ editingUserId ? 'Update User' : 'Create User' }}</h4>
+    <p class="text-muted small">Create and maintain platform users.</p>
+
+    <div *ngIf="saveMessage" class="alert alert-success py-2">{{ saveMessage }}</div>
+    <div *ngIf="saveError" class="alert alert-danger py-2">{{ saveError }}</div>
+
+    <form [formGroup]="userForm" (ngSubmit)="saveUser()">
+      <div class="mb-2">
+        <label class="form-label">Username (Email)</label>
+        <input class="form-control" formControlName="username" type="email" placeholder="user@company.com" />
+      </div>
+
+      <div class="row g-2 mb-2">
+        <div class="col">
+          <label class="form-label">First Name</label>
+          <input class="form-control" formControlName="firstName" type="text" />
+        </div>
+        <div class="col">
+          <label class="form-label">Last Name</label>
+          <input class="form-control" formControlName="lastName" type="text" />
+        </div>
+      </div>
+
+      <div class="mb-2">
+        <label class="form-label">Email Address</label>
+        <input class="form-control" formControlName="emailAddress" type="email" />
+      </div>
+
+      <div class="mb-2">
+        <label class="form-label">Phone Number</label>
+        <input class="form-control" formControlName="phoneNumber" type="text" />
+      </div>
+
+      <div class="mb-2">
+        <label class="form-label">Password {{ editingUserId ? '(optional for update)' : '' }}</label>
+        <input class="form-control" formControlName="password" type="password" />
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label d-block">Roles</label>
+        <div class="role-grid">
+          <div class="form-check" *ngFor="let role of roleOptions">
+            <input
+              class="form-check-input"
+              type="checkbox"
+              [id]="'role-' + role"
+              [checked]="hasRole(role)"
+              (change)="onRoleChange(role, $any($event.target).checked)"
+            />
+            <label class="form-check-label" [for]="'role-' + role">{{ role }}</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button class="btn btn-primary" type="submit" [disabled]="isSaving">
+          {{ editingUserId ? 'Update User' : 'Create User' }}
+        </button>
+        <button class="btn btn-outline-secondary" type="button" (click)="cancelEdit()">Clear</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card shadow-sm p-4" *ngIf="activeSection === 'list'">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+      <h4 class="mb-0">Registered Users</h4>
+      <button class="btn btn-sm btn-outline-primary" type="button" (click)="refreshUsers()">Refresh</button>
+    </div>
+    <p class="text-muted small mb-3">List all users with edit and delete actions.</p>
+
+    <div *ngIf="saveMessage" class="alert alert-success py-2">{{ saveMessage }}</div>
+    <div *ngIf="saveError" class="alert alert-danger py-2">{{ saveError }}</div>
+
+    <div *ngIf="isLoading" class="text-muted">Loading users...</div>
+
+    <div class="table-responsive" *ngIf="!isLoading">
+      <table class="table table-sm align-middle">
+        <thead>
+          <tr>
+            <th>Username</th>
+            <th>Name</th>
+            <th>Roles</th>
+            <th>Status</th>
+            <th class="text-end">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let user of users">
+            <td>{{ getUsername(user) }}</td>
+            <td>{{ user.firstName }} {{ user.lastName }}</td>
+            <td>{{ toRoles(getRoles(user)) }}</td>
+            <td>
+              <span class="badge" [class.bg-success]="isActive(user)" [class.bg-secondary]="!isActive(user)">
+                {{ isActive(user) ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+            <td class="text-end">
+              <button class="btn btn-sm btn-outline-primary me-2" (click)="editUser(user)">Edit</button>
+              <button class="btn btn-sm btn-outline-danger" (click)="deleteUser(user)">Delete</button>
+            </td>
+          </tr>
+          <tr *ngIf="users.length === 0">
+            <td colspan="5" class="text-center text-muted">No users found.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="card shadow-sm p-4" *ngIf="activeSection === 'assign'">
+    <h4>User Site Assignment</h4>
+    <p class="text-muted small">Assign one or more Jira sites to a user and set the default site.</p>
+
+    <div *ngIf="saveMessage" class="alert alert-success py-2">{{ saveMessage }}</div>
+    <div *ngIf="saveError" class="alert alert-danger py-2">{{ saveError }}</div>
+
+    <div *ngIf="isLoading || isLoadingSites" class="text-muted">Loading users and sites...</div>
+
+    <form *ngIf="!isLoading && !isLoadingSites" [formGroup]="assignmentForm" (ngSubmit)="assignSite()">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">User</label>
+          <select class="form-select" formControlName="userId" (change)="fillUsernameFromSelectedUser()">
+            <option [ngValue]="null">Select user</option>
+            <option *ngFor="let user of users" [ngValue]="user.id">
+              {{ getUsername(user) }} ({{ user.firstName }} {{ user.lastName }})
+            </option>
+          </select>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Site</label>
+          <select class="form-select" formControlName="siteId">
+            <option [ngValue]="null">Select site</option>
+            <option *ngFor="let site of sites" [ngValue]="site.id">
+              {{ site.siteName }} ({{ site.baseURL || site.baseUrl || site.hostPart }})
+            </option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-check mt-3 mb-3">
+        <input class="form-check-input" type="checkbox" id="defaultForUser" formControlName="defaultForUser" />
+        <label class="form-check-label" for="defaultForUser">Set as default site for this user</label>
+      </div>
+
+      <div class="d-flex gap-2">
+        <button class="btn btn-primary" type="submit" [disabled]="isAssigning">
+          {{ isAssigning ? 'Assigning...' : 'Assign Site' }}
+        </button>
+        <button class="btn btn-outline-secondary" type="button" (click)="loadSites()">Refresh Sites</button>
+      </div>
+
+      <hr class="my-4" />
+
+      <h5>Find Assigned Sites By Username</h5>
+      <p class="text-muted small mb-2">Enter a username (email) to list all sites assigned to that user.</p>
+
+      <div class="row g-2 align-items-end mb-3">
+        <div class="col-md-8">
+          <label class="form-label">Username</label>
+          <input class="form-control" type="text" [formControl]="usernameLookup" placeholder="user@company.com" />
+          <div class="invalid-hint small" *ngIf="usernameLookup.invalid && usernameLookup.touched">
+            Username is required.
+          </div>
+        </div>
+        <div class="col-md-4">
+          <button class="btn btn-outline-primary w-100" type="button" (click)="fetchAssignedSitesByUsername()" [disabled]="isLoadingAssignedSites">
+            {{ isLoadingAssignedSites ? 'Loading...' : 'Get Assigned Sites' }}
+          </button>
+        </div>
+      </div>
+    </form>
+
+    <div *ngIf="assignedSitesMessage" class="alert alert-info py-2 mt-3 mb-2">{{ assignedSitesMessage }}</div>
+
+    <div class="table-responsive mt-2" *ngIf="assignedSitesByUsername.length > 0">
+      <table class="table table-sm align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Site Name</th>
+            <th>Host</th>
+            <th>Base URL</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let site of assignedSitesByUsername">
+            <td>{{ site.siteName }}</td>
+            <td>{{ site.hostPart || '-' }}</td>
+            <td>{{ site.baseURL || site.baseUrl || '-' }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

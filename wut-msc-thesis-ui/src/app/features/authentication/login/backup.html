@@ -1,0 +1,30 @@
+
+<div class="container mt-4">
+    <h4 class="mb-3">User List</h4>
+
+    <table class="table table-bordered table-striped table-hover text-center">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            <!-- @for (user of userList; track user.id; let i= $index) {
+        <tr>
+            <td>{{user.id}}</td>
+            <td>{{user.userName}}</td>
+        </tr>
+      } -->
+
+            <tr *ngFor="let user of userList">
+                <td>{{user.id}}</td>
+                <td>{{user.userName}}</td>
+            </tr>
+        </tbody>
+    </table>
+</div>

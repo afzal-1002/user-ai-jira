@@ -1,0 +1,44 @@
+<div class="card shadow-sm">
+  <div class="card-body">
+    <h5 class="card-title mb-2">Model Comparison History</h5>
+    <p class="text-muted small mb-2">
+      Historical comparison of Gemini vs DeepSeek for issues where both provided estimations.
+    </p>
+
+    <div class="row g-3">
+      <div class="col-md-6">
+        <app-bar-comparison-chart [labels]="labels" [values]="values"></app-bar-comparison-chart>
+        <p class="chart-caption small text-muted mt-2">
+          Figure: Model dominance ratio showing how often each model produced the closer estimate to the ground truth across historical issues.
+        </p>
+      </div>
+      <div class="col-md-6">
+        <div class="table-responsive small history-comp-table" *ngIf="rows.length; else noRows">
+          <table class="table table-sm align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Issue</th>
+                <th class="text-end">Actual (h)</th>
+                <th class="text-end">Gemini Est</th>
+                <th class="text-end">DeepSeek Est</th>
+                <th>Better</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let r of rows | slice:0:20">
+                <td>{{ r.issueKey }}</td>
+                <td class="text-end">{{ r.actualHours | number: '1.1-2' }}</td>
+                <td class="text-end">{{ r.geminiEst | number: '1.1-2' }}</td>
+                <td class="text-end">{{ r.deepSeekEst | number: '1.1-2' }}</td>
+                <td>{{ r.betterModel }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <ng-template #noRows>
+          <div class="small text-muted mt-2">Not enough overlapping issues to compute model comparison history.</div>
+        </ng-template>
+      </div>
+    </div>
+  </div>
+</div>

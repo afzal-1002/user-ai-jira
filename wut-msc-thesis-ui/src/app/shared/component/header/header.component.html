@@ -1,0 +1,102 @@
+<!-- 🌟 Logged-in navbar -->
+<nav *ngIf="authService.isLoggedIn$ | async" class="navbar navbar-expand-lg main-navbar sticky-top">
+  <div class="container-fluid px-3">
+
+    <!-- Brand: route by role, include :userId -->
+    <ng-container *ngIf="authService.currentUser$ | async as user; else guest">
+      <a class="navbar-brand fw-bold"
+         [routerLink]="(authService.isAdmin$ | async) ? ['/admin-dashboard', user.id]
+                                                     : ['/user-dashboard',  user.id]">
+        Bug Estimation Tool
+      </a>
+    </ng-container>
+    <ng-template #guest>
+      <a class="navbar-brand fw-bold" routerLink="/">Bug Estimation Tool</a>
+    </ng-template>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ms-auto d-flex align-items-center gap-3">
+
+        <!-- Product (all logged-in users) -->
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+            Product <i class="bi bi-caret-down-fill"></i>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a class="dropdown-item" routerLink="/mcp/projects">Projects</a></li>
+            <li><a class="dropdown-item" routerLink="/mcp/projects">Bug Module</a></li>
+            <li><a class="dropdown-item" routerLink="/ai-estimations">AI Estimations Analysis</a></li>
+            <li><hr class="dropdown-divider" /></li>
+            <li><a class="dropdown-item" routerLink="/ai-estimations/comparison">Model Comparison</a></li>
+            <li><a class="dropdown-item" routerLink="/ai-research">AI Research</a></li>
+            <li><a class="dropdown-item" routerLink="/ai-history">Historical AI Performance</a></li>
+          </ul>
+        </li>
+
+        <!-- Home Dashboard (all non-admin users) -->
+        <ng-container *ngIf="(authService.isNormalUser$ | async) && (authService.currentUser$ | async) as user">
+          <li class="nav-item">
+            <a class="nav-link" [routerLink]="['/user-dashboard', user.id]">Home Dashboard</a>
+          </li>
+        </ng-container>
+
+        <!-- Use Cases (all non-admin users) -->
+        <ng-container *ngIf="authService.isNormalUser$ | async">
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle customLink" role="button" data-bs-toggle="dropdown">
+              Use Cases <i class="bi bi-caret-down-fill"></i>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item customLink" routerLink="/create-bug">Create Bug</a></li>
+              <li><a class="dropdown-item customLink" routerLink="/update-bug">Update Bug</a></li>
+              <li><a class="dropdown-item customLink" routerLink="/all-bugs">View All Bugs</a></li>
+            </ul>
+          </li>
+        </ng-container>
+
+        <!-- Admin area (admins only) -->
+        <ng-container *ngIf="authService.currentUser$ | async as user">
+          <li class="nav-item" *ngIf="authService.isAdmin$ | async">
+            <a class="nav-link" [routerLink]="['/admin-dashboard', user.id]">Admin Dashboard</a>
+          </li>
+
+          <!-- User dropdown -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+              <span *ngIf="user.firstName && user.lastName">{{ user.firstName }} {{ user.lastName }}</span>
+              <span *ngIf="!user.firstName || !user.lastName">{{ user.displayName}}</span>
+              <i class="bi bi-caret-down-fill"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li>
+                <a class="dropdown-item" routerLink="/view-profile">View Profile</a>
+              </li>
+              <li>
+                <a class="dropdown-item" [routerLink]="['/update-profile', user.id]">Update Profile</a>
+              </li>
+            </ul>
+          </li>
+        </ng-container>
+
+        <!-- Logout -->
+        <li class="nav-item">
+          <a class="btn nav-link text-danger" (click)="logOut()">Logout</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- 🌙 Guest navbar -->
+<nav *ngIf="!(authService.isLoggedIn$ | async)" class="navbar navbar-expand-lg guest-navbar sticky-top">
+  <div class="container-fluid px-3">
+    <a class="navbar-brand fw-bold" routerLink="/">Bug Estimation Tool</a>
+    <div class="ms-auto d-flex align-items-center gap-3">
+      <a class="nav-link btn btn-sm" routerLink="/login" (click)="userLoggedIn()">Login</a>
+    </div>
+  </div>
+</nav>

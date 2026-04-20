@@ -1,0 +1,134 @@
+.history-page {
+  max-width: 1400px;
+  padding-bottom: 2rem;
+}
+
+.filter-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background-color: #f9fafb;
+  
+  .card-body {
+    padding: 1.25rem;
+  }
+
+  .card-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  .form-label {
+    color: #6b7280;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+  }
+}
+
+// Charts Grid Layout
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.chart-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  }
+
+  .card-body {
+    padding: 1.5rem;
+  }
+
+  .card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-text {
+    color: #6b7280;
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+  }
+
+  .chart-container {
+    position: relative;
+    height: 350px;
+    margin: 1rem 0;
+
+    canvas {
+      max-height: 100%;
+    }
+  }
+
+  .thesis-note {
+    border-left: 3px solid #3b82f6;
+    padding-left: 0.75rem;
+    color: #4b5563;
+    font-style: italic;
+    margin-top: 1rem;
+
+    strong {
+      color: #1f2937;
+      font-style: normal;
+    }
+  }
+
+  .chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    flex-wrap: wrap;
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .legend-color-box {
+      width: 16px;
+      height: 16px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    .legend-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #374151;
+    }
+  }
+}
+
+.history-back-btn {
+  border-radius: 999px;
+  padding: 0.4rem 1rem;
+  font-size: 0.85rem;
+}
+
+// Loading and Error States
+.alert {
+  border-radius: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+// Table Styling
+app-estimation-history-table {
+  display: block;
+  width: 100%;
+}

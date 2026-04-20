@@ -1,0 +1,12 @@
+<section class="research-chart-card">
+  <header class="research-chart-card__header" *ngIf="title || subtitle">
+    <h5 class="research-chart-card__title" *ngIf="title">{{ title }}</h5>
+    <p class="research-chart-card__subtitle" *ngIf="subtitle">{{ subtitle }}</p>
+  </header>
+
+  <div class="research-chart-card__body">
+    <ng-content></ng-content>
+  </div>
+
+  <footer class="research-chart-card__caption" *ngIf="caption">{{ caption }}</footer>
+</section>

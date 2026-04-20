@@ -1,0 +1,41 @@
+<div class="container mt-4 history-page">
+  <div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+      <h2 class="mb-1">Accuracy Trend</h2>
+      <p class="text-muted mb-0">Mean absolute error evolution over time for each AI provider.</p>
+    </div>
+    <div>
+      <button class="btn btn-outline-secondary btn-sm history-back-btn" (click)="goBack()">
+        &larr; Back to History
+      </button>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <h5 class="card-title mb-1">Accuracy Trend Analysis</h5>
+          <p class="text-muted small mb-0">Mean absolute error over time for a selected AI provider.</p>
+        </div>
+        <div>
+          <select class="form-select form-select-sm" [(ngModel)]="provider" (change)="onProviderChange()" style="width: 150px;">
+            <option value="GEMINI">Gemini</option>
+            <option value="DEEPSEEK">DeepSeek</option>
+          </select>
+        </div>
+      </div>
+
+      <div *ngIf="isLoading" class="small text-muted">Loading accuracy trend...</div>
+      <div *ngIf="error" class="small text-danger">{{ error }}</div>
+
+      <ng-container *ngIf="!isLoading && !error && maePoints.length">
+        <app-line-trend-chart [points]="maePoints"></app-line-trend-chart>
+      </ng-container>
+
+      <div *ngIf="!isLoading && !error && !maePoints.length" class="small text-muted">
+        No accuracy trend data available.
+      </div>
+    </div>
+  </div>
+</div>

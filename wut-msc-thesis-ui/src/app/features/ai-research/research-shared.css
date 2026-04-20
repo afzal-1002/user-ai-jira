@@ -1,0 +1,157 @@
+:host {
+  display: block;
+}
+
+.ai-research-page {
+  max-width: 1100px;
+  margin: 0 auto 2rem;
+}
+
+.research-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.research-header__title {
+  margin: 0;
+}
+
+.research-header__subtitle {
+  margin: 0.15rem 0 0;
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.research-back-btn {
+  border-radius: 999px;
+  padding: 0.35rem 1.1rem;
+  font-size: 0.85rem;
+}
+
+.research-status {
+  padding: 0.65rem 0.95rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.research-status--loading {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.research-status--error {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.chart-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.metric-band {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.85rem;
+}
+
+.metric-chip {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  background: #f8fafc;
+  font-size: 0.82rem;
+}
+
+.metric-chip__label {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  font-size: 0.7rem;
+}
+
+.metric-chip__value {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.raw-result-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 1rem 1.25rem;
+  background: #ffffff;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  margin-top: 2rem;
+}
+
+.raw-result-card pre {
+  background: #0f172a;
+  color: #f8fafc;
+  padding: 0.75rem;
+  border-radius: 10px;
+  max-height: 380px;
+  overflow: auto;
+}
+
+.ai-research-section {
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 1.25rem 1.35rem;
+  background-color: #ffffff;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+  margin-bottom: 1.5rem;
+}
+
+.ai-research-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.ai-research-section__title {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.ai-research-section__description {
+  margin: 0 0 1rem;
+  font-size: 0.92rem;
+  color: #6b7280;
+}
+
+.ai-research-status {
+  font-size: 0.85rem;
+  margin-bottom: 0.4rem;
+}
+
+.ai-research-raw-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 0.9rem 1rem;
+  background: #f8fafc;
+  margin-top: 1.1rem;
+}
+
+.ai-research-raw-card pre {
+  background: #fff;
+  border-radius: 10px;
+  border: 1px solid #e2e8f0;
+}
+
+.ai-research-chart-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}

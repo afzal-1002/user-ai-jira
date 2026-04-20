@@ -1,0 +1,142 @@
+<div class="details-container">
+  <div class="details-header">
+    <div class="header-title">
+      <h2>📋 API Request Details</h2>
+    </div>
+    <button class="close-btn" (click)="close()">✕</button>
+  </div>
+
+  <div class="details-content">
+    <!-- Basic Information Section -->
+    <div class="detail-section">
+      <div class="section-header" (click)="toggleSection('basic')">
+        <span class="section-title">
+          {{ expandedSections.basic ? '▼' : '▶' }} Basic Information
+        </span>
+      </div>
+      <div *ngIf="expandedSections.basic" class="section-content">
+        <div class="info-row">
+          <span class="label">Method:</span>
+          <span class="badge method" [ngClass]="getMethodClass(log.method)">
+            {{ log.method }}
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="label">Endpoint:</span>
+          <span class="value">{{ log.endpoint }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Full URL:</span>
+          <span class="value url-value">{{ log.url }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Status Code:</span>
+          <span class="badge status" [ngClass]="getStatusClass(log.statusCode)">
+            {{ log.statusCode }}
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="label">Success:</span>
+          <span class="badge" [ngClass]="log.success ? 'success' : 'failed'">
+            {{ log.success ? '✓ Yes' : '✗ No' }}
+          </span>
+        </div>
+        <div class="info-row">
+          <span class="label">Timestamp:</span>
+          <span class="value">{{ log.timestamp | date: 'medium' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Response Time:</span>
+          <span class="value">{{ log.responseTime }}ms</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Request Details Section -->
+    <div class="detail-section">
+      <div class="section-header" (click)="toggleSection('request')">
+        <span class="section-title">
+          {{ expandedSections.request ? '▼' : '▶' }} Request Details
+        </span>
+      </div>
+      <div *ngIf="expandedSections.request" class="section-content">
+        <div class="info-row" *ngIf="log.component">
+          <span class="label">Component:</span>
+          <span class="value">{{ log.component }}</span>
+        </div>
+        <div class="info-row" *ngIf="log.frontend">
+          <span class="label">Frontend App:</span>
+          <span class="value">{{ log.frontend }}</span>
+        </div>
+        <div class="info-row" *ngIf="log.userId">
+          <span class="label">User ID:</span>
+          <span class="value">{{ log.userId }}</span>
+        </div>
+        <div class="info-row" *ngIf="log.requestPayload" class="full-width">
+          <span class="label">Request Payload:</span>
+          <pre class="code-block">{{ formatJson(log.requestPayload) }}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Response Details Section -->
+    <div class="detail-section">
+      <div class="section-header" (click)="toggleSection('response')">
+        <span class="section-title">
+          {{ expandedSections.response ? '▼' : '▶' }} Response Details
+        </span>
+      </div>
+      <div *ngIf="expandedSections.response" class="section-content">
+        <div *ngIf="log.responsePayload" class="info-row full-width">
+          <span class="label">Response Payload:</span>
+          <pre class="code-block">{{ formatJson(log.responsePayload) }}</pre>
+        </div>
+        <div *ngIf="!log.responsePayload" class="empty-info">
+          No response payload recorded
+        </div>
+      </div>
+    </div>
+
+    <!-- Error Information Section -->
+    <div class="detail-section" *ngIf="log.errorMessage">
+      <div class="section-header error-header" (click)="toggleSection('error')">
+        <span class="section-title">
+          {{ expandedSections.error ? '▼' : '▶' }} ❌ Error Information
+        </span>
+      </div>
+      <div *ngIf="expandedSections.error" class="section-content error-content">
+        <div class="info-row full-width">
+          <span class="label">Error Message:</span>
+          <div class="error-message">{{ log.errorMessage }}</div>
+        </div>
+        <div class="info-row full-width" *ngIf="log.stackTrace">
+          <span class="label">Stack Trace:</span>
+          <pre class="code-block error-code">{{ log.stackTrace }}</pre>
+        </div>
+      </div>
+    </div>
+
+    <!-- Metadata Section -->
+    <div class="detail-section">
+      <div class="section-header" (click)="toggleSection('basic')">
+        <span class="section-title">
+          {{ expandedSections.basic ? '▼' : '▶' }} Metadata
+        </span>
+      </div>
+      <div *ngIf="expandedSections.basic" class="section-content">
+        <div class="info-row">
+          <span class="label">Log ID:</span>
+          <span class="value monospace">{{ log.id }}</span>
+        </div>
+        <div class="info-row" *ngIf="log.userAgent">
+          <span class="label">User Agent:</span>
+          <span class="value small">{{ log.userAgent }}</span>
+        </div>
+        <div class="info-row" *ngIf="log.ipAddress">
+          <span class="label">IP Address:</span>
+          <span class="value">{{ log.ipAddress }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

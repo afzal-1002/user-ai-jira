@@ -1,0 +1,40 @@
+<section class="ai-research-section">
+  <div class="ai-research-section__header">
+    <h5 class="ai-research-section__title">Hybrid Strategy Recommendation</h5>
+    <button type="button" class="btn btn-outline-secondary btn-sm" (click)="goBack()">Back to Home</button>
+  </div>
+
+  <p class="ai-research-section__description">
+    Summarises the recommended hybrid AI estimation pipeline and its industry motivation.
+  </p>
+
+  <div *ngIf="isLoading" class="ai-research-status text-muted">Loading hybrid strategy...</div>
+  <div *ngIf="error" class="ai-research-status text-danger">{{ error }}</div>
+
+  <div *ngIf="result">
+    <div class="ai-research-raw-card">
+      <h6>Recommended Pipeline</h6>
+      <p class="small mb-2" *ngIf="result.pipelineDescription">{{ result.pipelineDescription }}</p>
+      <ul class="small mb-0" *ngIf="result.recommendedPipeline || result.detailedAnalysisModel || result.fastEstimationModel">
+        <li *ngIf="result.recommendedPipeline"><strong>Pipeline:</strong> {{ result.recommendedPipeline }}</li>
+        <li *ngIf="result.detailedAnalysisModel"><strong>Detailed analysis model:</strong> {{ result.detailedAnalysisModel }}</li>
+        <li *ngIf="result.fastEstimationModel"><strong>Fast estimation model:</strong> {{ result.fastEstimationModel }}</li>
+      </ul>
+    </div>
+
+    <div class="ai-research-raw-card mt-3">
+      <h6 class="mb-1">Industry Use Case</h6>
+      <p class="small mb-0" *ngIf="result.industryUseCase">{{ result.industryUseCase }}</p>
+    </div>
+
+    <div class="ai-research-raw-card mt-3">
+      <h6 class="mb-1">Flow (textual diagram)</h6>
+      <pre class="small p-2" *ngIf="result.flowDiagram">{{ result.flowDiagram }}</pre>
+    </div>
+
+    <div class="ai-research-raw-card mt-3">
+      <h6 class="mb-1">Raw Hybrid Strategy Payload</h6>
+      <pre class="small p-2">{{ result | json }}</pre>
+    </div>
+  </div>
+</section>

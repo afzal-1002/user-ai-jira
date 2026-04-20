@@ -1,0 +1,130 @@
+.project-detail-container {
+  max-width: 1100px;
+  margin: 2rem auto;
+  padding: 1.5rem;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+
+.title-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.project-name {
+  margin: 0;
+}
+
+.project-key {
+  font-size: 0.9rem;
+  color: #6c757d;
+}
+
+.content-grid {
+  display: grid;
+  grid-template-columns: 2fr 1.5fr;
+  gap: 1.5rem;
+}
+
+.card {
+  background-color: #ffffff;
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.lead-info {
+  display: flex;
+  align-items: center;
+}
+
+.lead-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-right: 0.75rem;
+}
+
+.lead-name {
+  font-weight: 600;
+}
+
+.lead-id {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem 1rem;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-item .label {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.detail-item .value {
+  font-size: 0.95rem;
+}
+
+.issue-types-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.issue-types-list li {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0.75rem;
+}
+
+.issue-type-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 0.5rem;
+}
+
+.issue-type-name {
+  font-weight: 500;
+}
+
+.issue-type-desc {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.actions-card .actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.loading-error-container {
+  max-width: 600px;
+  margin: 3rem auto;
+  text-align: center;
+}
+
+@media (max-width: 768px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .title-block {
+    align-items: flex-start;
+  }
+}

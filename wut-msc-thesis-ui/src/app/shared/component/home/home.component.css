@@ -1,0 +1,24 @@
+/* Background with image */
+ /* .welcome-bg {
+   background: url('../../assets/image/robot.png') no-repeat center center fixed; 
+  background-size: cover;
+}  */
+
+/* Glassmorphism style for the card */
+.glass-card {
+  background: azure; /* semi-transparent white */
+  backdrop-filter: blur(10px); /* blur effect for glass look */
+  -webkit-backdrop-filter: blur(10px); /* Safari support */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* subtle border */
+  color: white;
+  margin-top: -200px;
+}
+
+.welcome-bg{
+  background-color: whitesmoke;
+}
+
+.customText{
+  border-radius: 15px; 
+  border-color: rgb(170, 223, 224)
+}

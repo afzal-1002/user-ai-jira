@@ -1,0 +1,306 @@
+<section class="bug-compare-card">
+  <div class="bug-compare-header">
+    <div>
+      <p class="eyebrow">Bug-Level Deep Dive</p>
+      <h4>Gemini vs DeepSeek per bug</h4>
+      <p class="lede">Provide a Jira key, click <strong>Run Issue Comparison</strong>, and we will hit the live API to contrast analysis speed, estimation discipline, stability, and confidence for that exact defect.</p>
+    </div>
+    <div class="bug-compare-controls">
+      <label class="bug-input-group">
+        <span class="bug-input-label">Issue Key</span>
+        <input
+          class="bug-input"
+          type="text"
+          maxlength="32"
+          placeholder="BUG-230"
+          [(ngModel)]="issueKeyInput"
+          (keyup.enter)="handleCompare()"
+          [disabled]="isLoading"
+          aria-label="Issue key" />
+      </label>
+      <button
+        type="button"
+        class="bug-cta"
+        (click)="handleCompare()"
+        [disabled]="isLoading">
+        <span *ngIf="!isLoading">Run Issue Comparison</span>
+        <span *ngIf="isLoading">Crunching…</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="analysis-guidance-grid">
+    <article class="guidance-card guidance-card--warning">
+      <h5>What you should <span>NOT</span> use</h5>
+      <p class="guidance-emoji">🚫 Pie chart (bad choice here)</p>
+      <p>Pie charts are for proportions of a whole. Our data mixes time, variability, estimation accuracy, and stability, so there is no 100% whole to split.</p>
+      <p class="guidance-callout">👉 A pie chart would be misleading and any examiner would question it.</p>
+    </article>
+
+    <article class="guidance-card guidance-card--ranking">
+      <h5>Best charts for THIS data</h5>
+      <ul class="ranked-list">
+        <li>
+          <span class="ranked-badge">🥇 Grouped bar chart</span>
+          <p>Gemini vs DeepSeek on avg analysis time, avg estimated hours, stability score, and confidence level.</p>
+        </li>
+        <li>
+          <span class="ranked-badge">🥈 Range (min–max) bar</span>
+          <p>Highlights uncertainty envelopes: min→max analysis time and min→max estimated hours.</p>
+        </li>
+        <li>
+          <span class="ranked-badge">🥉 Error bar chart</span>
+          <p>Avg analysis time ± confidence interval. Screams “statistically grounded evaluation”.</p>
+        </li>
+        <li>
+          <span class="ranked-badge">4️⃣ Radar (optional)</span>
+          <p>Nice for slides, but secondary to the evidence-based charts above.</p>
+      </ul>
+      <p class="guidance-callout">Required combo: grouped bar + error bar, with range-bar as supporting evidence.</p>
+    </article>
+
+    <article class="guidance-card guidance-card--mapping">
+      <h5>JSON → chart mapping</h5>
+      <table>
+        <thead>
+          <tr>
+            <th>JSON field</th>
+            <th>Recommended chart</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>avgAnalysisTimeSec</td>
+            <td>Grouped bar / Error bar</td>
+          </tr>
+          <tr>
+            <td>minAnalysisTimeSec · maxAnalysisTimeSec</td>
+            <td>Range (min→max) bar</td>
+          </tr>
+          <tr>
+            <td>avgEstimatedResolutionHours</td>
+            <td>Grouped bar</td>
+          </tr>
+          <tr>
+            <td>minEstimatedResolutionHours · maxEstimatedResolutionHours</td>
+            <td>Range (min→max) bar</td>
+          </tr>
+          <tr>
+            <td>stabilityScore</td>
+            <td>Grouped bar</td>
+          </tr>
+          <tr>
+            <td>confidenceInterval.lower/upper</td>
+            <td>Error bar chart</td>
+          </tr>
+        </tbody>
+      </table>
+    </article>
+  </div>
+
+  <div class="bug-state" *ngIf="isLoading">
+    Crunching run history for {{ issueKeyInput || 'your bug' }}…
+  </div>
+
+  <div class="bug-state bug-state--error" *ngIf="!isLoading && errorMessage">
+    {{ errorMessage }}
+  </div>
+
+  <div class="bug-state" *ngIf="!isLoading && !errorMessage && hasAttempted && !result">
+    No comparison data surfaced for {{ issueKeyInput || 'that key' }} yet.
+  </div>
+
+  <ng-container *ngIf="result">
+    <div class="issue-pill">Issue {{ result.issueKey }}</div>
+
+    <div class="summary-chip-grid" *ngIf="summaryChips.length">
+      <div class="summary-chip" *ngFor="let chip of summaryChips" [ngClass]="'summary-chip--' + chip.tone">
+        <span class="summary-chip__label">{{ chip.label }}</span>
+        <span class="summary-chip__value">{{ chip.value }}</span>
+      </div>
+    </div>
+
+    <div class="chart-stack">
+      <figure class="bug-chart-card" *ngIf="resolutionHoursChartData && resolutionHoursChartOptions">
+        <div class="bug-chart-head">
+          <div>
+            <p class="bug-chart-kicker">📊 Resolution discipline</p>
+            <h5>Min / avg / max resolution hours</h5>
+          </div>
+          <span class="bug-chart-meta">hours</span>
+        </div>
+        <div class="bug-chart-canvas">
+          <canvas
+            baseChart
+            [data]="resolutionHoursChartData"
+            [options]="resolutionHoursChartOptions"
+            [type]="'bar'">
+          </canvas>
+        </div>
+        <figcaption>Mirrors the requested view: each bar represents Gemini vs DeepSeek commitment in hours (minimum, average, and maximum) for the selected Jira issue.</figcaption>
+      </figure>
+
+      <figure class="bug-chart-card" *ngIf="analysisTimeChartData && analysisTimeChartOptions">
+        <div class="bug-chart-head">
+          <div>
+            <p class="bug-chart-kicker">⏱ Analysis workload</p>
+            <h5>Min / avg / max analysis runtime</h5>
+          </div>
+          <span class="bug-chart-meta">seconds</span>
+        </div>
+        <div class="bug-chart-canvas">
+          <canvas
+            baseChart
+            [data]="analysisTimeChartData"
+            [options]="analysisTimeChartOptions"
+            [type]="'bar'">
+          </canvas>
+        </div>
+        <figcaption>Dedicated view for runtime only—three bars per provider make it obvious who inspects the bug faster, especially when comparing min vs max latency.</figcaption>
+      </figure>
+
+      <figure class="bug-chart-card" *ngIf="stabilityConfidenceChartData && stabilityConfidenceChartOptions">
+        <div class="bug-chart-head">
+          <div>
+            <p class="bug-chart-kicker">🛡 Trust indicators</p>
+            <h5>Stability score vs confidence level</h5>
+          </div>
+          <span class="bug-chart-meta">percent</span>
+        </div>
+        <div class="bug-chart-canvas">
+          <canvas
+            baseChart
+            [data]="stabilityConfidenceChartData"
+            [options]="stabilityConfidenceChartOptions"
+            [type]="'bar'">
+          </canvas>
+        </div>
+        <figcaption>Breaks out non-time evidence so thesis reviewers can focus on run-to-run stability and reported confidence without scrolling past runtime metrics.</figcaption>
+      </figure>
+
+      <figure class="bug-chart-card" *ngIf="groupedMetricChartData && groupedMetricChartOptions">
+        <div class="bug-chart-head">
+          <div>
+            <p class="bug-chart-kicker">🥇 Grouped bar comparison</p>
+            <h5>Direct Gemini vs DeepSeek matchup</h5>
+          </div>
+          <span class="bug-chart-meta">Mixed metrics</span>
+        </div>
+        <div class="bug-chart-canvas">
+          <canvas
+            baseChart
+            [data]="groupedMetricChartData"
+            [options]="groupedMetricChartOptions"
+            [type]="'bar'">
+          </canvas>
+        </div>
+        <figcaption>Shows avg analysis time, avg estimated hours, stability score, and confidence level side-by-side under identical defect conditions.</figcaption>
+      </figure>
+
+      <figure class="bug-chart-card" *ngIf="analysisRangeChartData && analysisRangeChartOptions">
+        <div class="bug-chart-head">
+          <div>
+            <p class="bug-chart-kicker">🥈 Range bar</p>
+            <h5>Analysis time volatility</h5>
+          </div>
+          <span class="bug-chart-meta">seconds</span>
+        </div>
+        <div class="bug-chart-canvas">
+          <canvas
+            baseChart
+            [data]="analysisRangeChartData"
+            [options]="analysisRangeChartOptions"
+            [type]="'bar'">
+          </canvas>
+        </div>
+        <figcaption>Highlights min→max runtime per model (e.g., Gemini is more exploratory, DeepSeek more consistent).</figcaption>
+      </figure>
+
+      <figure class="bug-chart-card" *ngIf="estimationRangeChartData && estimationRangeChartOptions">
+        <div class="bug-chart-head">
+          <div>
+            <p class="bug-chart-kicker">🥈 Range bar</p>
+            <h5>Estimation envelope</h5>
+          </div>
+          <span class="bug-chart-meta">hours</span>
+        </div>
+        <div class="bug-chart-canvas">
+          <canvas
+            baseChart
+            [data]="estimationRangeChartData"
+            [options]="estimationRangeChartOptions"
+            [type]="'bar'">
+          </canvas>
+        </div>
+        <figcaption>Instantly shows who is conservative vs aggressive when forecasting engineering effort.</figcaption>
+      </figure>
+
+      <figure class="bug-chart-card" *ngIf="confidenceIntervalChartData && confidenceIntervalChartOptions">
+        <div class="bug-chart-head">
+          <div>
+            <p class="bug-chart-kicker">🥉 Error bar</p>
+            <h5>Avg analysis ± confidence interval</h5>
+          </div>
+          <span class="bug-chart-meta">seconds</span>
+        </div>
+        <div class="bug-chart-canvas">
+          <canvas
+            baseChart
+            [data]="confidenceIntervalChartData"
+            [options]="confidenceIntervalChartOptions"
+            [type]="'bar'">
+          </canvas>
+        </div>
+        <figcaption>Custom plugin draws the lower/upper confidence bounds exactly as recommended for a statistically grounded write-up.</figcaption>
+      </figure>
+    </div>
+
+    <div class="model-grid">
+      <article class="model-card" *ngFor="let entry of result.modelComparison; trackBy: trackByProvider">
+        <header class="model-card__header">
+          <div>
+            <p class="model-provider">{{ entry.aiProvider }}</p>
+            <h5>{{ entry.aiModel }}</h5>
+          </div>
+          <div class="badge-tray">
+            <span class="pill" [class.pill--on]="entry.markdownEnabled">Markdown</span>
+            <span class="pill" [class.pill--on]="entry.explanationEnabled">Explanation</span>
+          </div>
+        </header>
+
+        <div class="stat-grid">
+          <div class="stat">
+            <p class="stat-label">Avg analysis</p>
+            <p class="stat-value">{{ formatSeconds(entry.avgAnalysisTimeSec) }}</p>
+            <p class="stat-hint">{{ formatSeconds(entry.minAnalysisTimeSec) }} – {{ formatSeconds(entry.maxAnalysisTimeSec) }}</p>
+          </div>
+          <div class="stat">
+            <p class="stat-label">Std deviation</p>
+            <p class="stat-value">{{ formatSeconds(entry.stdDeviationAnalysisTime) }}</p>
+            <p class="stat-hint">runtime volatility</p>
+          </div>
+          <div class="stat">
+            <p class="stat-label">Avg estimate</p>
+            <p class="stat-value">{{ formatHours(entry.avgEstimatedResolutionHours) }}</p>
+            <p class="stat-hint">{{ formatHours(entry.minEstimatedResolutionHours) }} – {{ formatHours(entry.maxEstimatedResolutionHours) }}</p>
+          </div>
+          <div class="stat">
+            <p class="stat-label">Actual effort</p>
+            <p class="stat-value">{{ formatHours(entry.avgActualResolutionHours) }}</p>
+            <p class="stat-hint">observed</p>
+          </div>
+          <div class="stat">
+            <p class="stat-label">Stability score</p>
+            <p class="stat-value">{{ formatScore(entry.stabilityScore) }}</p>
+            <p class="stat-hint">run-to-run consistency</p>
+          </div>
+        </div>
+
+        <div class="confidence" *ngIf="entry.confidenceInterval">
+          <p class="confidence__label">Confidence interval ({{ formatConfidence(entry.confidenceInterval.confidenceLevel) }})</p>
+          <p class="confidence__range">{{ formatSeconds(entry.confidenceInterval.lowerBound) }} — {{ formatSeconds(entry.confidenceInterval.upperBound) }}</p>
+        </div>
+      </article>
+    </div>
+  </ng-container>
+</section>

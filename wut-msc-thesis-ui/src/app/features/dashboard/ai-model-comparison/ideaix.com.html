@@ -1,0 +1,289 @@
+div class="container mt-4 ai-comparison-page ai-estimations-page">
+  <div class="d-flex justify-content-between align-items-start mb-3">
+    <div>
+      <h2 class="mb-1">AI Model Comparison - Gemini vs DeepSeek</h2>
+      <p class="text-muted mb-0 small">Thesis-ready visual comparison of performance, estimation, stability, and content quality.</p>
+    </div>
+    <div>
+      <button class="btn btn-outline-secondary btn-sm comparison-back-btn" (click)="goBack()">
+        &larr; Back to AI Estimations
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabs / menu for individual comparison views inside a centered card -->
+  <div class="ai-comparison-tabs-card">
+    <ul class="nav nav-pills small ai-comparison-tabs mb-0 justify-content-center">
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab === 'performance'" (click)="selectTab('performance')">Performance</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab === 'estimation'" (click)="selectTab('estimation')">Estimation</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab === 'stability'" (click)="selectTab('stability')">Stability</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab === 'content'" (click)="selectTab('content')">Content Quality</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" [class.active]="activeTab === 'summary'" (click)="selectTab('summary')">Summary</button>
+      </li>
+    </ul>
+  </div>
+
+
+  <!-- Performance vs Estimation row -->
+  <div *ngIf="activeTab === 'performance' || activeTab === 'estimation'" class="row g-4 justify-content-center mt-3">
+    <!-- Performance bar chart -->
+    <div class="col-md-6" *ngIf="activeTab === 'performance'">
+      <h5 class="chart-title">Performance - Average Response Time</h5>
+      <p class="chart-subtitle small text-muted mb-1">X: Gemini, DeepSeek &nbsp;·&nbsp; Y: Avg response time (seconds)</p>
+      <div *ngIf="isLoadingPerformance" class="small text-muted mb-1">Loading performance comparison...</div>
+      <div *ngIf="errorPerformance" class="alert alert-danger py-1 small">{{ errorPerformance }}</div>
+      <div class="thesis-bar-chart" *ngIf="performanceModels.length && !activeResponseView">
+        <canvas baseChart
+          [data]="performanceBarData"
+          [options]="performanceBarOptions"
+          [type]="performanceBarType"
+          style="max-width: 420px; min-height: 220px;"></canvas>
+      </div>
+      <!-- Line chart for response time trends -->
+      <div class="thesis-line-chart mt-4" *ngIf="performanceLineData">
+        <h6 class="small text-muted mb-1">Response Time Trends (Line Chart)</h6>
+        <canvas baseChart
+          [data]="performanceLineData"
+          [options]="performanceLineOptions"
+          [type]="performanceLineType"
+          style="max-width: 420px; min-height: 220px;"></canvas>
+      </div>
+      <p class="chart-caption small text-muted mt-1" *ngIf="performanceModels.length && !activeResponseView">
+        Figure: Average response time (seconds) of Gemini and DeepSeek across all evaluation runs.
+      </p>
+
+      <!-- Detailed performance distribution: min / avg / max / std dev -->
+      <div class="thesis-bar-chart mt-4" *ngIf="performanceDetailBarData && performanceDetailBarData.labels?.length">
+        <h6 class="small text-muted mb-1">Performance Distribution - Min, Avg, Max, Std Dev</h6>
+        <canvas baseChart
+          [data]="performanceDetailBarData"
+          [options]="performanceDetailBarOptions"
+          [type]="performanceDetailBarType"
+          style="max-width: 420px; min-height: 240px;"></canvas>
+        <p class="chart-caption small text-muted mt-1">
+          Figure: Distribution of response times for each model (minimum, average, maximum, and standard deviation in seconds) highlighting both speed and variability.
+        </p>
+      </div>
+
+    <!-- Response-time API detail buttons -->
+    <div class="mt-3" *ngIf="performanceModels.length">
+      <h6 class="small text-muted mb-2">Response-time API details</h6>
+      <div *ngIf="isLoadingResponseTime" class="small text-muted mb-1">Calling response-time API...</div>
+      <div *ngIf="responseTimeError" class="alert alert-danger py-1 small">{{ responseTimeError }}</div>
+
+      <!-- Stats Bar Chart -->
+      <div *ngIf="activeResponseView === 'stats' && responseTimeStats && !responseTimeError" class="thesis-bar-chart mt-3">
+        <div class="row">
+          <div class="col-12">
+            <div class="d-flex justify-content-center mb-2">
+              <span class="me-4"><strong>Model</strong></span>
+              <span class="me-4">Avg</span>
+              <span class="me-4">Min</span>
+              <span class="me-4">Max</span>
+              <span>StdDev</span>
+            </div>
+            <div *ngFor="let stat of responseTimeStats" class="d-flex align-items-end mb-2">
+              <span class="me-4" style="width: 80px;">{{ stat.aiProvider }}</span>
+              <div class="thesis-bar-shell me-4" style="width: 60px;">
+                <div class="thesis-bar bg-primary" [style.height.%]="(stat.avgResponseTimeSec / maxResponseTimeStat) * 95"></div>
+              </div>
+              <div class="thesis-bar-shell me-4" style="width: 60px;">
+                <div class="thesis-bar bg-success" [style.height.%]="(stat.minResponseTimeSec / maxResponseTimeStat) * 95"></div>
+              </div>
+              <div class="thesis-bar-shell me-4" style="width: 60px;">
+                <div class="thesis-bar bg-danger" [style.height.%]="(stat.maxResponseTimeSec / maxResponseTimeStat) * 95"></div>
+              </div>
+              <div class="thesis-bar-shell" style="width: 60px;">
+                <div class="thesis-bar bg-warning" [style.height.%]="(stat.stdDeviationSec / maxResponseTimeStat) * 95"></div>
+              </div>
+            </div>
+            <div class="d-flex justify-content-center small text-muted mt-1">
+              <span class="me-4" style="width: 80px;"></span>
+              <span class="me-4">Avg</span>
+              <span class="me-4">Min</span>
+              <span class="me-4">Max</span>
+              <span>StdDev</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Extremes Text Summary -->
+      <div *ngIf="activeResponseView === 'summary' && responseTimeSummary && !responseTimeError" class="mt-3">
+        <div class="alert alert-info p-2">
+          <div><strong>Recommendation:</strong> {{ responseTimeSummary.recommendation }}</div>
+          <div><strong>Fastest Model:</strong> {{ responseTimeSummary.fastestModel }}</div>
+          <div><strong>Slowest Model:</strong> {{ responseTimeSummary.slowestModel }}</div>
+        </div>
+      </div>
+    </div>
+    </div>
+
+    <!-- Estimation bar chart -->
+    <div class="col-md-6" *ngIf="activeTab === 'estimation'">
+      <h5 class="chart-title">Estimation - Average Resolution Time</h5>
+      <p class="chart-subtitle small text-muted mb-1">X: Gemini, DeepSeek &nbsp;·&nbsp; Y: Avg estimated hours</p>
+      <div *ngIf="isLoadingEstimation" class="small text-muted mb-1">Loading estimation comparison...</div>
+      <div *ngIf="errorEstimation" class="alert alert-danger py-1 small">{{ errorEstimation }}</div>
+      <!-- Estimation Bar Chart -->
+      <div *ngIf="activeTab === 'estimation' && estimationBarData && estimationBarData.labels && estimationBarData.labels.length">
+        <canvas baseChart
+          [data]="estimationBarData"
+          [options]="estimationBarOptions"
+          [type]="estimationBarType"
+          style="max-width: 420px; min-height: 220px;"></canvas>
+        <p class="chart-caption small text-muted mt-1">
+          Figure: Average estimated resolution time by AI model (Gemini vs DeepSeek); lower bars indicate faster predictions.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stability vs Content row -->
+  <!-- Radar chart for multi-metric comparison -->
+  <div *ngIf="activeTab === 'stability'" class="row g-4 mt-3 justify-content-center">
+    <div class="col-md-7">
+      <h5 class="chart-title">Radar Chart - Multi-Metric Comparison</h5>
+      <p class="chart-subtitle small text-muted mb-1">Compare avg, min, max, stddev for each model</p>
+      <canvas baseChart
+        [data]="stabilityRadarData"
+        [options]="stabilityRadarOptions"
+        [type]="stabilityRadarType"
+        style="max-width: 420px; min-height: 320px;"></canvas>
+    </div>
+  </div>
+  <div *ngIf="activeTab === 'stability' || activeTab === 'content'" class="row g-4 mt-3 justify-content-center">
+    <!-- Stability line chart -->
+    <div class="col-md-7" *ngIf="activeTab === 'stability'">
+      <h5 class="chart-title">Stability - Average Standard Deviation</h5>
+      <p class="chart-subtitle small text-muted mb-1">X: Gemini, DeepSeek &nbsp;·&nbsp; Y: Avg std dev of estimated hours</p>
+      <div *ngIf="isLoadingStability" class="small text-muted mb-1">Loading stability comparison...</div>
+      <div *ngIf="errorStability" class="alert alert-danger py-1 small">{{ errorStability }}</div>
+      <!-- Stability Bar Chart (replaces radar) -->
+      <div *ngIf="activeTab === 'stability' && stabilityBarData && stabilityBarData.labels && stabilityBarData.labels.length">
+        <canvas baseChart
+          [data]="stabilityBarData"
+          [options]="stabilityBarOptions"
+          [type]="stabilityBarType"
+          style="max-width: 420px; min-height: 220px;"></canvas>
+        <p class="chart-caption small text-muted mt-1">
+          Figure: Stability score by AI model (Gemini vs DeepSeek); higher bars indicate more stable predictions.
+        </p>
+      </div>
+      <div *ngIf="stabilityBarPairs.length" class="small mt-1 comparison-legend">
+        <span class="legend-box gemini"></span> Gemini
+        <span class="ms-2 legend-box deepseek"></span> DeepSeek
+      </div>
+      <p class="chart-caption small text-muted mt-1" *ngIf="stabilityBarPairs.length">
+        Figure: Average standard deviation (hours) of AI estimates across repeated runs for Gemini and DeepSeek.
+      </p>
+    </div>
+
+    <!-- Content quality grouped bar chart (radar-like) -->
+    <div class="col-md-5" *ngIf="activeTab === 'content'">
+      <h5 class="chart-title">Engineering Score</h5>
+      <p class="chart-subtitle small text-muted mb-1">Model-wise engineering relevance score (0 = low, 3 = high).</p>
+      <div *ngIf="isLoadingContent" class="small text-muted mb-1">Loading content quality comparison...</div>
+      <div *ngIf="errorContent" class="alert alert-danger py-1 small">{{ errorContent }}</div>
+      <div *ngIf="contentBarPairs.length" class="mb-1 content-metric-label">
+        {{ contentMetrics[0]?.label }}
+      </div>
+      <div class="content-bar-chart" *ngIf="contentBarPairs.length">
+        <div class="content-chart-with-axes">
+          <!-- Y-axis with tick labels -->
+          <div class="content-y-axis">
+            <div class="content-y-tick" *ngFor="let tick of contentYAxisTicks">
+              <span class="content-y-label">{{ tick | number: '1.0-1' }}</span>
+            </div>
+          </div>
+
+          <!-- Original bar group layout -->
+          <div class="content-chart-inner">
+            <div class="content-grid" *ngIf="contentBarPairs.length">
+              <div class="content-grid-line" *ngFor="let tick of contentYAxisTicks"></div>
+            </div>
+            <div class="thesis-bar-chart">
+              <div class="thesis-bar-group" *ngFor="let m of contentBarPairs">
+                <div class="thesis-bar-top-value">{{ m.value | number: '1.2-2' }}</div>
+                <div class="thesis-bar-shell">
+                  <div
+                    class="thesis-bar"
+                    [ngClass]="{ 'gemini': m.name === 'Gemini', 'deepseek': m.name === 'DeepSeek' }"
+                    [style.height.%]="(m.value / 3) * 95"
+                  ></div>
+                </div>
+                <div class="thesis-bar-label">{{ m.name }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="contentBarPairs.length" class="small mt-1 comparison-legend">
+        <span class="legend-box deepseek"></span>
+        <span class="ms-1">Engineering Score</span>
+      </div>
+      <p class="chart-caption small text-muted mt-1" *ngIf="contentMetrics.length">
+        Figure: Engineering relevance score for Gemini and DeepSeek (higher is better).
+      </p>
+    </div>
+  </div>
+
+  <!-- Summary tab -->
+  <!-- Pie chart for summary breakdown -->
+  <div *ngIf="activeTab === 'summary' && summaryScores.length" class="row g-3 justify-content-center mt-3">
+    <div class="col-md-5">
+      <h6 class="chart-title">Summary Breakdown (Pie Chart)</h6>
+      <canvas baseChart
+        [data]="summaryPieData"
+        [options]="summaryPieOptions"
+        [type]="summaryPieType"
+        style="max-width: 320px; min-height: 220px;"></canvas>
+    </div>
+  </div>
+  <div *ngIf="activeTab === 'summary'" class="mt-3">
+    <h5 class="chart-title">Overall Comparison Summary</h5>
+    <p class="chart-subtitle small text-muted mb-2">High-level visual summary.</p>
+    <div *ngIf="isLoadingSummary" class="small text-muted mb-1">Loading comparison summary...</div>
+    <div *ngIf="errorSummary" class="alert alert-danger py-1 small">{{ errorSummary }}</div>
+    <div class="row g-3 justify-content-center" *ngIf="comparisonSummary">
+      <div class="col-md-7 col-lg-6">
+        <div class="thesis-bar-chart" *ngIf="summaryScores.length">
+          <div class="thesis-bar-group" *ngFor="let s of summaryScores">
+            <div class="thesis-bar-shell">
+              <div
+                class="thesis-bar"
+                [ngClass]="{ 'gemini': s.name === 'Gemini', 'deepseek': s.name === 'DeepSeek' }"
+                [style.height.%]="maxSummaryValue ? (s.value / maxSummaryValue) * 95 : 0"
+              ></div>
+            </div>
+            <div class="thesis-bar-label">{{ s.name }}</div>
+            <div class="thesis-bar-value">{{ s.value | number: '1.0-0' }} categories</div>
+          </div>
+        </div>
+        <div *ngIf="summaryScores.length" class="small mt-1 comparison-legend">
+          <span class="legend-box gemini"></span> Gemini
+          <span class="ms-2 legend-box deepseek"></span> DeepSeek
+        </div>
+        <p class="chart-caption small text-muted mt-1" *ngIf="summaryScores.length">
+          Figure: Number of summary categories (stability, speed, engineering depth, research, industry) where each model
+          is recommended.
+        </p>
+        <div class="summary-text small mt-2" *ngIf="summaryKeyValues.length">
+          <div *ngFor="let item of summaryKeyValues">
+            <strong>{{ item.label }}:</strong>
+            <span class="ms-1">{{ item.value }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

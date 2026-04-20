@@ -1,0 +1,81 @@
+<div class="overall-wrapper">
+  <div *ngIf="isLoading" class="small text-muted">Loading overall comparison...</div>
+  <div *ngIf="error" class="alert alert-danger py-1 small">{{ error }}</div>
+
+  <ng-container *ngIf="!isLoading && !error">
+    <div class="overall-grid">
+      <figure class="chart-card">
+        <h5 class="chart-title">Performance Analysis</h5>
+        <p class="chart-subtitle">Average response time (seconds).</p>
+        <canvas baseChart [data]="performanceBarData" [options]="performanceBarOptions" [type]="'bar'"></canvas>
+        <figcaption class="chart-caption">
+          DeepSeek sustains slightly lower response latency relative to Gemini.
+        </figcaption>
+      </figure>
+
+      <figure class="chart-card">
+        <h5 class="chart-title">Estimation Behaviour</h5>
+        <p class="chart-subtitle">Min / Avg / Max estimated hours.</p>
+        <canvas baseChart [data]="estimationGroupedData" [options]="estimationGroupedOptions" [type]="'bar'"></canvas>
+        <figcaption class="chart-caption">
+          Gemini keeps broader hour ranges while DeepSeek compresses estimates.
+        </figcaption>
+      </figure>
+
+      <figure class="chart-card">
+        <h5 class="chart-title">Stability & Consistency</h5>
+        <p class="chart-subtitle">Score (line) and variance (line/pie).</p>
+        <canvas baseChart [data]="stabilityLineData" [options]="stabilityLineOptions" [type]="'line'"></canvas>
+        <div class="mt-3">
+          <canvas baseChart style="max-width: 320px; margin: 0 auto;"
+                  [data]="stabilityPieData" [options]="stabilityPieOptions" [type]="'pie'"></canvas>
+        </div>
+        <figcaption class="chart-caption">
+          DeepSeek edges Gemini on stability score; the pie slice shows its share.
+        </figcaption>
+      </figure>
+
+      <figure class="chart-card">
+        <h5 class="chart-title">Content Quality & Explainability</h5>
+        <p class="chart-subtitle">Engineering relevance vs response length.</p>
+        <canvas baseChart [data]="contentBarData" [options]="contentBarOptions" [type]="'bar'"></canvas>
+        <figcaption class="chart-caption">
+          Gemini still produces longer, detail-heavy explanations; DeepSeek keeps concise answers.
+        </figcaption>
+      </figure>
+
+      <figure class="chart-card">
+        <h5 class="chart-title">Multi‑Criteria Radar</h5>
+        <p class="chart-subtitle">Normalized comparison across five dimensions.</p>
+        <canvas baseChart [data]="overallRadarData" [options]="overallRadarOptions" [type]="'radar'"></canvas>
+        <figcaption class="chart-caption">
+          Radar view highlights Gemini’s depth vs DeepSeek’s speed/stability advantage.
+        </figcaption>
+      </figure>
+
+      <figure class="chart-card">
+        <h5 class="chart-title">Decision Scorecard</h5>
+        <p class="chart-subtitle">Key criteria side-by-side.</p>
+        <table class="scorecard-table">
+          <thead>
+            <tr>
+              <th>Criterion</th>
+              <th>Gemini</th>
+              <th>DeepSeek</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of scorecardRows">
+              <td>{{ row.criterion }}</td>
+              <td>{{ row.gemini }}</td>
+              <td>{{ row.deepseek }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <ul class="insight-list" *ngIf="insights.length">
+          <li *ngFor="let insight of insights">{{ insight }}</li>
+        </ul>
+      </figure>
+    </div>
+  </ng-container>
+</div>

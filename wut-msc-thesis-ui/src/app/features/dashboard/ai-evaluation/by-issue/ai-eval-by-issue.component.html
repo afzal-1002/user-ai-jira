@@ -1,0 +1,119 @@
+<div class="evaluation-wrapper">
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="small text-muted text-center">
+    Running evaluation...
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="alert alert-danger py-1 small">
+    {{ error }}
+  </div>
+
+  <!-- CONTENT -->
+  <ng-container *ngIf="!isLoading && !error">
+
+    <div class="evaluation-grid">
+
+      <!-- Performance -->
+      <figure class="chart-card">
+        <h5 class="chart-title">Performance Analysis</h5>
+        <p class="chart-subtitle">Average latency comparison.</p>
+
+        <canvas *ngIf="providerBarData?.datasets?.length" baseChart [data]="providerBarData"
+          [options]="providerBarOptions" [type]="providerBarType" style="max-height: 280px;">
+        </canvas>
+
+        <p *ngIf="!providerBarData?.datasets?.length" class="text-muted small text-center mt-3">
+          No performance data available.
+        </p>
+
+        <figcaption class="chart-caption">
+          Figure: Average estimated resolution time (hours) for Gemini vs DeepSeek.
+        </figcaption>
+      </figure>
+
+      <!-- Analysis Time -->
+      <figure class="chart-card">
+        <h5 class="chart-title">Average Analysis Time</h5>
+        <p class="chart-subtitle">Seconds spent per issue by model.</p>
+
+        <canvas *ngIf="byIssueTimeBarData?.datasets?.length" baseChart [data]="byIssueTimeBarData"
+          [options]="byIssueTimeBarOptions" [type]="byIssueTimeBarType" style="max-height: 280px;">
+        </canvas>
+
+        <figcaption class="chart-caption">
+          Figure: Average analysis time (seconds) per AI model.
+        </figcaption>
+      </figure>
+
+      <!-- Provider Stats -->
+      <figure class="chart-card">
+        <h5 class="chart-title">Detailed Provider Statistics</h5>
+        <p class="chart-subtitle">Min | Max | Avg | Runs overview.</p>
+
+        <canvas *ngIf="byIssueAllStatsBarData?.datasets?.length" baseChart [data]="byIssueAllStatsBarData"
+          [options]="byIssueAllStatsBarOptions" [type]="byIssueAllStatsBarType" style="max-height: 280px;">
+        </canvas>
+      </figure>
+
+      <!-- Overall Summary -->
+      <figure class="chart-card">
+        <h5 class="chart-title">Overall Issue Summary</h5>
+        <p class="chart-subtitle">Aggregate issue-level statistics.</p>
+
+        <canvas *ngIf="byIssueOverallBarData?.datasets?.length" baseChart [data]="byIssueOverallBarData"
+          [options]="byIssueOverallBarOptions" [type]="byIssueOverallBarType" style="max-height: 280px;">
+        </canvas>
+      </figure>
+
+      <!-- Provider Usage -->
+      <figure class="chart-card chart-card--pie">
+        <h5 class="chart-title">Provider Usage Distribution</h5>
+        <p class="chart-subtitle">Share of evaluation runs.</p>
+
+        <canvas
+          baseChart
+          [data]="pieProviderRunsData"
+          [options]="pieProviderRunsOptions"
+          [type]="pieProviderRunsType">
+        </canvas>
+
+        <figcaption class="chart-caption">
+          Figure: Distribution of evaluation runs between Gemini and DeepSeek.
+        </figcaption>
+      </figure>
+
+      <!-- Radar -->
+      <figure class="chart-card">
+        <h5 class="chart-title">Multi-Criteria Model Comparison</h5>
+        <p class="chart-subtitle">Normalized evaluation dimensions.</p>
+
+        <canvas baseChart [data]="radarModelComparisonData" [options]="radarModelComparisonOptions"
+          [type]="radarModelComparisonType">
+        </canvas>
+
+        <figcaption class="chart-caption">
+          Figure: Radar comparison across estimation depth, speed, and usage.
+        </figcaption>
+      </figure>
+
+      <!-- Line -->
+      <figure class="chart-card">
+        <h5 class="chart-title">Estimation Range</h5>
+        <p class="chart-subtitle">Uncertainty window for issue resolution.</p>
+
+        <canvas baseChart [data]="lineEstimationRangeData" [options]="lineEstimationRangeOptions"
+          [type]="lineEstimationRangeType">
+        </canvas>
+
+        <figcaption class="chart-caption">
+          Figure: Minimum, average, and maximum estimated resolution time.
+        </figcaption>
+      </figure>
+
+
+
+    </div>
+  </ng-container>
+</div>

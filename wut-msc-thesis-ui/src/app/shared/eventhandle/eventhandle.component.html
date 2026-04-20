@@ -1,0 +1,83 @@
+<div class="first" style="background-color: bisque; margin-bottom: 50px;">
+  <div>
+    <h1> My Name is Muhammad Afzal</h1>
+  </div>
+
+  <!-- <div>
+    <button (click)="handleClick()">
+      Click me
+    </button>
+    <h2> {{fullName}}</h2>
+  </div> -->
+
+  <div class="mainClass">
+    <div class="displayClass">
+      <h2 class="count"> {{count}} </h2>
+    </div>
+    <div class="calculator">
+      <button class="btn bg-red " (click)="handleCounter('minus')"> Decrement </button>
+      <button class="btn bg-black" (click)="handleCounter('reset')"> Reset </button>
+      <button class="btn bg-grey" (click)="handleCounter('plus')"> Increment</button>
+    </div>
+  </div>
+
+  <div class="eventClass">
+    <button class="btn " name="loginButton" (click)="handleEvent($event)"> Click event </button>
+  </div>
+
+  <br> <br>
+
+  <div class="eventClass" style="background-color: cadetblue; width: 100px; height: 100px;  margin-left: 50px;"
+    (click)="handleEvent($event)" (mouseenter)="handleEvent($event)">
+  </div>
+
+  <br>
+  <div class="eventClass"
+    style="background-color: rgb(51, 28, 102); width: 100px; height: 100px;  margin-left: 50px; margin-top: 10px;"
+    (click)="handleEvent($event)" (mouseenter)="handleEvent($event)">
+
+  </div>
+
+
+  <div class="eventClass" style="background-color: rgb(51, 28, 102); margin-left: 50px; margin-top: 10px;">
+    <input class=""
+      style="height: 30px; background-color: beige; font-size: medium; width: 500px; margin-top: 5px; margin-bottom: 5px; border: 2px solid green;"
+      (input)="handleInputEvent($event)" (focus)="handleInputEvent($event)" (blur)="handleInputEvent($event)">
+  </div>
+
+  <div class="eventClass" style="background-color: whitesmoke; margin-left: 50px; margin-top: 10px;">
+
+    <h1 style="color: blue;"> Get and Set Input field values</h1>
+  </div>
+
+
+
+
+  <!-- User Login Form  Using Event Data-->
+
+  <div class="userLogin"
+    style="background-color: rgb(51, 28, 102); padding: 20px; margin: 20px; border-radius: 8px; width: fit-content; color: white;">
+
+    <!-- Optional Interactive Box -->
+    <div class="eventClass" style="background-color: white; width: 200px; height: 10px; margin-bottom: 20px;"
+      (click)="handleEvent($event)" (mouseenter)="handleEvent($event)">
+    </div>
+
+    <!-- Username -->
+
+
+
+
+  </div>
+</div>
+
+<br><br>
+
+
+<!-- <app-login></app-login>
+
+<app-header></app-header>
+
+<app-profile></app-profile> -->
+
+<hr><hr>

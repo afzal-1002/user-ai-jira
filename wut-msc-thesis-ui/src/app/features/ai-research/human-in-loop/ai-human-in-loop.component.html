@@ -1,0 +1,48 @@
+<div class="container mt-4 ai-research-page">
+  <div class="research-header">
+    <div>
+      <h2 class="research-header__title">Human-in-the-Loop Impact</h2>
+      <p class="research-header__subtitle">
+        Styled like the model comparison view to show how prompts shift quality, relevance, and run distribution.
+      </p>
+    </div>
+    <button type="button" class="btn btn-outline-secondary research-back-btn" (click)="goBack()">
+      &larr; Back
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="research-status research-status--loading">Loading human-in-the-loop analysis&#8230;</div>
+  <div *ngIf="!isLoading && error" class="research-status research-status--error">{{ error }}</div>
+
+  <div class="chart-stack" *ngIf="!isLoading && !error">
+    <app-ai-metrics-chart-card
+      title="Quality vs Relevance"
+      subtitle="With user prompt vs without"
+      caption="Figure: Shared grouped-bar presentation reused from the evaluation tabs for consistency."
+      [chartType]="'bar'"
+      [chartData]="promptImpactChartData"
+      [chartOptions]="promptImpactChartOptions">
+      <div class="metric-band" *ngIf="humanSummaryChips.length">
+        <div class="metric-chip" *ngFor="let chip of humanSummaryChips">
+          <span class="metric-chip__label">{{ chip.label }}</span>
+          <span class="metric-chip__value">{{ chip.value }}</span>
+        </div>
+      </div>
+    </app-ai-metrics-chart-card>
+
+    <app-ai-metrics-chart-card
+      title="Prompt Usage Mix"
+      subtitle="Share of runs guided by human prompts"
+      caption="Figure: Doughnut visual analogous to the markdown ON/OFF chart from the metrics analysis page."
+      [chartType]="'doughnut'"
+      [chartData]="promptDistributionChartData"
+      [chartOptions]="promptDistributionChartOptions"
+      [dense]="true">
+    </app-ai-metrics-chart-card>
+  </div>
+
+  <section class="raw-result-card" *ngIf="result">
+    <h5 class="mb-2">Raw Human-in-the-Loop Metrics</h5>
+    <pre class="small mb-0">{{ result | json }}</pre>
+  </section>
+</div>
