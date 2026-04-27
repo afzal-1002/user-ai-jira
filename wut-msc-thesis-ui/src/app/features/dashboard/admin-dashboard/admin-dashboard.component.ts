@@ -21,9 +21,9 @@ export class AdminDashboardComponent {
   user: User | null | undefined = null;
 
 features: Array<{ icon: string; iconImage?: string; title: string; description: string; button: string; link: string }> = [
-  { icon: '🌐', title: 'Jira Domains', description: 'Configure Jira domains and base URLs', button: 'Manage Jira Domains', link: '/admin/jira-domain' },
-  { icon: '🗂️', title: 'Jira Projects', description: 'Register Jira project keys and names', button: 'Manage Jira Projects', link: '/admin/projects' },
-  { icon: '🔐', title: 'GitHub Credentials', description: 'Store encrypted GitHub tokens and usernames', button: 'Manage Credentials', link: '/admin/credentials' },
+  { icon: '🌐', title: 'Jira Domains', description: 'Configure Jira domains and base URLs', button: 'Manage Jira Domains', link: '/admin/jira-platform' },
+  { icon: '🗂️', title: 'Jira Projects', description: 'Register Jira project keys and names', button: 'Manage Jira Projects', link: '/projects' },
+  { icon: '🔐', title: 'GitHub Credentials', description: 'Store encrypted GitHub tokens and usernames', button: 'Manage Credentials', link: '/admin/repositories' },
   { icon: '🔗', title: 'Repository Mapping', description: 'Link projects to repositories and default branches', button: 'Manage Mappings', link: '/admin/repositories' },
   { icon: '👥', title: 'User Management', description: 'Create and maintain platform users', button: 'Manage Users', link: '/admin/users' },
   { icon: '📁', title: 'User Project View', description: 'Open user dashboard/project selection flow', button: 'Open Dashboard', link: '/dashboard' },

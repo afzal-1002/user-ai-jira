@@ -9,7 +9,7 @@
     </div>
 
     <div class="header-actions">
-      <span class="status-pill" [ngClass]="statusClass(sessionStatus)">{{ sessionStatus }}</span>
+      <span class="status-pill" [ngClass]="statusClass(sessionStatus)">{{ sessionStatusLabel }}</span>
       <button class="btn btn-outline-secondary btn-sm" type="button" (click)="goToIssueDetails()" [disabled]="!issueKey">
         Open Issue
       </button>
@@ -38,11 +38,11 @@
       </div>
       <div class="meta-row">
         <span>Repository</span>
-        <strong>{{ analysis?.repositoryName || session?.repositoryName || session?.repoName || 'N/A' }}</strong>
+        <strong>{{ repositoryDisplayName || 'N/A' }}</strong>
       </div>
       <div class="meta-row">
         <span>Branch</span>
-        <strong>{{ session?.branchName || 'N/A' }}</strong>
+        <strong>{{ branchDisplayName || 'N/A' }}</strong>
       </div>
 
       <hr />

@@ -52,62 +52,74 @@
     <p>No issues match your filter criteria. Try adjusting your search.</p>
   </div>
 
-  <div *ngIf="!isLoading && filteredIssues.length > 0" class="issues-list">
-    <div *ngFor="let issue of filteredIssues" class="issue-card">
-      <div class="issue-header">
-        <div class="issue-key-section">
-          <h3 class="issue-key">{{ issue.key }}</h3>
-          <span class="issue-type" [title]="issue.fields?.issuetype?.description">{{ issue.fields?.issuetype?.name }}</span>
-        </div>
-        <div class="issue-badges">
-          <span class="badge" [ngClass]="getStatusClass(issue.fields?.status?.name)">{{ issue.fields?.status?.name }}</span>
-          <span class="badge" [ngClass]="getPriorityClass(issue.fields?.priority?.name)">{{ issue.fields?.priority?.name }}</span>
-        </div>
-      </div>
+  <div *ngIf="!isLoading && filteredIssues.length > 0" class="table-responsive">
+    <table class="table table-hover table-striped align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Bug ID</th>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Priority</th>
+          <th>Assignee</th>
+          <th>Reporter</th>
+          <th>Dates</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let issue of filteredIssues">
+          <!-- Bug ID -->
+          <td>
+            <span class="badge bg-info">{{ issue.key }}</span>
+          </td>
 
-      <div class="issue-summary">
-        <h4>{{ issue.fields?.summary }}</h4>
-      </div>
+          <!-- Title -->
+          <td>
+            <strong>{{ issue.fields?.summary }}</strong>
+          </td>
 
-      <div class="issue-details">
-        <div class="detail-row">
-          <span class="label">Description:</span>
-          <span class="value">{{ getDescription(issue.fields?.description) }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Assignee:</span>
-          <span class="value">{{ issue.fields?.assignee?.displayName || 'Unassigned' }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Reporter:</span>
-          <span class="value">{{ issue.fields?.reporter?.displayName || 'Unknown' }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Created:</span>
-          <span class="value">{{ issue.fields?.created | slice:0:10 }}</span>
-        </div>
-        <div class="detail-row">
-          <span class="label">Updated:</span>
-          <span class="value">{{ issue.fields?.updated | slice:0:10 }}</span>
-        </div>
-        <div class="detail-row" *ngIf="issue.fields?.duedate">
-          <span class="label">Due Date:</span>
-          <span class="value">{{ issue.fields?.duedate }}</span>
-        </div>
-      </div>
+          <!-- Description -->
+          <td>
+            <small [title]="issue.fields?.description || 'No description'">
+              {{ getTruncatedDescription(issue.fields?.description, 6) }}
+            </small>
+          </td>
 
-      <div class="issue-footer">
-        <div class="issue-meta">
-          <span class="meta-item">
-            <span class="meta-label">Comments:</span>
-            <span class="meta-value">{{ issue.fields?.comment?.comments?.length || 0 }}</span>
-          </span>
-        </div>
-        <div class="issue-actions">
-          <button class="btn btn-primary btn-sm" (click)="viewDetails(issue)">📋 View Details</button>
-        </div>
-      </div>
-    </div>
+          <!-- Priority -->
+          <td>
+            <span class="badge" [ngClass]="getPriorityClass(issue.fields?.priority?.name)">
+              {{ issue.fields?.priority?.name || 'N/A' }}
+            </span>
+          </td>
+
+          <!-- Assignee -->
+          <td>
+            <small>{{ issue.fields?.assignee?.displayName || 'Unassigned' }}</small>
+          </td>
+
+          <!-- Reporter -->
+          <td>
+            <small>{{ issue.fields?.reporter?.displayName || 'Unknown' }}</small>
+          </td>
+
+          <!-- Dates (Created, Updated, Due Date) -->
+          <td>
+            <div class="dates-info">
+              <small class="d-block"><strong>Created:</strong> {{ issue.fields?.created | slice:0:10 }}</small>
+              <small class="d-block"><strong>Updated:</strong> {{ issue.fields?.updated | slice:0:10 }}</small>
+              <small class="d-block" *ngIf="issue.fields?.duedate"><strong>Due:</strong> {{ issue.fields?.duedate }}</small>
+            </div>
+          </td>
+
+          <!-- Actions -->
+          <td>
+            <button class="btn btn-sm btn-primary" (click)="viewDetails(issue)" title="View Details">
+              View Details
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 
   <div *ngIf="!isLoading && filteredIssues.length > 0" class="results-count">Showing {{ filteredIssues.length }} of {{ issues.length }} issues</div>

@@ -28,24 +28,24 @@ public interface CommentClient {
 
     // Jira-first (write → upsert local)
     @PostMapping(value = "/{issueKey}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    CommentResponse create(@PathVariable("issueKey") String issueKey,
+    CommentResponse create(@PathVariable String issueKey,
                            @RequestBody CreateCommentRequest request);
 
     @PutMapping(value = "/{issueKey}/{jiraCommentId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    CommentResponse update(@PathVariable("issueKey") String issueKey,
-                           @PathVariable("jiraCommentId") String jiraCommentId,
+    CommentResponse update(@PathVariable String issueKey,
+                           @PathVariable String jiraCommentId,
                            @RequestBody UpdateCommentRequest request);
 
     @DeleteMapping("/{issueKey}/{jiraCommentId}")
-    void delete(@PathVariable("issueKey") String issueKey,
-                @PathVariable("jiraCommentId") String jiraCommentId);
+    void delete(@PathVariable String issueKey,
+                @PathVariable String jiraCommentId);
 
     // Reads (Jira fresh → upsert local)
     @GetMapping("/by-issue/{issueKey}")
-    List<CommentResponse> findAllByIssueKey(@PathVariable("issueKey") String issueKey);
+    List<CommentResponse> findAllByIssueKey(@PathVariable String issueKey);
 
     @GetMapping("/local/by-issue/{issueKey}")
-    List<CommentResponse> getAllLocalByIssueKey(@PathVariable("issueKey") String issueKey);
+    List<CommentResponse> getAllLocalByIssueKey(@PathVariable String issueKey);
 
     @GetMapping("/local/{id}")
     CommentResponse getLocalById(@PathVariable("id") String id);

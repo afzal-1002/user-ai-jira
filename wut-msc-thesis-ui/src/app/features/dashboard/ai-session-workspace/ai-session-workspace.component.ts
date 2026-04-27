@@ -12,6 +12,7 @@ import {
   FixPreview
 } from '../../../models/interface/ai-session-workflow.interface';
 import { AiSessionWorkflowService } from '../../../services/ai/ai-session-workflow.service';
+import { AdminConfigService, ProjectRepositoryConfig } from '../../../services/admin/admin-config.service';
 
 @Component({
   selector: 'app-ai-session-workspace',
@@ -30,6 +31,9 @@ export class AiSessionWorkspaceComponent implements OnInit {
   analysis: AnalyzeRepoBugResponse | null = null;
   preview: FixPreview | null = null;
   applyResult: ApplyFixResult | null = null;
+
+  defaultRepoName = '';
+  defaultBaseBranch = '';
 
   prompt = 'Focus on the production path, not tests.';
   commitMessage = '';
@@ -54,7 +58,8 @@ export class AiSessionWorkspaceComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private mcpFrontendService: McpFrontendService,
-    private aiSessionWorkflowService: AiSessionWorkflowService
+    private aiSessionWorkflowService: AiSessionWorkflowService,
+    private adminConfigService: AdminConfigService
   ) {}
 
   ngOnInit(): void {
@@ -67,15 +72,35 @@ export class AiSessionWorkspaceComponent implements OnInit {
   }
 
   get sessionStatus(): AiSessionStatus | 'UNKNOWN' {
-    return (this.session?.status || 'UNKNOWN') as AiSessionStatus | 'UNKNOWN';
+    if (this.session?.status) {
+      return this.session.status;
+    }
+
+    if (this.projectKey && this.issueKey) {
+      return 'CREATED';
+    }
+
+    return 'UNKNOWN';
+  }
+
+  get sessionStatusLabel(): string {
+    if (!this.session && this.projectKey && this.issueKey) {
+      return 'READY';
+    }
+
+    return this.sessionStatus;
+  }
+
+  get hasActiveSession(): boolean {
+    return !!this.session && !!this.session.sessionId && this.session.sessionId === this.sessionId;
   }
 
   get canGeneratePreview(): boolean {
-    return !!this.selectedFilePath && !!this.issueKey && !!this.sessionId && !this.isPreviewLoading;
+    return !!this.selectedFilePath && !!this.issueKey && !this.isPreviewLoading;
   }
 
   get canApplyFix(): boolean {
-    return !!this.preview?.updatedContent && !this.isApplying && this.sessionStatus !== 'REVIEW';
+    return !!this.selectedFilePath && !!this.issueKey && !this.isApplying && this.sessionStatus !== 'REVIEW';
   }
 
   get canSendForReview(): boolean {
@@ -88,6 +113,25 @@ export class AiSessionWorkspaceComponent implements OnInit {
 
   get selectedIssueSummary(): string {
     return this.issue?.fields?.summary || 'No summary available.';
+  }
+
+  get repositoryDisplayName(): string {
+    return String(
+      this.analysis?.repositoryName
+      || this.session?.repositoryName
+      || this.session?.repoName
+      || this.defaultRepoName
+      || ''
+    ).trim();
+  }
+
+  get branchDisplayName(): string {
+    return String(
+      this.session?.branchName
+      || this.analysis?.suggestedBranchName
+      || this.defaultBaseBranch
+      || ''
+    ).trim();
   }
 
   get possibleSolutions(): string[] {
@@ -117,6 +161,7 @@ export class AiSessionWorkspaceComponent implements OnInit {
         this.session = session;
         this.issueKey = this.issueKey || this.resolveIssueKeyFromSession(session);
         this.projectKey = this.projectKey || this.resolveProjectKeyFromSession(session);
+        this.loadDefaultRepositoryMapping(this.projectKey);
         this.selectedFilePath = this.selectedFilePath || String(session.recommendedFile || '').trim();
         this.commitMessage = this.commitMessage || `AI fix for ${this.issueKey || 'issue'}`;
 
@@ -136,7 +181,7 @@ export class AiSessionWorkspaceComponent implements OnInit {
       },
       error: (error) => {
         if (Number(error?.status || 0) === 404) {
-          this.recoverMissingSession();
+          this.handleMissingSessionWithoutAutoCreate();
           return;
         }
 
@@ -146,7 +191,7 @@ export class AiSessionWorkspaceComponent implements OnInit {
     });
   }
 
-  private recoverMissingSession(): void {
+  private handleMissingSessionWithoutAutoCreate(): void {
     const issueKey = String(this.issueKey || this.route.snapshot.queryParamMap.get('issueKey') || '').trim().toUpperCase();
     const projectKey = String(this.projectKey || this.route.snapshot.queryParamMap.get('projectKey') || '').trim().toUpperCase();
 
@@ -159,33 +204,20 @@ export class AiSessionWorkspaceComponent implements OnInit {
     // Update stored values
     this.issueKey = issueKey;
     this.projectKey = projectKey;
+    this.loadDefaultRepositoryMapping(projectKey);
 
-    this.aiSessionWorkflowService.startSession({
-      projectKey,
-      baseBranch: this.session?.baseBranch || 'main',
-      bugs: [issueKey]
-    }).subscribe({
-      next: (session) => {
-        // Update session ID and reload the session in-place
-        this.sessionId = session.sessionId;
-        this.session = session;
-        this.aiSessionWorkflowService.saveLastSessionForIssue(issueKey, session.sessionId);
-        this.hydrateAnalysisFromSession(session);
-        this.hydratePreviewFromSession(session);
-        this.loadIssueDetails(issueKey);
-        this.isSessionLoading = false;
-        this.sessionError = '';
-        
-        // Automatically run analysis for new session
-        if (this.sessionStatus === 'CREATED' || this.sessionStatus === 'FAILED') {
-          this.runAnalysis();
-        }
-      },
-      error: (error) => {
-        this.isSessionLoading = false;
-        this.sessionError = this.buildErrorMessage(error, 'The existing session was not found, and a new session could not be created.');
-      }
-    });
+    // Important: do NOT create a new session/branch when opening workspace.
+    // Session/branch creation is deferred until Apply Fix.
+    this.session = null;
+    this.analysis = null;
+    this.preview = null;
+    this.applyResult = null;
+    this.isSessionLoading = false;
+    this.sessionError = '';
+
+    if (issueKey) {
+      this.loadIssueDetails(issueKey);
+    }
   }
 
   loadIssueDetails(issueKey: string): void {
@@ -266,30 +298,71 @@ export class AiSessionWorkspaceComponent implements OnInit {
   }
 
   applyFix(): void {
-    if (!this.preview || !this.issueKey || !this.selectedFilePath || this.isApplying) {
+    if (!this.issueKey || !this.selectedFilePath || this.isApplying) {
       return;
     }
 
     this.isApplying = true;
     this.applyError = '';
 
-    this.aiSessionWorkflowService.applyApprovedFix({
-      sessionId: this.sessionId,
-      issueKey: this.issueKey,
-      filePath: this.selectedFilePath,
-      updatedContent: this.preview.updatedContent,
-      commitMessage: String(this.commitMessage || '').trim() || `AI fix for ${this.issueKey}`
-    }).subscribe({
-      next: (result) => {
-        this.applyResult = result;
-        this.isApplying = false;
-        this.refreshSession();
+    this.ensureSessionForApply(
+      () => {
+        const applyWithPreview = () => {
+          if (!this.preview?.updatedContent) {
+            this.isApplying = false;
+            this.applyError = 'Unable to apply fix because preview content is missing.';
+            return;
+          }
+
+          this.aiSessionWorkflowService.applyApprovedFix({
+            sessionId: this.sessionId,
+            issueKey: this.issueKey,
+            filePath: this.selectedFilePath,
+            updatedContent: this.preview.updatedContent,
+            commitMessage: String(this.commitMessage || '').trim() || `AI fix for ${this.issueKey}`
+          }).subscribe({
+            next: (result) => {
+              this.applyResult = result;
+              this.isApplying = false;
+              this.refreshSession();
+            },
+            error: (error) => {
+              this.isApplying = false;
+              this.applyError = this.buildErrorMessage(error, 'Failed to apply approved fix.');
+            }
+          });
+        };
+
+        // If preview doesn't exist yet, generate it now in the newly created session,
+        // then apply fix in the same action.
+        if (!this.preview?.updatedContent) {
+          const userPrompt = String(this.prompt || '').trim() || 'Keep the change minimal and avoid unrelated edits.';
+
+          this.aiSessionWorkflowService.previewFix({
+            sessionId: this.sessionId,
+            issueKey: this.issueKey,
+            filePath: this.selectedFilePath,
+            userPrompt
+          }).subscribe({
+            next: (preview) => {
+              this.preview = preview;
+              applyWithPreview();
+            },
+            error: (error) => {
+              this.isApplying = false;
+              this.applyError = this.buildErrorMessage(error, 'Failed to generate preview before applying fix.');
+            }
+          });
+          return;
+        }
+
+        applyWithPreview();
       },
-      error: (error) => {
+      (errorMessage) => {
         this.isApplying = false;
-        this.applyError = this.buildErrorMessage(error, 'Failed to apply approved fix.');
+        this.applyError = errorMessage;
       }
-    });
+    );
   }
 
   sendForReview(): void {
@@ -336,6 +409,10 @@ export class AiSessionWorkspaceComponent implements OnInit {
   }
 
   private refreshSession(): void {
+    if (!this.sessionId || !this.hasActiveSession) {
+      return;
+    }
+
     this.aiSessionWorkflowService.getSession(this.sessionId).subscribe({
       next: (session) => {
         this.session = session;
@@ -421,6 +498,37 @@ export class AiSessionWorkspaceComponent implements OnInit {
     return String(session.projectKey || '').trim().toUpperCase();
   }
 
+  private ensureSessionForApply(onReady: () => void, onFailure: (message: string) => void): void {
+    if (this.hasActiveSession) {
+      onReady();
+      return;
+    }
+
+    if (!this.issueKey || !this.projectKey) {
+      onFailure('Cannot create branch session because project key or issue key is missing.');
+      return;
+    }
+
+    this.aiSessionWorkflowService.startSession({
+      projectKey: this.projectKey,
+      baseBranch: String(this.session?.baseBranch || this.defaultBaseBranch || 'main').trim() || 'main',
+      bugs: [this.issueKey]
+    }).subscribe({
+      next: (session) => {
+        this.sessionId = session.sessionId;
+        this.session = session;
+        this.sessionError = '';
+        this.aiSessionWorkflowService.saveLastSessionForIssue(this.issueKey, session.sessionId);
+        this.hydrateAnalysisFromSession(session);
+        this.hydratePreviewFromSession(session);
+        onReady();
+      },
+      error: (error) => {
+        onFailure(this.buildErrorMessage(error, 'Failed to create a branch session for applying fix.'));
+      }
+    });
+  }
+
   private buildErrorMessage(error: any, fallback: string): string {
     const code = Number(error?.status || 0);
     const backendMessage = String(error?.error?.message || error?.message || '').trim();
@@ -446,5 +554,42 @@ export class AiSessionWorkspaceComponent implements OnInit {
     }
 
     return backendMessage || fallback;
+  }
+
+  private loadDefaultRepositoryMapping(projectKey: string): void {
+    const normalizedProjectKey = String(projectKey || '').trim().toUpperCase();
+    if (!normalizedProjectKey) {
+      return;
+    }
+
+    this.adminConfigService.getDefaultProjectRepository(normalizedProjectKey).subscribe({
+      next: (mapping) => {
+        this.defaultRepoName = this.getNormalizedRepoNameFromMapping(mapping);
+        this.defaultBaseBranch = String(mapping?.defaultBranch || '').trim();
+      },
+      error: () => {
+        // Keep fallback values empty when no default repository mapping exists.
+      }
+    });
+  }
+
+  private getNormalizedRepoNameFromMapping(mapping: ProjectRepositoryConfig | null | undefined): string {
+    if (!mapping) {
+      return '';
+    }
+
+    const repoName = String(mapping.repoName || mapping.repositoryName || '').trim();
+    if (repoName) {
+      return repoName;
+    }
+
+    const rawUrl = String(mapping.repoUrl || mapping.repositoryUrl || '').trim();
+    if (!rawUrl) {
+      return '';
+    }
+
+    const cleanedUrl = rawUrl.replace(/\.git$/i, '').replace(/\/$/, '');
+    const match = cleanedUrl.match(/github\.com[:/]([^/]+\/[^/]+)$/i);
+    return match?.[1] || '';
   }
 }

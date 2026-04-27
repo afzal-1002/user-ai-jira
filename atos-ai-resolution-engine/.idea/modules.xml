@@ -2,7 +2,6 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/AI-INTEGRATION.iml" filepath="$PROJECT_DIR$/.idea/AI-INTEGRATION.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/bug-resolution-ai-system.iml" filepath="$PROJECT_DIR$/.idea/bug-resolution-ai-system.iml" />
     </modules>
   </component>

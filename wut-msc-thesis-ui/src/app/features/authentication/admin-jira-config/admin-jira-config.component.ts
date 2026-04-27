@@ -80,6 +80,32 @@ export class AdminJiraConfigComponent implements OnInit {
     this.loadSites();
   }
 
+  onSiteActionChange(site: SiteResponse, action: string): void {
+    const nextAction = String(action || '').trim().toLowerCase();
+    if (!nextAction) {
+      return;
+    }
+
+    if (nextAction === 'edit') {
+      this.startEditSite(site);
+      return;
+    }
+
+    if (nextAction === 'delete') {
+      this.deleteSite(site);
+      return;
+    }
+
+    if (nextAction === 'save') {
+      this.saveSiteEdit(site);
+      return;
+    }
+
+    if (nextAction === 'cancel') {
+      this.cancelEditSite();
+    }
+  }
+
   getDisplayBaseUrl(site: SiteResponse): string {
     const direct = (site.baseURL || site.baseUrl || '').trim();
     if (direct) {

@@ -3,14 +3,13 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { McpFrontendService, McpProjectSource } from '../../../services/mcp/mcp-frontend.service';
 import { McpFrontendStateService } from '../../../services/mcp/mcp-frontend-state.service';
-import { IssueResponseComponent } from './issue-response/issue-response.component';
 import { BugDetailsComponent } from './bug-details/bug-details.component';
 import { JiraIssueResponse } from '../../../models/interface/jira-issue.interface';
 
 @Component({
   selector: 'app-issue-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule, IssueResponseComponent, BugDetailsComponent],
+  imports: [CommonModule, RouterModule, BugDetailsComponent],
   templateUrl: './issue-detail.component.html',
   styleUrls: ['./issue-detail.component.css']
 })

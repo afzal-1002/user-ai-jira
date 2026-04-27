@@ -2,174 +2,84 @@
   <!-- Header Section -->
   <div class="bug-header">
     <div class="header-top">
-      <div class="issue-key-badge">{{ bug.key }}</div>
-      <h1 class="bug-summary">{{ bug.fields.summary }}</h1>
-    </div>
-    
-    <div class="status-priority-row">
-      <span class="badge" [ngClass]="'bg-' + getStatusColor(bug.fields.status?.name)">
-        {{ bug.fields.status?.name }}
-      </span>
-      <span class="badge" [ngClass]="'bg-' + getPriorityColor(bug.fields.priority?.name)">
-        {{ bug.fields.priority?.name }} Priority
-      </span>
+      <h1 class="bug-summary">
+        <span class="bug-key-inline">{{ bug.key }}</span>
+        <span class="bug-title-inline">{{ bug.fields.summary }}</span>
+      </h1>
+      <div class="status-priority-row">
+        <span class="badge" [ngClass]="'bg-' + getStatusColor(bug.fields.status?.name)">
+          {{ bug.fields.status?.name }}
+        </span>
+        <span class="badge" [ngClass]="'bg-' + getPriorityColor(bug.fields.priority?.name)">
+          {{ bug.fields.priority?.name }}
+        </span>
+      </div>
     </div>
   </div>
 
-  <!-- Main Content Grid -->
   <div class="bug-content">
-    <!-- Left Column: Metadata -->
-    <div class="metadata-column">
+    <!-- Summary/metadata row -->
+    <div class="metadata-row">
       <div class="metadata-card">
-        <h3 class="metadata-title">Issue Details</h3>
-        
-        <!-- Project -->
-        <div class="metadata-item">
-          <label>Project</label>
-          <div class="metadata-value">
-            <span class="project-badge">{{ bug.fields.project?.name }}</span>
-          </div>
-        </div>
-
-        <!-- Type -->
-        <div class="metadata-item">
-          <label>Type</label>
-          <div class="metadata-value">{{ bug.fields.issuetype?.name }}</div>
-        </div>
-
-        <!-- Assignee -->
-        <div class="metadata-item">
-          <label>Assignee</label>
-          <div class="metadata-value" *ngIf="bug.fields.assignee">
-            <div class="user-info">
-              <img *ngIf="bug.fields.assignee.avatarUrls" [src]="bug.fields.assignee.avatarUrls['32x32']" [alt]="bug.fields.assignee.displayName" class="avatar">
-              <span>{{ bug.fields.assignee.displayName }}</span>
-            </div>
-          </div>
-          <div class="metadata-value" *ngIf="!bug.fields.assignee">Unassigned</div>
-        </div>
-
-        <!-- Reporter -->
-        <div class="metadata-item">
-          <label>Reporter</label>
-          <div class="metadata-value" *ngIf="bug.fields.reporter">
-            <div class="user-info">
-              <img *ngIf="bug.fields.reporter.avatarUrls" [src]="bug.fields.reporter.avatarUrls['32x32']" [alt]="bug.fields.reporter.displayName" class="avatar">
-              <span>{{ bug.fields.reporter.displayName }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Creator -->
-        <div class="metadata-item">
-          <label>Creator</label>
-          <div class="metadata-value" *ngIf="bug.fields.creator">
-            <div class="user-info">
-              <img *ngIf="bug.fields.creator.avatarUrls" [src]="bug.fields.creator.avatarUrls['32x32']" [alt]="bug.fields.creator.displayName" class="avatar">
-              <span>{{ bug.fields.creator.displayName }}</span>
-            </div>
-          </div>
+        <div class="meta-inline">
+          <span class="meta-label">Priority:</span>
+          <span class="meta-value">{{ bug.fields.priority?.name || 'N/A' }}</span>
         </div>
       </div>
 
-      <!-- Dates Card -->
       <div class="metadata-card">
-        <h3 class="metadata-title">Dates</h3>
-        
-        <div class="metadata-item">
-          <label>Created</label>
-          <div class="metadata-value">{{ formatDate(bug.fields.created) }}</div>
-        </div>
-
-        <div class="metadata-item">
-          <label>Updated</label>
-          <div class="metadata-value">{{ formatDate(bug.fields.updated) }}</div>
-        </div>
-
-        <div class="metadata-item">
-          <label>Due Date</label>
-          <div class="metadata-value" *ngIf="bug.fields.duedate">
-            {{ bug.fields.duedate | date: 'MMM d, y' }}
-          </div>
-          <div class="metadata-value" *ngIf="!bug.fields.duedate">None</div>
-        </div>
-
-        <div class="metadata-item">
-          <label>Last Viewed</label>
-          <div class="metadata-value">{{ formatDate(bug.fields.lastViewed) }}</div>
+        <div class="meta-inline">
+          <span class="meta-label">Status:</span>
+          <span class="meta-value">{{ bug.fields.status?.name || 'N/A' }}</span>
         </div>
       </div>
 
-      <!-- Labels & Components -->
-      <div class="metadata-card" *ngIf="getLabels().length > 0 || getComponentNames().length > 0">
-        <h3 class="metadata-title">Categories</h3>
-        
-        <div class="metadata-item" *ngIf="getLabels().length > 0">
-          <label>Labels</label>
-          <div class="metadata-value">
-            <span class="label-badge" *ngFor="let label of getLabels()">{{ label }}</span>
-          </div>
-        </div>
-
-        <div class="metadata-item" *ngIf="getComponentNames().length > 0">
-          <label>Components</label>
-          <div class="metadata-value">
-            <span class="label-badge" *ngFor="let component of getComponentNames()">{{ component }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Time Tracking Card -->
-      <div class="metadata-card" *ngIf="bug.fields.timetracking">
-        <h3 class="metadata-title">Time Tracking</h3>
-        
-        <div class="metadata-item">
-          <label>Original Estimate</label>
-          <div class="metadata-value">{{ formatTimeEstimate(bug.fields.timetracking?.originalEstimateSeconds) }}</div>
-        </div>
-
-        <div class="metadata-item">
-          <label>Remaining Estimate</label>
-          <div class="metadata-value">{{ formatTimeEstimate(bug.fields.timetracking?.remainingEstimateSeconds) }}</div>
-        </div>
-
-        <div class="metadata-item" *ngIf="bug.fields.timetracking.originalEstimateSeconds !== undefined && bug.fields.timetracking.remainingEstimateSeconds !== undefined">
-          <label>Time Spent</label>
-          <div class="metadata-value">
-            {{ formatTimeEstimate(bug.fields.timetracking.originalEstimateSeconds - bug.fields.timetracking.remainingEstimateSeconds) }}
-          </div>
-        </div>
-
-        <!-- Progress Bar -->
-        <div class="progress-item" *ngIf="bug.fields.timetracking.originalEstimateSeconds">
-          <div class="progress-label">Time Progress</div>
-          <div class="progress-bar">
-            <div class="progress-fill" [style.width]="getTimeSpentPercent() + '%'"></div>
-          </div>
-          <div class="progress-text">{{ getTimeSpentPercent() }}% Complete</div>
-        </div>
-      </div>
-
-      <!-- Watchers & Votes -->
       <div class="metadata-card">
-        <h3 class="metadata-title">Engagement</h3>
-        
-        <div class="metadata-item">
-          <label>Watchers</label>
-          <div class="metadata-value">{{ getWatchersCount() }} {{ getWatchersCount() === 1 ? 'person' : 'people' }}</div>
+        <div class="meta-inline">
+          <span class="meta-label">Assignee:</span>
+          <span class="meta-value">{{ bug.fields.assignee?.displayName || 'Unassigned' }}</span>
         </div>
+      </div>
 
-        <div class="metadata-item">
-          <label>Votes</label>
-          <div class="metadata-value">{{ getVotesCount() }} {{ getVotesCount() === 1 ? 'vote' : 'votes' }}</div>
+      <div class="metadata-card">
+        <div class="meta-inline">
+          <span class="meta-label">Reporter:</span>
+          <span class="meta-value">{{ bug.fields.reporter?.displayName || 'Unknown' }}</span>
+        </div>
+      </div>
+
+      <div class="metadata-card">
+        <div class="meta-inline">
+          <span class="meta-label">Created:</span>
+          <span class="meta-value">{{ bug.fields.created | date: 'MMM d, y' }}</span>
+        </div>
+      </div>
+
+      <div class="metadata-card">
+        <div class="meta-inline">
+          <span class="meta-label">Updated:</span>
+          <span class="meta-value">{{ bug.fields.updated | date: 'MMM d, y' }}</span>
+        </div>
+      </div>
+
+      <div class="metadata-card">
+        <div class="meta-inline">
+          <span class="meta-label">Due Date:</span>
+          <span class="meta-value">{{ bug.fields.duedate ? (bug.fields.duedate | date: 'MMM d, y') : 'None' }}</span>
+        </div>
+      </div>
+
+      <div class="metadata-card">
+        <div class="meta-inline">
+          <span class="meta-label">Project:</span>
+          <span class="meta-value">{{ bug.fields.project?.name || 'N/A' }}</span>
         </div>
       </div>
     </div>
 
-    <!-- Right Column: Details & Comments -->
+    <!-- Full width sections -->
     <div class="details-column">
-      <!-- Description -->
-      <div class="details-card">
+      <div class="details-card full-width-card">
         <h3 class="card-title">Description</h3>
         <div class="description-content">
           <app-comment-renderer 
@@ -180,8 +90,7 @@
         </div>
       </div>
 
-      <!-- Attachments -->
-      <div class="details-card" *ngIf="hasAttachments()">
+      <div class="details-card full-width-card" *ngIf="hasAttachments()">
         <h3 class="card-title">Attachments ({{ bug.fields.attachment?.length || 0 }})</h3>
         <div class="attachments-list">
           <div class="attachment-item" *ngFor="let attachment of bug.fields.attachment">
@@ -202,14 +111,13 @@
         </div>
       </div>
 
-      <!-- Comments Section -->
-      <div class="details-card">
+      <div class="details-card full-width-card">
         <h3 class="card-title">Comments ({{ totalComments }})</h3>
         <div *ngIf="deleteErrorMessage" class="alert alert-danger alert-dismissible fade show" role="alert">
           {{ deleteErrorMessage }}
           <button type="button" class="btn-close" (click)="deleteErrorMessage = ''"></button>
         </div>
-        
+
         <div class="comments-list">
           <div class="comment-item" *ngFor="let comment of displayedComments">
             <div class="comment-header">
@@ -244,7 +152,7 @@
                 </button>
               </div>
             </div>
-            
+
             <div class="comment-content" *ngIf="editingCommentId !== comment.id" (click)="startEditComment(comment)">
               <app-comment-renderer 
                 *ngIf="comment.body?.content"

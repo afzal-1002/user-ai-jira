@@ -1,57 +1,96 @@
 .bug-details-container {
-  padding: 2rem;
-  background-color: #f5f5f5;
-  border-radius: 8px;
+  padding: 24px 28px 32px;
+  background-color: transparent;
+  border-radius: 0;
   max-width: 100%;
+  width: 100%;
 }
 
 /* Header Section */
 .bug-header {
-  margin-bottom: 2rem;
+  margin-bottom: 24px;
   background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 28px 32px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 0;
 }
 
 .header-top {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 0;
+  flex-wrap: nowrap;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-left: auto;
 }
 
 .issue-key-badge {
   display: inline-block;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  font-weight: 600;
-  font-size: 0.85rem;
-  min-width: 60px;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 1rem;
+  min-width: 80px;
   text-align: center;
+  flex: 0 0 auto;
 }
 
 .bug-summary {
   margin: 0;
-  font-size: 1.75rem;
-  font-weight: 700;
   color: #333;
-  flex: 1;
+  flex: 1 1 auto;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+}
+
+.bug-key-inline {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #1d2e45;
+  flex: 0 0 auto;
+}
+
+.bug-title-inline {
+  font-size: 1.6rem;
+  font-weight: 500;
+  color: #2a3f5e;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .status-priority-row {
   display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
+  gap: 12px;
+  flex-wrap: nowrap;
+  margin-left: auto;
+  flex: 0 0 auto;
 }
 
 .badge {
   display: inline-block;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.85rem;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.9rem;
   font-weight: 600;
   color: white;
 }
@@ -79,64 +118,92 @@
 
 /* Main Content Grid */
 .bug-content {
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
 /* Metadata Column */
-.metadata-column {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+.metadata-row {
+  display: grid !important;
+  grid-template-columns: repeat(8, minmax(130px, 1fr));
+  gap: 12px;
 }
 
 .metadata-card {
   background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 14px 16px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  min-height: 64px;
+  min-width: 0;
+  display: flex !important;
+  align-items: center;
 }
 
+.meta-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Compatibility with older stacked template: keep label/value on one line */
 .metadata-title {
-  margin: 0 0 1rem 0;
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #333;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 2px solid #667eea;
-  padding-bottom: 0.75rem;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  font-size: 0.95rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: #394b63 !important;
+  white-space: nowrap !important;
+  flex: 0 0 auto;
 }
 
-.metadata-item {
-  margin-bottom: 1rem;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-}
-
-.metadata-item label {
-  display: block;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #666;
-  text-transform: uppercase;
-  letter-spacing: 0.3px;
-  margin-bottom: 0.5rem;
+.metadata-title::after {
+  content: ':';
+  margin-left: 2px;
 }
 
 .metadata-value {
-  font-size: 0.95rem;
+  margin-left: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.metadata-card .meta-inline,
+.metadata-card .metadata-title,
+.metadata-card .metadata-value {
+  align-self: center;
+}
+
+.meta-label {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #394b63;
+  flex: 0 0 auto;
+}
+
+.meta-value {
+  font-size: 0.96rem;
   color: #333;
-  font-weight: 500;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 10px;
 }
 
 .avatar {
@@ -157,7 +224,7 @@
   display: inline-block;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 0.4rem 0.8rem;
+  padding: 6px 12px;
   border-radius: 4px;
   font-size: 0.85rem;
   font-weight: 600;
@@ -167,17 +234,17 @@
   display: inline-block;
   background-color: #e9ecef;
   color: #333;
-  padding: 0.4rem 0.8rem;
+  padding: 6px 12px;
   border-radius: 4px;
   font-size: 0.85rem;
-  margin-right: 0.5rem;
-  margin-bottom: 0.5rem;
+  margin-right: 6px;
+  margin-bottom: 6px;
 }
 
 /* Progress Bar */
 .progress-item {
-  margin-top: 1rem;
-  padding-top: 1rem;
+  margin-top: 15px;
+  padding-top: 15px;
   border-top: 1px solid #eee;
 }
 
@@ -187,7 +254,7 @@
   color: #666;
   text-transform: uppercase;
   letter-spacing: 0.3px;
-  margin-bottom: 0.5rem;
+  margin-bottom: 8px;
 }
 
 .progress-bar {
@@ -196,7 +263,7 @@
   background-color: #e9ecef;
   border-radius: 4px;
   overflow: hidden;
-  margin-bottom: 0.5rem;
+  margin-bottom: 6px;
 }
 
 .progress-fill {
@@ -215,23 +282,29 @@
 .details-column {
   display: flex;
   flex-direction: column;
-  gap: 1.5rem;
+  gap: 20px;
+  width: 100%;
 }
 
 .details-card {
   background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 24px 26px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+}
+
+.full-width-card {
+  width: 100%;
 }
 
 .card-title {
-  margin: 0 0 1rem 0;
+  margin: 0 0 15px 0;
   font-size: 1.1rem;
   font-weight: 700;
   color: #333;
   border-bottom: 2px solid #667eea;
-  padding-bottom: 0.75rem;
+  padding-bottom: 10px;
 }
 
 /* Description */
@@ -239,6 +312,7 @@
   font-size: 0.95rem;
   line-height: 1.6;
   color: #555;
+  width: 100%;
 }
 
 .no-content {
@@ -251,21 +325,23 @@
 .attachments-list {
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 15px;
+  width: 100%;
 }
 
 .attachment-item {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 1rem;
+  padding: 15px;
   background-color: #f8f9fa;
   border-radius: 6px;
   border-left: 3px solid #667eea;
+  transition: background-color 0.2s;
+}
 
-  &:hover {
-    background-color: #f0f1ff;
-  }
+.attachment-item:hover {
+  background-color: #f0f1ff;
 }
 
 .attachment-info {
@@ -277,17 +353,17 @@
   font-weight: 600;
   color: #667eea;
   text-decoration: none;
-  margin-bottom: 0.5rem;
+  margin-bottom: 8px;
   word-break: break-word;
+}
 
-  &:hover {
-    text-decoration: underline;
-  }
+.attachment-link:hover {
+  text-decoration: underline;
 }
 
 .attachment-meta {
   display: flex;
-  gap: 1rem;
+  gap: 15px;
   flex-wrap: wrap;
   font-size: 0.8rem;
   color: #999;
@@ -297,6 +373,70 @@
 .attachment-date,
 .attachment-author {
   display: inline-block;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .bug-key-inline {
+    font-size: 1.6rem;
+  }
+
+  .bug-title-inline {
+    font-size: 1.3rem;
+  }
+
+  .metadata-row {
+    grid-template-columns: repeat(4, minmax(170px, 1fr));
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .bug-details-container {
+    padding: 16px;
+  }
+  
+  .bug-header {
+    padding: 18px 16px;
+  }
+  
+  .header-top {
+    flex-wrap: wrap;
+  }
+  
+  .bug-summary {
+    gap: 10px;
+    white-space: normal;
+  }
+  
+  .bug-key-inline {
+    font-size: 1.2rem;
+  }
+
+  .bug-title-inline {
+    font-size: 1.05rem;
+  }
+
+  .metadata-row {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .metadata-card {
+    min-width: 220px;
+  }
+  
+  .detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 15px 20px;
+  }
+
+  .details-card {
+    padding: 18px 16px;
+  }
 }
 
 .attachment-thumbnail {
@@ -322,6 +462,7 @@
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  width: 100%;
 }
 
 .comment-item {

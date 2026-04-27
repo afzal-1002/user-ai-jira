@@ -1,4 +1,4 @@
-<div class="container py-4 admin-jira-wrap">
+<div class="container-fluid py-4 admin-jira-wrap">
   <div class="d-flex justify-content-between align-items-center mb-3">
     <h3 class="mb-0">Jira Platform Registration</h3>
     <a routerLink="/home" class="btn btn-outline-secondary">Back</a>
@@ -6,7 +6,7 @@
 
   <div class="row g-4">
     <!-- Left: Create/Update Form -->
-    <div class="col-lg-5">
+    <div class="col-12">
       <div class="card shadow-sm p-4">
         <h5>Create Jira Site Connection</h5>
         <p class="text-muted small">Admin-only setup. hostPart is saved using the same value as siteName and Jira token is encrypted in backend storage.</p>
@@ -56,7 +56,7 @@
     </div>
 
     <!-- Right: Configured Sites Table -->
-    <div class="col-lg-7">
+    <div class="col-12">
       <div class="card shadow-sm p-4">
         <div class="d-flex justify-content-between align-items-center mb-2">
           <h5 class="mb-0">Configured Sites</h5>
@@ -113,32 +113,21 @@
                   </ng-template>
                 </td>
                 <td class="text-end">
-                  <ng-container *ngIf="editingSiteId !== site.id; else editActionsTpl">
-                    <button class="btn btn-sm btn-outline-primary me-2" type="button" (click)="startEditSite(site)">
-                      Edit
-                    </button>
-                    <button
-                      class="btn btn-sm btn-outline-danger"
-                      type="button"
-                      (click)="deleteSite(site)"
-                      [disabled]="deletingSiteId === site.id"
-                    >
-                      {{ deletingSiteId === site.id ? 'Deleting...' : 'Delete' }}
-                    </button>
-                  </ng-container>
-                  <ng-template #editActionsTpl>
-                    <button
-                      class="btn btn-sm btn-primary me-2"
-                      type="button"
-                      (click)="saveSiteEdit(site)"
-                      [disabled]="isUpdatingSite"
-                    >
-                      {{ isUpdatingSite ? 'Saving...' : 'Save' }}
-                    </button>
-                    <button class="btn btn-sm btn-outline-secondary" type="button" (click)="cancelEditSite()">
-                      Cancel
-                    </button>
-                  </ng-template>
+                  <select
+                    class="form-select form-select-sm action-select"
+                    [disabled]="deletingSiteId === site.id || isUpdatingSite"
+                    (change)="onSiteActionChange(site, $any($event.target).value); $any($event.target).value = ''"
+                  >
+                    <option value="" selected>Actions</option>
+                    <ng-container *ngIf="editingSiteId !== site.id; else editActionOptionsTpl">
+                      <option value="edit">Edit</option>
+                      <option value="delete">{{ deletingSiteId === site.id ? 'Deleting...' : 'Delete' }}</option>
+                    </ng-container>
+                    <ng-template #editActionOptionsTpl>
+                      <option value="save">{{ isUpdatingSite ? 'Saving...' : 'Save' }}</option>
+                      <option value="cancel">Cancel</option>
+                    </ng-template>
+                  </select>
                 </td>
               </tr>
             </tbody>

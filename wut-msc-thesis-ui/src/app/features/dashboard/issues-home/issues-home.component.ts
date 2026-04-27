@@ -214,6 +214,20 @@ export class IssuesHomeComponent implements OnInit {
     return 'No description provided';
   }
 
+  getTruncatedDescription(description: any, wordLimit: number = 6): string {
+    const fullDescription = this.getDescription(description);
+    if (fullDescription === 'No description provided') {
+      return fullDescription;
+    }
+    
+    const words = fullDescription.split(/\s+/);
+    if (words.length <= wordLimit) {
+      return fullDescription;
+    }
+    
+    return words.slice(0, wordLimit).join(' ') + '...';
+  }
+
   viewDetails(issue: IssueResponse): void {
     const issueKey = issue.key;
     const selectedSite = this.mcpFrontendStateService.selectedSite;

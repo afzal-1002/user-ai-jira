@@ -1,24 +1,32 @@
 <div class="issue-detail-container">
-  <div class="detail-header d-flex align-items-center gap-3">
-    <button class="btn btn-secondary" (click)="goBack()">← Back to Issues</button>
-    <h1 class="mb-0 flex-grow-1">Issue Details - {{ issueKey }}</h1>
-    <a
-      class="btn btn-primary"
-      [routerLink]="['/mcp/issues', issueKey, 'analysis']"
-      [queryParams]="{ siteId: siteId, source: source, projectKey: projectKey }"
-      *ngIf="issue"
-    >
-      🧠 Get AI Analysis
-    </a>
-    <button
-      class="btn btn-success"
-      (click)="openCopilotWorkspace()"
-      [disabled]="!issueKey"
-      *ngIf="issue"
-      title="Open GitHub Copilot Workspace for AI-powered analysis and fixes"
-    >
-      🚀 GitHub Copilot Workspace
-    </button>
+  <div class="detail-header d-flex align-items-center justify-content-between gap-3">
+    <!-- Left: Bug ID and Title -->
+    <div class="header-left">
+      <h1 class="header-title mb-0">Issue Overview</h1>
+      <p class="header-subtitle mb-0">{{ issue?.fields?.summary || issueKey }}</p>
+    </div>
+    
+    <!-- Right: Action Buttons + Back -->
+    <div class="header-right d-flex gap-2 align-items-center">
+      <a
+        class="btn btn-primary"
+        [routerLink]="['/mcp/issues', issueKey, 'analysis']"
+        [queryParams]="{ siteId: siteId, source: source, projectKey: projectKey }"
+        *ngIf="issue"
+      >
+        🧠 Get AI Analysis
+      </a>
+      <button
+        class="btn btn-success"
+        (click)="openCopilotWorkspace()"
+        [disabled]="!issueKey"
+        *ngIf="issue"
+        title="Open GitHub Copilot Workspace for AI-powered analysis and fixes"
+      >
+        🚀 GitHub Copilot Workspace
+      </button>
+      <button class="btn btn-secondary" (click)="goBack()">Back to Issues</button>
+    </div>
   </div>
 
   <!-- Loading State -->
@@ -39,11 +47,11 @@
     *ngIf="!isLoading && issue && !errorMessage"
   ></ng-container>
 
-  <!-- Bug Details Component - Show for Bug type issues -->
-  <app-bug-details *ngIf="!isLoading && issue && !errorMessage && (issue.fields.issuetype?.name === 'Bug' || issue.fields.issuetype?.name === 'bug')" [bug]="issue"></app-bug-details>
-
-  <!-- Fallback to Issue Response Component for non-bug issues -->
-  <app-issue-response *ngIf="!isLoading && issue && !errorMessage && issue.fields.issuetype?.name !== 'Bug' && issue.fields.issuetype?.name !== 'bug'" [issue]="issue"></app-issue-response>
+  <!-- Use unified details layout for all issue types -->
+  <app-bug-details
+    *ngIf="!isLoading && issue && !errorMessage"
+    [bug]="issue"
+  ></app-bug-details>
 
   <!-- Debug info if nothing shows -->
   <div *ngIf="!isLoading && issue && !errorMessage" class="alert alert-info">
@@ -54,6 +62,7 @@
 
   <!-- Back Button -->
   <div class="action-footer" *ngIf="!isLoading">
-    <button class="btn btn-secondary" (click)="goBack()">← Back to Issues</button>
+    <!-- Footer content can be added here if needed -->
   </div>
+
 </div>

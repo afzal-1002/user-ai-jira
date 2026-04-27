@@ -48,108 +48,133 @@
     <p>Choose one assigned site from the dropdown to view its {{ isBugsFlow ? 'bugs' : 'projects' }}.</p>
   </div>
 
-  <!-- Projects Grid (Hidden in Bugs Flow) -->
+  <!-- Projects List (Hidden in Bugs Flow) -->
   <div *ngIf="!isLoading && !isBugsFlow && hasSelectedSite && projects.length === 0 && !errorMessage" class="empty-state">
     <div class="empty-state-icon">📁</div>
     <h4>No Projects Found</h4>
     <p>Select a site to load projects for that site.</p>
   </div>
 
-  <!-- Projects Grid -->
-  <div *ngIf="!isLoading && !isBugsFlow && projects.length > 0" class="projects-grid">
-    <div *ngFor="let project of projects" class="project-card">
-      <!-- Project Card Header -->
-      <div class="project-card-header">
-        <div class="project-info">
-          <h5 class="project-key">{{ project.key }}</h5>
-          <h4 class="project-name">{{ project.name }}</h4>
-        </div>
-        <div class="project-type-badge">
-          <span class="badge" [ngClass]="project.projectTypeKey === 'software' ? 'bg-light' : 'bg-info'">
-            {{ project.projectTypeKey }}
-          </span>
-        </div>
-      </div>
+  <!-- Projects Table -->
+  <div *ngIf="!isLoading && !isBugsFlow && projects.length > 0" class="table-responsive">
+    <table class="table table-hover table-striped align-middle">
+      <thead class="table-light">
+        <tr>
+          <th>Key</th>
+          <th>Name</th>
+          <th>Project Lead</th>
+          <th>Description</th>
+          <th>Project ID</th>
+          <th>Type</th>
+          <th>Issue Types</th>
+          <th>Supported Types</th>
+          <th>Bugs</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let project of projects">
+          <!-- Key -->
+          <td>
+            <span class="badge bg-info">{{ project.key }}</span>
+          </td>
 
-      <!-- Project Card Body -->
-      <div class="project-card-body">
-        <!-- Description -->
-        <p class="project-description" *ngIf="project.description">
-          {{ project.description }}
-        </p>
-        <p class="project-description text-muted" *ngIf="!project.description">
-          No description provided
-        </p>
+          <!-- Name -->
+          <td>
+            <strong>{{ project.name }}</strong>
+          </td>
 
-        <!-- Lead Information -->
-        <div class="project-lead-section" *ngIf="project.lead">
-          <div class="lead-info">
-            <small class="detail-label">Project Lead:</small>
-            <div class="lead-details">
+          <!-- Project Lead -->
+          <td>
+            <div class="d-flex align-items-center gap-2" *ngIf="project.lead">
               <img *ngIf="project.lead.avatarUrls?.['24x24']" 
-                    [src]="project.lead.avatarUrls?.['24x24']" 
+                   [src]="project.lead.avatarUrls?.['24x24']" 
                    [alt]="project.lead.displayName" 
-                   class="lead-avatar" />
-              <span class="lead-name">{{ project.lead.displayName }}</span>
-              <span class="lead-account-id" [title]="project.lead.accountId">({{ project.lead.accountId | slice:0:15 }}...)</span>
+                   class="rounded-circle"
+                   style="width: 24px; height: 24px;" />
+              <div class="text-truncate">
+                <small>{{ project.lead.displayName }}</small><br>
+                <small class="text-muted" [title]="project.lead.accountId">({{ project.lead.accountId | slice:0:12 }}...)</small>
+              </div>
             </div>
-          </div>
-        </div>
+            <span *ngIf="!project.lead" class="text-muted">N/A</span>
+          </td>
 
-        <!-- Project Details Grid -->
-        <div class="project-details-grid">
-          <div class="detail-item">
-            <small class="detail-label">Project ID:</small>
-            <span class="detail-value" [title]="project.id">{{ project.id }}</span>
-          </div>
-          <div class="detail-item">
-            <small class="detail-label">Assignee Type:</small>
-            <span class="detail-value">{{ project.assigneeType }}</span>
-          </div>
-          <div class="detail-item">
-            <small class="detail-label">Issue Types:</small>
-            <span class="detail-value">{{ project.issueTypes?.length || 0 }} types</span>
-          </div>
-          <div class="detail-item">
-            <small class="detail-label">Style:</small>
-            <span class="detail-value">{{ project.style }}</span>
-          </div>
-          <div class="detail-item">
-            <small class="detail-label">Visibility:</small>
-            <span class="detail-value" [ngClass]="project.private ? 'text-danger' : 'text-success'">
-              {{ project.private ? 'Private' : 'Public' }}
+          <!-- Description -->
+          <td>
+            <small [title]="project.description || 'No description'">
+              {{ project.description ? (project.description | slice:0:50) + (project.description.length > 50 ? '...' : '') : 'No description' }}
+            </small>
+          </td>
+
+          <!-- Project ID -->
+          <td>
+            <small [title]="project.id + ''">{{ (project.id + '').substring(0, 12) }}...</small>
+          </td>
+
+          <!-- Type -->
+          <td>
+            <span class="badge" [ngClass]="project.projectTypeKey === 'software' ? 'bg-light text-dark' : 'bg-info'">
+              {{ project.projectTypeKey }}
             </span>
-          </div>
-        </div>
+          </td>
 
-        <!-- Issue Types -->
-        <div class="issue-types-section" *ngIf="project.issueTypes && project.issueTypes.length > 0">
-          <small class="detail-label">Supported Issue Types:</small>
-          <div class="issue-types-list">
-            <span *ngFor="let issueType of project.issueTypes" class="issue-type-badge">
-              <img *ngIf="issueType.iconUrl" 
-                   [src]="issueType.iconUrl" 
-                   [alt]="issueType.name" 
-                   class="issue-type-icon" 
-                   title="{{ issueType.description }}" />
-              {{ issueType.name }}
-            </span>
-          </div>
-        </div>
-      </div>
+          <!-- Issue Types Count -->
+          <td>
+            <span class="badge bg-secondary">{{ project.issueTypes?.length || 0 }} types</span>
+          </td>
 
-      <!-- Project Card Footer -->
-      <div class="project-card-footer">
-        <button class="btn btn-sm btn-primary" (click)="viewProjectDetails(project)">
-          View Details
-        </button>
-        <button class="btn btn-sm btn-primary" (click)="viewBugs(project.key)">
-          View Bugs
-        </button>
-        <button class="btn btn-sm btn-primary" (click)="editProject(project)">
-          Edit
-        </button>
-      </div>
-    </div>
+          <!-- Supported Types Dropdown -->
+          <td>
+            <div class="dropdown" *ngIf="project.issueTypes && project.issueTypes.length > 0">
+              <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" [id]="'supportedTypes' + project.key" data-bs-toggle="dropdown" aria-expanded="false">
+                View Types
+              </button>
+              <ul class="dropdown-menu" [attr.aria-labelledby]="'supportedTypes' + project.key">
+                <li *ngFor="let issueType of project.issueTypes">
+                  <a class="dropdown-item d-flex align-items-center gap-2" href="javascript:void(0)">
+                    <img *ngIf="issueType.iconUrl" 
+                         [src]="issueType.iconUrl" 
+                         [alt]="issueType.name" 
+                         class="rounded"
+                         style="width: 18px; height: 18px;" />
+                    <span>{{ issueType.name }}</span>
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <span *ngIf="!project.issueTypes || project.issueTypes.length === 0" class="text-muted">None</span>
+          </td>
+
+          <!-- Bugs -->
+          <td>
+            <button class="btn btn-sm btn-primary" (click)="viewBugs(project.key)" title="View Bugs">
+              View Bugs
+            </button>
+          </td>
+
+          <!-- Actions -->
+          <td>
+            <div class="dropdown">
+              <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" [id]="'actions' + project.key" data-bs-toggle="dropdown" aria-expanded="false">
+                Actions
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end" [attr.aria-labelledby]="'actions' + project.key">
+                <li>
+                  <a class="dropdown-item" href="javascript:void(0)" (click)="viewProjectDetails(project)">
+                    👁️ View Details
+                  </a>
+                </li>
+                <li>
+                  <a class="dropdown-item" href="javascript:void(0)" (click)="editProject(project)">
+                    ✏️ Edit
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>
